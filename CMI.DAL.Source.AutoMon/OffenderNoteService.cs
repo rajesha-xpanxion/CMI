@@ -44,7 +44,6 @@ namespace CMI.DAL.Source.AutoMon
                                 Value = Convert.ToString(reader[DBColumnName.VALUE]),
                                 Logon = Convert.ToString(reader[DBColumnName.LOGON]),
                                 Email = Convert.ToString(reader[DBColumnName.EMAIL])
-
                             });
                         }
                     }

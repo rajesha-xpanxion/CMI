@@ -36,7 +36,7 @@ namespace CMI.Processor
         DAL.ExecutionStatus processorExecutionStatus = new DAL.ExecutionStatus() { IsSuccessful = true };
 
         CMI.Common.Logging.ILogger logger;
-        DAL.IProcessorProvider databaseProvider;
+        DAL.IProcessorProvider processorProvider;
         Common.Notification.IEmailNotificationProvider emailNotificationProvider;
 
         DAL.ProcessorConfig processorConfig;
@@ -82,7 +82,7 @@ namespace CMI.Processor
             this.lookupService = lookupService;
 
             this.logger = logger;
-            this.databaseProvider = databaseProvider;
+            this.processorProvider = databaseProvider;
             this.emailNotificationProvider = emailNotificationProvider;
 
             this.processorConfig = processorConfig.Value;
@@ -177,7 +177,7 @@ namespace CMI.Processor
                             FirstName = offenderDetails.FirstName,
                             MiddleName = offenderDetails.MiddleName,
                             LastName = offenderDetails.LastName,
-                            ClientType = "Private", //offenderDetails.ClientType,
+                            ClientType = offenderDetails.ClientType,
                             TimeZone = offenderDetails.TimeZone,
                             Gender = offenderDetails.Gender,
                             Ethnicity = MapEthnicity(offenderDetails.Race),
@@ -577,7 +577,7 @@ namespace CMI.Processor
         {
             try
             {
-                lastExecutionDateTime = databaseProvider.GetLastExecutionDateTime();
+                lastExecutionDateTime = processorProvider.GetLastExecutionDateTime();
 
                 logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "RetrieveLastExecutionDateTime", Message = "Successfully retrieved Last Execution Date Time", CustomParams = JsonConvert.SerializeObject(lastExecutionDateTime) });
             }
@@ -591,7 +591,7 @@ namespace CMI.Processor
         {
             try
             {
-                databaseProvider.SaveExecutionStatus(executionStatus);
+                processorProvider.SaveExecutionStatus(executionStatus);
             }
             catch (Exception ex)
             {
@@ -637,31 +637,6 @@ namespace CMI.Processor
 
         private string MapAddressType(string sourceAddressType)
         {
-            /*
-             * source  *
-                Absconded
-                Additional
-                Committed
-                Homeless
-                Incarcerated
-                Mailing
-                Permanent
-                Release Address
-                Residential
-                School
-                Unknown
-                Work/Business
-             */
-            /*
-             * dest  *
-                [
-                    "Shipping Address",
-                    "Billing Address",
-                    "Home Address",
-                    "Work Address",
-                    "Other"
-                ]
-             */
             string destAddressType = string.Empty;
 
             switch(sourceAddressType)
@@ -685,29 +660,6 @@ namespace CMI.Processor
 
         private string MapContactType(string sourceContactType)
         {
-            /*
-             *  source  *
-                Fax
-                Message
-                Mobile
-                Office
-                Pager
-                Residential
-             */
-            /*
-             * dest  *
-                [
-                    "Home Phone",
-                    "Business Phone",
-                    "Cell Phone",
-                    "Other",
-                    "E-mail",
-                    "Web Address",
-                    "Fax",
-                    "Emergency Phone",
-                    "Work Phone"
-                ]
-             */
             string destContactType = string.Empty;
 
             switch (sourceContactType)
