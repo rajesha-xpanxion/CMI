@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CMI.DAL.Dest
+{
+    public interface IAddressService
+    {
+        bool AddNewAddressDetails(Address address);
+
+        Address GetAddressDetails(string clientId, string addressId);
+
+        bool UpdateAddressDetails(Address address);
+    }
+}

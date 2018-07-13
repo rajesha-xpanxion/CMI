@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CMI.Common.Logging\CMI.Common.Logging.csproj" />
+    <ProjectReference Include="..\CMI.Common.Notification\CMI.Common.Notification.csproj" />
+    <ProjectReference Include="..\CMI.DAL.Dest.Nexus\CMI.DAL.Dest.Nexus.csproj" />
+    <ProjectReference Include="..\CMI.DAL.Source.AutoMon\CMI.DAL.Source.AutoMon.csproj" />
+    <ProjectReference Include="..\CMI.Processor.DAL\CMI.Processor.DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="AppSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
