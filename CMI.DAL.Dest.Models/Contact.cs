@@ -12,5 +12,6 @@ namespace CMI.DAL.Dest
         public string ContactValue { get; set; }
         public string ContactType { get; set; }
         public bool IsPrimary { get; set; }
+        public string Status { get; set; }
     }
 }

@@ -76,16 +76,10 @@ namespace CMI.DAL.Source.AutoMon
                     MiddleName = "Brent",
                     LastName = "Aitkens",
                     DateOfBirth = new DateTime(1961, 6, 12),
-                    ClientType = "Private",//"PRCS",
+                    ClientType = "PRCS",
                     TimeZone = "Pacific Standard Time",
                     Gender = "Male",
-                    Race = "Caucasian",
-                    CaseloadName = "A-wYaTt TeStInG FuN",
-                    CaseloadType = "Adult Formal Supervision - PRCS",
-                    OfficerLogon = "jwyatt",
-                    OfficerEmail = "julie.wyatt@edcgov.us",
-                    OfficerFirstName = "Julie",
-                    OfficerLastName = "Wyatt"
+                    Race = "Caucasian"
                 },
                 new Offender()
                 {
@@ -94,16 +88,10 @@ namespace CMI.DAL.Source.AutoMon
                     MiddleName = "Charles",
                     LastName = "Morrissey",
                     DateOfBirth = new DateTime(1981,6,25),
-                    ClientType = "Private",
+                    ClientType = "PRCS",
                     TimeZone = "Pacific Standard Time",
                     Gender = "Male",
-                    Race = "Caucasian",
-                    CaseloadName = "SLT Adult Bail Rev 2",
-                    CaseloadType =  "Adult Investigation",
-                    OfficerLogon = "JDering",
-                    OfficerEmail = "jamie.dering@edcgov.us",
-                    OfficerFirstName = "Jamie",
-                    OfficerLastName = "Dering"
+                    Race = "Caucasian"
                 },
                 new Offender()
                 {
@@ -112,16 +100,10 @@ namespace CMI.DAL.Source.AutoMon
                     MiddleName = "Giana",
                     LastName = "Granger",
                     DateOfBirth = new DateTime(1980,11,03),
-                    ClientType = "Private",
+                    ClientType = "PRCS",
                     TimeZone = "Pacific Standard Time",
                     Gender ="Female",
-                    Race = "Caucasian",
-                    CaseloadName = "WS Adult Sup 3",
-                    CaseloadType = "Adult Formal Supervision",
-                    OfficerLogon = "mdragony",
-                    OfficerEmail ="mindi.dragony@edcgov.us",
-                    OfficerFirstName ="Mindi",
-                    OfficerLastName ="Dragony"
+                    Race = "Caucasian"
                 }
             };
             */

@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Common.Logging", "CMI.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Processor.DAL", "CMI.Processor.DAL\CMI.Processor.DAL.csproj", "{A4C5837D-C6D4-4A83-B793-331369E7503C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMI.Common.Notification", "CMI.Common.Notification\CMI.Common.Notification.csproj", "{2A1CEF5E-BA8D-40FF-80F4-B56DDD4D5B2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Common.Notification", "CMI.Common.Notification\CMI.Common.Notification.csproj", "{2A1CEF5E-BA8D-40FF-80F4-B56DDD4D5B2F}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "CMI.Processor.DB", "CMI.Processor.DB\CMI.Processor.DB.sqlproj", "{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,12 @@ Global
 		{2A1CEF5E-BA8D-40FF-80F4-B56DDD4D5B2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A1CEF5E-BA8D-40FF-80F4-B56DDD4D5B2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A1CEF5E-BA8D-40FF-80F4-B56DDD4D5B2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

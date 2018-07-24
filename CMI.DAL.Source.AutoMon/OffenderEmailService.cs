@@ -18,6 +18,7 @@ namespace CMI.DAL.Source.AutoMon
         public IEnumerable<OffenderEmail> GetAllOffenderEmails(DateTime lastExecutionDateTime)
         {
             
+            
             List<OffenderEmail> offenderEmails = new List<OffenderEmail>();
 
             using (SqlConnection conn = new SqlConnection(sourceConfig.AutoMonDBConnString))

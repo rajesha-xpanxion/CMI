@@ -12,5 +12,6 @@ namespace CMI.DAL.Dest
         public string FullAddress { get; set; }
         public string AddressType { get; set; }
         public bool IsPrimary { get; set; }
+        public string Status { get; set; }
     }
 }

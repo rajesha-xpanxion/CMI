@@ -252,7 +252,8 @@ namespace CMI.Processor
                             AddressType = MapAddressType(offenderAddressDetails.AddressType),
                             FullAddress = MapFullAddress(offenderAddressDetails.Line1, offenderAddressDetails.Line2, offenderAddressDetails.City, offenderAddressDetails.State, offenderAddressDetails.Zip),
                             IsPrimary = offenderAddressDetails.IsPrimary,
-                            Comment = offenderAddressDetails.Comment
+                            Comment = offenderAddressDetails.Comment,
+                            Status = "Active"
                         };
 
                         if (addressService.GetAddressDetails(address.ClientId, address.AddressId) == null)
@@ -320,7 +321,8 @@ namespace CMI.Processor
                             ContactType = MapContactType(offenderPhoneDetails.PhoneNumberType),
                             ContactValue = offenderPhoneDetails.Phone,
                             IsPrimary = offenderPhoneDetails.IsPrimary,
-                            Comment = offenderPhoneDetails.Comment
+                            Comment = offenderPhoneDetails.Comment,
+                            Status = "Active"
                         };
 
                         if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
@@ -386,7 +388,8 @@ namespace CMI.Processor
                             ContactId = string.Format("{0}-{1}", offenderEmailDetails.Pin, offenderEmailDetails.Pin),
                             ContactType = DAL.Constants.CONTACT_TYPE_EMAIL_DEST,
                             ContactValue = offenderEmailDetails.EmailAddress,
-                            IsPrimary = offenderEmailDetails.IsPrimary
+                            IsPrimary = offenderEmailDetails.IsPrimary,
+                            Status = "Active"
                         };
 
                         if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)

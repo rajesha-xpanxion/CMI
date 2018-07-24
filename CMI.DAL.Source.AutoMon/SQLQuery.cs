@@ -19,12 +19,26 @@ WHERE
 (
 	SELECT
 		L.[Id],
-		L.[Description]
+		L.[PermDesc]
 	FROM
 		[dbo].[Lookup] L JOIN [dbo].[LookupType] LT
 			ON L.[LookupTypeId] = LT.[Id]
 	WHERE
 		LT.[Description] = 'Race'
+), CaseStatusData AS
+(
+	SELECT
+		CA.[CaseId],
+		L.[PermDesc]
+	FROM
+		[dbo].[CaseAttribute] CA JOIN [dbo].[AttributeDef] AD
+			ON CA.[AttributeId] = AD.[Id]
+			JOIN [dbo].[Lookup] L
+				ON CA.[Value] = L.[Id]
+	WHERE
+		AD.[PermDesc] = 'Case_CaseStatus'
+		AND CA.[FromTime] IS NOT NULL AND CA.[ToTime] IS NULL
+		AND CA.[FromTime] > @LastExecutionDateTime
 )
 SELECT DISTINCT
 	O.[Pin],
@@ -37,7 +51,7 @@ SELECT DISTINCT
 	
 	CT.[PermDesc] AS [ClientType],
 
-	RD.[Description] AS [Race],
+	RD.[PermDesc] AS [Race],
 
 	CL.[Name] As [CaseloadName],
 
@@ -68,10 +82,16 @@ FROM
 									ON OFC.[PersonId] = OFCPER.[Id]
 									LEFT JOIN [dbo].[AnyName] OFCNAME
 										ON OFCPER.[NameId] = OFCNAME.[Id]
+
 										LEFT JOIN [dbo].[CourtCase] CC
 											ON O.[Id] = CC.[OffenderId]
 											LEFT JOIN [dbo].[CaseType] CT
 												ON CC.[CaseTypeId] = CT.[Id]
+												LEFT JOIN [dbo].[CaseCategory] CSCT
+													ON CT.[CaseCategoryId] = CSCT.[Id]
+
+													LEFT JOIN CaseStatusData CSD
+														ON CC.[Id] = CSD.[CaseId]
 WHERE
 	AN.[Firstname] IS NOT NULL
 	AND P.[DOB] IS NOT NULL
@@ -81,6 +101,9 @@ WHERE
 	AND OFCL.[FromTime] IS NOT NULL AND OFCL.[ToTime] IS NULL AND OFCL.[IsPrimary] = 1
 	AND CC.[FromTime] IS NOT NULL AND CC.[CloseDateTime] IS NULL AND CT.[IsActive] = 1
 	AND (AN.[FromTime] > @LastExecutionDateTime OR OCL.[FromTime] > @LastExecutionDateTime OR P.[LastModified] > @LastExecutionDateTime OR OFCL.[FromTime] > @LastExecutionDateTime)
+	AND CSD.[PermDesc] = 'Active'
+	AND CSCT.[PermDesc] = 'Service'
+	AND (CT.[PermDesc] = 'Formal' OR CT.[PermDesc] = 'PRCS' OR CT.[PermDesc] = 'MCS' OR CT.[PermDesc] = 'Adult.Interstate')
 ";
 
 
@@ -241,7 +264,7 @@ SELECT DISTINCT
 	CRG.[MostSeriousCharge] AS [IsPrimary],
 	CRG.[ViolationDate] AS [OffenseDate],
 
-	COALESCE(CSSD.[Value], CSED.[Value], CC.[CloseDateTime]) AS [CaseDate]
+	COALESCE(CSSD.[Value], CSED.[Value]) AS [CaseDate]
 FROM
 	[dbo].[Offender] O JOIN [dbo].[CourtCase] CC
 		ON O.[Id] = CC.[OffenderId]
@@ -262,6 +285,9 @@ FROM
 							LEFT JOIN CaseSupervisionEndDateData CSED
 								ON CC.[Id] = CSED.[CaseId]
 
+								LEFT JOIN [dbo].[CaseType] CT
+									ON CC.[CaseTypeId] = CT.[Id]
+
 WHERE
 	CRG.[FromTime] IS NOT NULL AND CRG.[ToTime] IS NULL
 	AND 
@@ -270,6 +296,7 @@ WHERE
 		OR CRG.[FromTime] > @LastExecutionDateTime 
 	)
 	AND CSLD.[Description] IS NOT NULL
+	AND (CT.[PermDesc] = 'Formal' OR CT.[PermDesc] = 'PRCS' OR CT.[PermDesc] = 'MCS' OR CT.[PermDesc] = 'Adult.Interstate')
 ";
 
 
