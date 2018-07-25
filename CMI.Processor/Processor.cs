@@ -708,7 +708,7 @@ namespace CMI.Processor
                 }
             }
 
-            return string.Empty;
+            return null;
         }
 
         private string MapSupervisingOfficer(string sourceFirstName, string sourceLastName, string sourceEmailAddress)
@@ -723,7 +723,7 @@ namespace CMI.Processor
                 }
             }
 
-            return string.Empty;
+            return null;
         }
         #endregion
         #endregion
