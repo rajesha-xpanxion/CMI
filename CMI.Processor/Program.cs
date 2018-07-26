@@ -30,7 +30,6 @@ namespace CMI.Processor
 
 
             Console.WriteLine("{0}Processor execution completed successfully...", Environment.NewLine);
-            Console.ReadKey();
         }
 
 
