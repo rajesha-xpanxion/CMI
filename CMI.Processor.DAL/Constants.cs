@@ -17,6 +17,12 @@ namespace CMI.Processor.DAL
 
         public const string IS_SUCCESSFUL = "@IsSuccessful";
 
+        public const string NUM_TASK_PROCESSED = "@NumTaskProcessed";
+
+        public const string NUM_TASK_SUCCEEDED = "@NumTaskSucceeded";
+
+        public const string NUM_TASK_FAILED = "@NumTaskFailed";
+
         public const string MESSAGE = "@Message";
 
         public const string ERROR_DETAILS = "@ErrorDetails";

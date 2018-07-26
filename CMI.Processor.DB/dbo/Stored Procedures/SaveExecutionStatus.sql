@@ -13,6 +13,9 @@ EXEC
 	[dbo].[SaveExecutionStatus]
 		@ExecutedOn = @CurrentDate,
 		@IsSuccessful = 1,
+		@NumTaskProcessed = 0,
+		@NumTaskSucceeded = 0,
+		@NumTaskFailed = 0,
 		@Message = 'test message',
 		@ErrorDetails = NULL
 ---------------------------------------------------------------------------------
@@ -23,6 +26,9 @@ Date			Author			Changes
 CREATE PROCEDURE [dbo].[SaveExecutionStatus]
 	@ExecutedOn DATETIME,
 	@IsSuccessful BIT,
+	@NumTaskProcessed INT,
+    @NumTaskSucceeded INT,
+    @NumTaskFailed INT,
 	@Message NVARCHAR(200) = NULL,
 	@ErrorDetails NVARCHAR(MAX) = NULL
 AS
@@ -32,6 +38,9 @@ BEGIN
 	(
 		[ExecutedOn],
 		[IsSuccessful],
+		[NumTaskProcessed],
+		[NumTaskSucceeded],
+		[NumTaskFailed],
 		[ExecutionStatusMessage],
 		[ErrorDetails]
 	)
@@ -39,11 +48,14 @@ BEGIN
 	(
 		@ExecutedOn,
 		@IsSuccessful,
+		@NumTaskProcessed,
+		@NumTaskSucceeded,
+		@NumTaskFailed,
 		@Message,
 		@ErrorDetails
 	)
 
-	SELECT IDENT_CURRENT('[dbo].[ProcessorExecutionHistory]') AS [HistoryId];
+	SELECT IDENT_CURRENT('[dbo].[ProcessorExecutionHistory]') AS [ProcessorExecutionHistoryId];
 	
 END
 

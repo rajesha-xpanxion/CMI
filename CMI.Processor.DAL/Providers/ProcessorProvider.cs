@@ -58,6 +58,12 @@ namespace CMI.Processor.DAL
 
                         cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.IS_SUCCESSFUL, Value = executionStatus.IsSuccessful, SqlDbType = System.Data.SqlDbType.Bit, Direction = System.Data.ParameterDirection.Input });
 
+                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.NUM_TASK_PROCESSED, Value = executionStatus.NumTaskProcessed, SqlDbType = System.Data.SqlDbType.Int, Direction = System.Data.ParameterDirection.Input });
+
+                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.NUM_TASK_SUCCEEDED, Value = executionStatus.NumTaskSucceeded, SqlDbType = System.Data.SqlDbType.Int, Direction = System.Data.ParameterDirection.Input });
+
+                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.NUM_TASK_FAILED, Value = executionStatus.NumTaskFailed, SqlDbType = System.Data.SqlDbType.Int, Direction = System.Data.ParameterDirection.Input });
+
                         if (!string.IsNullOrEmpty(executionStatus.ExecutionStatusMessage))
                         {
                             cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.MESSAGE, Value = executionStatus.ExecutionStatusMessage, SqlDbType = System.Data.SqlDbType.NVarChar, Direction = System.Data.ParameterDirection.Input });

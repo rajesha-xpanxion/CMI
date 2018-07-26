@@ -33,13 +33,15 @@ namespace CMI.Processor
         #endregion
 
         DateTime lastExecutionDateTime;
-        DAL.ExecutionStatus processorExecutionStatus = new DAL.ExecutionStatus() { IsSuccessful = true };
+        DAL.ExecutionStatus processorExecutionStatus = null;
 
         CMI.Common.Logging.ILogger logger;
         DAL.IProcessorProvider processorProvider;
         Common.Notification.IEmailNotificationProvider emailNotificationProvider;
 
         DAL.ProcessorConfig processorConfig;
+
+        List<Common.Notification.TaskExecutionStatus> taskExecutionStatuses = null;
         #endregion
 
         #region Constructor
@@ -86,54 +88,43 @@ namespace CMI.Processor
             this.emailNotificationProvider = emailNotificationProvider;
 
             this.processorConfig = processorConfig.Value;
+
+            taskExecutionStatuses = new List<Common.Notification.TaskExecutionStatus>();
+            processorExecutionStatus = new DAL.ExecutionStatus() { IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
         }
         #endregion
 
         #region Public Methods
         public void Execute()
         {
-            Common.Notification.TaskExecutionStatus taskExecutionStatus;
-            List<Common.Notification.TaskExecutionStatus> taskExecutionStatuses = new List<Common.Notification.TaskExecutionStatus>();
-
             //log info message for start of processing
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "Execute", Message = "Processor execution initiated." });
 
             //get last execution date time so that differential dataset is pulled from source
             RetrieveLastExecutionDateTime();
 
-
             //process client profiles
-            taskExecutionStatus = ProcessClientProfiles();
-            processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
-            taskExecutionStatuses.Add(taskExecutionStatus);
+            UpdateExecutionStatus(ProcessClientProfiles());
 
             //process client addresses
-            taskExecutionStatus = ProcessAddresses();
-            processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
-            taskExecutionStatuses.Add(taskExecutionStatus);
+            UpdateExecutionStatus(ProcessAddresses());
 
             //process client phone contacts
-            taskExecutionStatus = ProcessPhoneContacts();
-            processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
-            taskExecutionStatuses.Add(taskExecutionStatus);
+            UpdateExecutionStatus(ProcessPhoneContacts());
 
             //process client email contacts
-            taskExecutionStatus = ProcessEmailContacts();
-            processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
-            taskExecutionStatuses.Add(taskExecutionStatus);
+            UpdateExecutionStatus(ProcessEmailContacts());
 
             //process client cases
-            taskExecutionStatus = ProcessCases();
-            processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
-            taskExecutionStatuses.Add(taskExecutionStatus);
+            UpdateExecutionStatus(ProcessCases());
 
             //process client notes
-            taskExecutionStatus = ProcessNotes();
-            processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
-            taskExecutionStatuses.Add(taskExecutionStatus);
+            UpdateExecutionStatus(ProcessNotes());
 
             //derive final processor execution status and save it to database
-            processorExecutionStatus.ExecutionStatusMessage = processorExecutionStatus.IsSuccessful ? "Processor execution completed successfully." : "Processor execution failed. Please check logs for more details.";
+            processorExecutionStatus.ExecutionStatusMessage = processorExecutionStatus.IsSuccessful 
+                ? "Processor execution completed successfully." 
+                : "Processor execution failed. Please check logs for more details.";
             processorExecutionStatus.ExecutedOn = DateTime.Now;
             
             //save execution status details in history table
@@ -154,6 +145,26 @@ namespace CMI.Processor
         #endregion
 
         #region Private Processor Methods
+        private void UpdateExecutionStatus(Common.Notification.TaskExecutionStatus taskExecutionStatus)
+        {
+            processorExecutionStatus.NumTaskProcessed++;
+            if (taskExecutionStatus != null)
+            {
+                if (taskExecutionStatus.IsSuccessful)
+                {
+                    processorExecutionStatus.NumTaskSucceeded++;
+                }
+                else
+                {
+                    processorExecutionStatus.NumTaskFailed++;
+                }
+
+                processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
+                taskExecutionStatuses.Add(taskExecutionStatus);
+            }
+        }
+
+
         private Common.Notification.TaskExecutionStatus ProcessClientProfiles()
         {
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Client Profile processing initiated." });
