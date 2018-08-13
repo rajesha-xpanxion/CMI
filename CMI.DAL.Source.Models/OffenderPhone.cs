@@ -15,5 +15,7 @@ namespace CMI.DAL.Source
         public bool IsPrimary { get; set; }
 
         public string Comment { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

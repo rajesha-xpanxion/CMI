@@ -28,7 +28,7 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PostAsJsonAsync<Case>(string.Format("api/v1/clients/{0}/cases", @case.ClientId), @case).Result;
+                var apiResponse = apiHost.PostAsJsonAsync<Case>(string.Format("api/{0}/clients/{1}/cases", destinationConfig.CaseIntegrationAPIVersion, @case.ClientId), @case).Result;
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
@@ -55,7 +55,7 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync(string.Format("api/v1/clients/{0}/cases/{1}", clientId, caseNumber)).Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/cases/{2}", destinationConfig.CaseIntegrationAPIVersion, clientId, caseNumber)).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
@@ -84,7 +84,7 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PutAsJsonAsync<Case>(string.Format("api/v1/clients/{0}/cases", @case.ClientId), @case).Result;
+                var apiResponse = apiHost.PutAsJsonAsync<Case>(string.Format("api/{0}/clients/{1}/cases", destinationConfig.CaseIntegrationAPIVersion, @case.ClientId), @case).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 

@@ -30,12 +30,11 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PostAsJsonAsync<Client>("api/v1/clients", client).Result;
+                var apiResponse = apiHost.PostAsJsonAsync<Client>(string.Format("api/{0}/clients", destinationConfig.CaseIntegrationAPIVersion), client).Result;
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
-                    //Console.WriteLine("New client details added successfully.{0}Response: {1}", Environment.NewLine, responseString);
                     return true;
                 }
                 else
@@ -57,7 +56,7 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync(string.Format("api/v1/clients/{0}", clientId)).Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}", destinationConfig.CaseIntegrationAPIVersion, clientId)).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
@@ -86,14 +85,13 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PutAsJsonAsync<Client>("api/v1/clients", client).Result;
+                var apiResponse = apiHost.PutAsJsonAsync<Client>(string.Format("api/{0}/clients", destinationConfig.CaseIntegrationAPIVersion), client).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     return true;
-                    //Console.WriteLine("Existing client details updated successfully.{0}Response: {1}", Environment.NewLine, responseString);
                 }
                 else
                 {

@@ -48,11 +48,9 @@ namespace CMI.DAL.Source.AutoMon
         public const string OFFENSE_DATE = "OffenseDate";
         public const string CASE_DATE = "CaseDate";
         public const string EMAIL_ADDRESS = "EmailAddress";
-        public const string NOTE_ID = "NoteId";
-        public const string NOTE_DATE = "NoteDate";
-        public const string VALUE = "Value";
-        public const string LOGON = "Logon";
-        public const string EMAIL = "Email";
-
+        public const string DATE = "Date";
+        public const string TEXT = "Text";
+        public const string AUTHOR_EMAIL = "AuthorEmail";
+        public const string IS_ACTIVE = "IsActive";
     }
 }

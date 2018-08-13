@@ -39,8 +39,10 @@ namespace CMI.DAL.Source.AutoMon
                             offenderEmails.Add(new OffenderEmail()
                             {
                                 Pin = Convert.ToString(reader[DBColumnName.PIN]),
+                                Id = Convert.ToInt32(reader[DBColumnName.ID]),
                                 EmailAddress = Convert.ToString(reader[DBColumnName.EMAIL_ADDRESS]),
-                                IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY])
+                                IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY]),
+                                IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
                             });
                         }
                     }
@@ -49,7 +51,7 @@ namespace CMI.DAL.Source.AutoMon
 
             return offenderEmails;
             
-            
+
             /*
             //test data
             return new List<OffenderEmail>()
@@ -57,22 +59,42 @@ namespace CMI.DAL.Source.AutoMon
                 new OffenderEmail()
                 {
                     Pin = "5824",
-                    FirstName = "John",
-                    MiddleName = "Brent",
-                    LastName = "Aitkens",
-
+                    Id = 362,
                     EmailAddress = "yougotmail@yahoo.com",
-                    IsPrimary = true
+                    IsPrimary = true,
+                    IsActive = true
                 },
                 new OffenderEmail()
                 {
                     Pin = "13475",
-                    FirstName = "Destiny",
-                    MiddleName = "Giana",
-                    LastName = "Granger",
-
+                    Id = 364,
                     EmailAddress = "destinyg@yahoo.com",
-                    IsPrimary = true
+                    IsPrimary = true,
+                    IsActive = true
+                },
+                new OffenderEmail()
+                {
+                    Pin = "1008383",
+                    Id = 30,
+                    EmailAddress = "christanickelllosrios@gmail.com",
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderEmail()
+                {
+                    Pin = "1008383",
+                    Id = 31,
+                    EmailAddress = "christanickell96@gmail.com",
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderEmail()
+                {
+                    Pin = "1008383",
+                    Id = 203,
+                    EmailAddress = "christanickelll96@gmail.com",
+                    IsPrimary = true,
+                    IsActive = true
                 }
             };
             */

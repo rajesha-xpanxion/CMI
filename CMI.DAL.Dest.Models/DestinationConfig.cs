@@ -8,6 +8,8 @@ namespace CMI.DAL.Dest.Models
     {
         public string CaseIntegrationAPIBaseURL { get; set; }
 
+        public string CaseIntegrationAPIVersion { get; set; }
+
         public TokenGeneratorConfig TokenGeneratorConfig { get; set; }
     }
 

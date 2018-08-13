@@ -12,5 +12,7 @@ namespace CMI.DAL.Dest
         Note GetNoteDetails(string clientId, string noteId);
 
         bool UpdateNoteDetails(Note note);
+
+        bool DeleteNoteDetails(string clientId, string noteId);
     }
 }

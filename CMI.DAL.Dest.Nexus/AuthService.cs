@@ -46,7 +46,7 @@ namespace CMI.DAL.Dest.Nexus
                     apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                     apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", _AuthToken.token_type, _AuthToken.access_token));
 
-                    var apiResponse = apiHost.GetAsync("api/v1/clients/IAmAlive").Result;
+                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/IAmAlive", destinationConfig.CaseIntegrationAPIVersion)).Result;
 
                     var responseString = apiResponse.Content.ReadAsStringAsync();
 

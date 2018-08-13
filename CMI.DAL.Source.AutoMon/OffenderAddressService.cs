@@ -46,7 +46,8 @@ namespace CMI.DAL.Source.AutoMon
                                 City = Convert.ToString(reader[DBColumnName.CITY]),
                                 State = Convert.ToString(reader[DBColumnName.STATE]),
                                 Zip = Convert.ToString(reader[DBColumnName.ZIP]),
-                                Comment = Convert.ToString(reader[DBColumnName.COMMENT])
+                                Comment = Convert.ToString(reader[DBColumnName.COMMENT]),
+                                IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
                             });
                         }
                     }
@@ -63,53 +64,176 @@ namespace CMI.DAL.Source.AutoMon
                 new OffenderAddress()
                 {
                     Pin = "5824",
-                    FirstName = "John",
-                    MiddleName = "Brent",
-                    LastName = "Aitkens",
-                    DateOfBirth = new DateTime(1961, 6, 12),
-                    ClientType = "Private",//"PRCS",
-                    TimeZone = "Pacific Standard Time",
-                    Gender = "Male",
-                    Race = "Caucasian",
-                    CaseloadName = "A-wYaTt TeStInG FuN",
-                    CaseloadType = "Adult Formal Supervision - PRCS",
-                    OfficerLogon = "jwyatt",
-                    OfficerEmail = string.Empty,//"julie.wyatt@edcgov.us",
-                    OfficerFirstName = "Julie",
-                    OfficerLastName = "Wyatt",
-
+                    Id = 20653,
+                    AddressType = "Mailing",
+                    Line1 = "7434 Wentworth Springs Rd",
+                    Line2 = "Apt 2",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 20603,
+                    AddressType = "Mailing",
+                    Line1 = "5050 Hope Mountain Rd",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95633",
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 20602,
+                    AddressType = "Residential",
+                    Line1 = "5050 Hope Mountain Rd",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95633",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 24855,
+                    AddressType = "Mailing",
+                    Line1 = "4211 Shoemaker Rd",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = true,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 24856,
+                    AddressType = "Residential",
+                    Line1 = "4211 Shoemaker Rd",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 55364,
+                    AddressType = "Residential",
+                    Line1 = "3821 Quest  Ct",
+                    Line2 = "Spc 5",
+                    City = "Cameron Park",
+                    State = "CA",
+                    Zip = "95682",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 44974,
+                    AddressType = "Residential",
+                    Line1 = "transient",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 56024,
+                    AddressType = "Residential",
+                    Line1 = "9097 Wentworth Springs Rd",
+                    Line2 = "Spc 8",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 52350,
+                    AddressType = "Mailing",
+                    Line1 = "9400 Wentworth Springs Rd",
+                    Line2 = "Spc 8",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 56738,
+                    AddressType = "Residential",
+                    Line1 = "Transient",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
+                    Id = 57285,
+                    AddressType = "Residential",
+                    Line1 = "9092 Wentworth springs Rd",
+                    City = "Georgetown",
+                    State = "CA",
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive =false
+                },
+                new OffenderAddress()
+                {
+                    Pin = "5824",
                     Id = 57284,
                     AddressType = "Mailing",
                     Line1 = "9092 Wentworth Springs Rd",
                     City = "Georgetown",
                     State = "CA",
-                    Zip = "95634"
+                    Zip = "95634",
+                    IsPrimary = false,
+                    IsActive = true
                 },
                 new OffenderAddress()
                 {
                     Pin = "5824",
-                    FirstName = "John",
-                    MiddleName = "Brent",
-                    LastName = "Aitkens",
-                    DateOfBirth = new DateTime(1961, 6, 12),
-                    ClientType = "Private",//"PRCS",
-                    TimeZone = "Pacific Standard Time",
-                    Gender = "Male",
-                    Race = "Caucasian",
-                    CaseloadName = "A-wYaTt TeStInG FuN",
-                    CaseloadType = "Adult Formal Supervision - PRCS",
-                    OfficerLogon = "jwyatt",
-                    OfficerEmail = string.Empty,//"julie.wyatt@edcgov.us",
-                    OfficerFirstName = "Julie",
-                    OfficerLastName = "Wyatt",
-
+                    Id = 59763,
+                    AddressType = "School",
+                    Line1 = "test line 1",
+                    City = "Anaheim",
+                    State = "CA",
+                    Zip = "11007",
+                    IsPrimary = false,
+                    IsActive =false
+                }
+,
+                new OffenderAddress()
+                {
+                    Pin = "5824",
                     Id = 58639,
                     AddressType = "Residential",
                     Line1 = "1 Transient",
                     City = "Georgetown",
                     State = "CA",
                     Zip = "95636",
-                    Comment = "test update revert"
+                    Comment = "test update revert",
+                    IsPrimary = false,
+                    IsActive = true
                 }
             };
             */

@@ -11,6 +11,7 @@ namespace CMI.Common.Notification
         public int SourceReceivedRecordCount { get; set; }
         public int DestAddRecordCount { get; set; }
         public int DestUpdateRecordCount { get; set; }
+        public int DestDeleteRecordCount { get; set; }
         public int DestFailureRecordCount { get; set; }
     }
 }

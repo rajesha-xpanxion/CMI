@@ -6,13 +6,12 @@ namespace CMI.DAL.Source
 {
     public class OffenderNote : Offender
     {
-        public int NoteId { get; set; }
+        public int Id { get; set; }
 
-        public DateTime NoteDate { get; set; }
+        public DateTime Date { get; set; }
 
-        public string Value { get; set; }
+        public string Text { get; set; }
 
-        public string Logon { get; set; }
-        public string Email { get; set; }
+        public string AuthorEmail { get; set; }
     }
 }

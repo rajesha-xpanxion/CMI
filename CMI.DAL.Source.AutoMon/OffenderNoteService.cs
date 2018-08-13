@@ -39,11 +39,10 @@ namespace CMI.DAL.Source.AutoMon
                             offenderNotes.Add(new OffenderNote()
                             {
                                 Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                NoteId = Convert.ToInt32(reader[DBColumnName.NOTE_ID]),
-                                NoteDate = Convert.ToDateTime(reader[DBColumnName.NOTE_DATE]),
-                                Value = Convert.ToString(reader[DBColumnName.VALUE]),
-                                Logon = Convert.ToString(reader[DBColumnName.LOGON]),
-                                Email = Convert.ToString(reader[DBColumnName.EMAIL])
+                                Id = Convert.ToInt32(reader[DBColumnName.ID]),
+                                Date = Convert.ToDateTime(reader[DBColumnName.DATE]),
+                                Text = Convert.ToString(reader[DBColumnName.TEXT]),
+                                AuthorEmail = Convert.ToString(reader[DBColumnName.AUTHOR_EMAIL])
                             });
                         }
                     }
@@ -53,6 +52,7 @@ namespace CMI.DAL.Source.AutoMon
             return offenderNotes;
             
 
+
             /*
             //test data
             return new List<OffenderNote>()
@@ -60,12 +60,58 @@ namespace CMI.DAL.Source.AutoMon
                 new OffenderNote()
                 {
                     Pin = "5824",
-
-                    NoteId = 774140,
-                    NoteDate = Convert.ToDateTime("2018-07-03 02:22:45.110"),
-                    Value = "test change on 07/03/2018 - 14:52",
-                    Logon = "rawate",
-                    Email = "rajesha@xpanxion.co.in"
+                    Id = 774140,
+                    Date = Convert.ToDateTime("2018-08-13 03:25:30.480"),
+                    Text = "test change on 13th August 2018 03:55 PM.",
+                    AuthorEmail = "rajesha@xpanxion.co.in"
+                },
+                new OffenderNote()
+                {
+                    Pin = "5824",
+                    Id = 774141,
+                    Date = Convert.ToDateTime("2018-07-03 01:09:26.863"),
+                    Text = "test change on 07/03/2018 - 13:39",
+                    AuthorEmail = "rajesha@xpanxion.co.in"
+                },
+                new OffenderNote()
+                {
+                    Pin = "5824",
+                    Id = 774142,
+                    Date = Convert.ToDateTime("2018 - 07 - 03 01:51:18.847"),
+                    Text = "test change on 07 / 03 / 2018 - 14:21",
+                    AuthorEmail = "rajesha@xpanxion.co.in"
+                },
+                new OffenderNote()
+                {
+                    Pin = "5824",
+                    Id = 774143,
+                    Date = Convert.ToDateTime("2018 - 07 - 03 02:22:45.110"),
+                    Text = "test change on 07 / 03 / 2018 - 14:52",
+                    AuthorEmail = "rajesha@xpanxion.co.in"
+                },
+                new OffenderNote()
+                {
+                    Pin = "5824",
+                    Id = 774144,
+                    Date = Convert.ToDateTime("2018 - 08 - 10 07:09:07.860"),
+                    Text = "test change on 10th August 2018 7:38 PM.",
+                    AuthorEmail = "rajesha@xpanxion.co.in"
+                },
+                new OffenderNote()
+                {
+                    Pin = "5824",
+                    Id = 774145,
+                    Date = Convert.ToDateTime("2018 - 08 - 13 02:22:07.893"),
+                    Text = "test change on 13th August 2018 02:50 PM.",
+                    AuthorEmail = "rajesha@xpanxion.co.in"
+                },
+                new OffenderNote()
+                {
+                    Pin = "5824",
+                    Id = 774146,
+                    Date = Convert.ToDateTime("2018 - 08 - 13 02:25:49.933"),
+                    Text = "test change on 13th August 2018 02:55 PM.",
+                    AuthorEmail = "rajesha@xpanxion.co.in"
                 }
             };
             */

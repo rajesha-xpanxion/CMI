@@ -121,7 +121,6 @@ WHERE
 )
 SELECT DISTINCT
 	O.[Pin],
-	
 	PA.[Id],
 	ATLD.[Description] AS [AddressType],
 	A.[Line1],
@@ -129,10 +128,12 @@ SELECT DISTINCT
 	A.[City],
 	A.[State],
 	A.[Zip],
-
 	N.[Value] AS [Comment],
-	
-	PA.[IsPrimary]
+	PA.[IsPrimary],
+	CASE 
+		WHEN A.[ToTime] IS NULL THEN 1
+		ELSE 0
+	END AS [IsActive]
 FROM
 	[dbo].[Person] P JOIN [dbo].[Offender] O
 		ON P.[Id] = O.[PersonId]
@@ -148,8 +149,7 @@ FROM
 					LEFT JOIN [dbo].[Note] N
 						ON A.[NoteId] = N.[Id]
 WHERE
-	A.[FromTime] IS NOT NULL AND A.[ToTime] IS NULL
-	AND (A.[FromTime] > @LastExecutionDateTime)
+	A.[FromTime] > @LastExecutionDateTime
 ";
 
         public const string GET_ALL_OFFENDER_PHONE_DETAILS = @"
@@ -174,7 +174,11 @@ SELECT DISTINCT
 
 	N.[Value] AS [Comment],
 
-	PP.[IsPrimary]
+	PP.[IsPrimary],
+	CASE 
+		WHEN PN.[ToTime] IS NULL THEN 1
+		ELSE 0
+	END AS [IsActive]
 FROM
 	[dbo].[Person] P JOIN [dbo].[Offender] O
 		ON P.[Id] = O.[PersonId]
@@ -189,25 +193,27 @@ FROM
 					LEFT JOIN [dbo].[Note] N
 						ON PN.[NoteId] = N.[Id]
 WHERE
-	PN.[FromTime] IS NOT NULL AND PN.[ToTime] IS NULL
-	AND (PN.[FromTime] > @LastExecutionDateTime)
+	PN.[FromTime] > @LastExecutionDateTime
 ";
 
         public const string GET_ALL_OFFENDER_EMAIL_DETAILS = @"
 SELECT DISTINCT
 	O.[Pin],
-
+	E.[Id],
 	E.[EmailAddress],
 
-	E.[IsPrimary]
+	E.[IsPrimary],
+	CASE 
+		WHEN E.[ToTime] IS NULL THEN 1
+		ELSE 0
+	END AS [IsActive]
 FROM
 	[dbo].[Person] P JOIN [dbo].[Offender] O
 		ON P.[Id] = O.[PersonId]
 		JOIN [dbo].[Email] E
 			ON P.[Id] = E.[PersonId]
 WHERE
-	E.[FromTime] IS NOT NULL AND E.[ToTime] IS NULL
-	AND (E.[FromTime] > @LastExecutionDateTime)
+	E.[FromTime] > @LastExecutionDateTime
 ";
 
         public const string GET_ALL_OFFENDER_CASE_DETAILS = @"
@@ -301,27 +307,91 @@ WHERE
 
 
         public const string GET_ALL_OFFENDER_NOTE_DETAILS = @"
+;WITH ClientNameChangeNotesData AS
+(
+	SELECT DISTINCT
+		OFNDR.[Pin],
+		N.[Id],
+		N.[Value],
+		OFCR.[Email],
+		N.[FromTime]
+	FROM
+		[dbo].[Offender] OFNDR JOIN [dbo].[Person] OFNDRPER
+			ON OFNDR.[PersonId] = OFNDRPER.[Id]
+			JOIN [dbo].[AnyName] OFNDRAN
+				ON OFNDRPER.[NameId] = OFNDRAN.[Id]
+				JOIN [dbo].[Note] N
+					ON OFNDRAN.[NoteId] = N.[Id]
+					JOIN [dbo].[Officer] OFCR
+						ON N.[EnteredByPId] = OFCR.[PersonId]
+	WHERE
+		N.[FromTime] > @LastExecutionDateTime
+
+), ClientAddressChangeNotesData AS
+(
+	SELECT DISTINCT
+		OFNDR.[Pin],
+		N.[Id],
+		N.[Value],
+		OFCR.[Email],
+		N.[FromTime]
+	FROM
+		[dbo].[Offender] OFNDR JOIN [dbo].[PersonAddress] OFNDRPA
+			ON OFNDR.[PersonId] = OFNDRPA.[PersonId]
+			JOIN [dbo].[Address] OFNDRA
+				ON OFNDRPA.[AddressId] = OFNDRA.[Id]
+				JOIN [dbo].[Note] N
+					ON OFNDRA.[NoteId] = N.[Id]
+					JOIN [dbo].[Officer] OFCR
+							ON N.[EnteredByPId] = OFCR.[PersonId]
+	WHERE
+		N.[FromTime] > @LastExecutionDateTime
+), ClientPhoneNumberChangeNotesData AS
+(
+	SELECT DISTINCT
+		OFNDR.[Pin],
+		N.[Id],
+		N.[Value],
+		OFCR.[Email],
+		N.[FromTime]
+	FROM
+		[dbo].[Offender] OFNDR JOIN [dbo].[PersonPhone] OFNDRPP
+			ON OFNDR.[PersonId] = OFNDRPP.[PersonId]
+			JOIN [dbo].[PhoneNumber] OFNDRPN
+				ON OFNDRPP.[PhoneNumberId] = OFNDRPN.[Id]
+				JOIN [dbo].[Note] N
+					ON OFNDRPN.[NoteId] = N.[Id]
+					JOIN [dbo].[Officer] OFCR
+						ON N.[EnteredByPId] = OFCR.[PersonId]
+	WHERE
+		N.[FromTime] > @LastExecutionDateTime
+)
 SELECT DISTINCT
-	OFN.[Pin],
-	AN.[NoteId],
-	N.[FromTime],
-	N.[Value],
-	OFC.[Logon],
-	OFC.[Email]
+	[Pin],
+	[Id],
+	[Value] AS [Text],
+	[Email] AS [AuthorEmail],
+	[FromTime] AS [Date]
 FROM
-	[dbo].[AnyName] AN JOIN [dbo].[Person] OFNP
-		ON AN.[Id] = OFNP.[NameId]
-		JOIN [dbo].[Offender] OFN
-			ON OFNP.[Id] = OFN.[PersonId]
-			JOIN [dbo].[Note] N
-				ON AN.[NoteId] = N.[Id]
-				JOIN [dbo].[Person] OFCP
-					ON N.[EnteredByPId] = OFCP.[Id]
-					JOIN [dbo].[Officer] OFC
-						ON OFCP.[Id] = OFC.PersonId
-WHERE
-	N.[FromTime] IS NOT NULL AND N.[ToTime] IS NULL
-	AND (N.[FromTime] > @LastExecutionDateTime)
+	ClientNameChangeNotesData
+UNION
+SELECT DISTINCT
+	[Pin],
+	[Id],
+	[Value] AS [Text],
+	[Email] AS [AuthorEmail],
+	[FromTime] AS [Date]
+FROM
+	ClientAddressChangeNotesData
+UNION
+SELECT DISTINCT
+	[Pin],
+	[Id],
+	[Value] AS [Text],
+	[Email] AS [AuthorEmail],
+	[FromTime] AS [Date]
+FROM
+	ClientPhoneNumberChangeNotesData
 ";
     }
 }

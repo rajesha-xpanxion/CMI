@@ -43,7 +43,8 @@ namespace CMI.DAL.Source.AutoMon
                                 PhoneNumberType = Convert.ToString(reader[DBColumnName.PHONE_NUMBER_TYPE]),
                                 Phone = Convert.ToString(reader[DBColumnName.PHONE]),
                                 IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY]),
-                                Comment = Convert.ToString(reader[DBColumnName.COMMENT])
+                                Comment = Convert.ToString(reader[DBColumnName.COMMENT]),
+                                IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
                             });
                         }
                     }
@@ -60,26 +61,52 @@ namespace CMI.DAL.Source.AutoMon
                 new OffenderPhone()
                 {
                     Pin = "5824",
-                    FirstName = "John",
-                    MiddleName = "Brent",
-                    LastName = "Aitkens",
-                    DateOfBirth = new DateTime(1961, 6, 12),
-                    ClientType = "Private",//"PRCS",
-                    TimeZone = "Pacific Standard Time",
-                    Gender = "Male",
-                    Race = "Caucasian",
-                    CaseloadName = "A-wYaTt TeStInG FuN",
-                    CaseloadType = "Adult Formal Supervision - PRCS",
-                    OfficerLogon = "jwyatt",
-                    OfficerEmail = string.Empty,//"julie.wyatt@edcgov.us",
-                    OfficerFirstName = "Julie",
-                    OfficerLastName = "Wyatt",
-
+                    Id = 75182,
+                    PhoneNumberType = "Mobile",
+                    Phone = "(530)957-1521",
+                    Comment = null,
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderPhone()
+                {
+                    Pin = "5824",
+                    Id = 84580,
+                    PhoneNumberType = "Mobile",
+                    Phone = "(530)308-3607",
+                    Comment = null,
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderPhone()
+                {
+                    Pin = "5824",
+                    Id = 92112,
+                    PhoneNumberType = "Mobile",
+                    Phone = "(530)334-0991",
+                    Comment = null,
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderPhone()
+                {
+                    Pin = "5824",
+                    Id = 98937,
+                    PhoneNumberType = "Message",
+                    Phone = "(997)032-7365",
+                    Comment = "test phone number",
+                    IsPrimary = false,
+                    IsActive = false
+                },
+                new OffenderPhone()
+                {
+                    Pin = "5824",
                     Id = 97560,
                     PhoneNumberType = "Mobile",
                     Phone = "(530)320-8045",
+                    Comment = "test update revert",
                     IsPrimary = false,
-                    Comment = "test update revert"
+                    IsActive = true
                 }
             };
             */

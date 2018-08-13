@@ -11,5 +11,7 @@ namespace CMI.DAL.Dest
         Address GetAddressDetails(string clientId, string addressId);
 
         bool UpdateAddressDetails(Address address);
+
+        bool DeleteAddressDetails(string clientId, string addressId);
     }
 }

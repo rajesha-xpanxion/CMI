@@ -28,13 +28,12 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PostAsJsonAsync<Contact>(string.Format("api/v1/clients/{0}/contacts", contact.ClientId), contact).Result;
+                var apiResponse = apiHost.PostAsJsonAsync<Contact>(string.Format("api/{0}/clients/{1}/contacts", destinationConfig.CaseIntegrationAPIVersion, contact.ClientId), contact).Result;
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     return true;
-                    //Console.WriteLine("New client contact details added successfully.{0}Response: {1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -55,7 +54,7 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync(string.Format("api/v1/clients/{0}/contacts/{1}", clientId, contactId)).Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/contacts/{2}", destinationConfig.CaseIntegrationAPIVersion, clientId, contactId)).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
@@ -84,18 +83,42 @@ namespace CMI.DAL.Dest.Nexus
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PutAsJsonAsync<Contact>(string.Format("api/v1/clients/{0}/contacts", contact.ClientId), contact).Result;
+                var apiResponse = apiHost.PutAsJsonAsync<Contact>(string.Format("api/{0}/clients/{1}/contacts", destinationConfig.CaseIntegrationAPIVersion, contact.ClientId), contact).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     return true;
-                    //Console.WriteLine("Existing client contact details updated successfully.{0}Response: {1}", Environment.NewLine, responseString);
                 }
                 else
                 {
                     throw new ApplicationException(string.Format("Error occurred while updating existing client contact details. API Response: {0}", responseString));
+                }
+            }
+        }
+
+        public bool DeleteContactDetails(string clientId, string contactId)
+        {
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.DeleteAsync(string.Format("api/{0}/clients/{1}/contacts/{2}", destinationConfig.CaseIntegrationAPIVersion, clientId, contactId)).Result;
+
+                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new ApplicationException(string.Format("Error occurred while deleting existing client contact details. API Response: {0}", responseString));
                 }
             }
         }

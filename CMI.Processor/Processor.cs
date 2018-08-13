@@ -264,15 +264,23 @@ namespace CMI.Processor
                             FullAddress = MapFullAddress(offenderAddressDetails.Line1, offenderAddressDetails.Line2, offenderAddressDetails.City, offenderAddressDetails.State, offenderAddressDetails.Zip),
                             IsPrimary = offenderAddressDetails.IsPrimary,
                             Comment = offenderAddressDetails.Comment,
-                            Status = "Active"
+                            IsActive = offenderAddressDetails.IsActive
                         };
 
                         if (addressService.GetAddressDetails(address.ClientId, address.AddressId) == null)
                         {
-                            if (addressService.AddNewAddressDetails(address))
+                            if (address.IsActive && addressService.AddNewAddressDetails(address))
                             {
                                 taskExecutionStatus.DestAddRecordCount++;
                                 logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "New Client Address details added successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                            }
+                        }
+                        else if (!address.IsActive)
+                        {
+                            if (addressService.DeleteAddressDetails(address.ClientId, address.AddressId))
+                            {
+                                taskExecutionStatus.DestDeleteRecordCount++;
+                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details deleted successfully.", CustomParams = JsonConvert.SerializeObject(address) });
                             }
                         }
                         else
@@ -333,15 +341,23 @@ namespace CMI.Processor
                             ContactValue = offenderPhoneDetails.Phone,
                             IsPrimary = offenderPhoneDetails.IsPrimary,
                             Comment = offenderPhoneDetails.Comment,
-                            Status = "Active"
+                            IsActive = offenderPhoneDetails.IsActive
                         };
 
                         if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
                         {
-                            if (contactService.AddNewContactDetails(contact))
+                            if (contact.IsActive && contactService.AddNewContactDetails(contact))
                             {
                                 taskExecutionStatus.DestAddRecordCount++;
                                 logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "New Client Phone Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                            }
+                        }
+                        else if (!contact.IsActive)
+                        {
+                            if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
+                            {
+                                taskExecutionStatus.DestDeleteRecordCount++;
+                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
                             }
                         }
                         else
@@ -396,19 +412,27 @@ namespace CMI.Processor
                         Contact contact = new Contact()
                         {
                             ClientId = offenderEmailDetails.Pin,
-                            ContactId = string.Format("{0}-{1}", offenderEmailDetails.Pin, offenderEmailDetails.Pin),
+                            ContactId = string.Format("{0}-{1}", offenderEmailDetails.Pin, offenderEmailDetails.Id),
                             ContactType = DAL.Constants.CONTACT_TYPE_EMAIL_DEST,
                             ContactValue = offenderEmailDetails.EmailAddress,
                             IsPrimary = offenderEmailDetails.IsPrimary,
-                            Status = "Active"
+                            IsActive = offenderEmailDetails.IsActive
                         };
 
                         if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
                         {
-                            if (contactService.AddNewContactDetails(contact))
+                            if (contact.IsActive && contactService.AddNewContactDetails(contact))
                             {
                                 taskExecutionStatus.DestAddRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "New Email Client Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "New Client Email Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                            }
+                        }
+                        else if (!contact.IsActive)
+                        {
+                            if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
+                            {
+                                taskExecutionStatus.DestDeleteRecordCount++;
+                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
                             }
                         }
                         else
@@ -416,7 +440,7 @@ namespace CMI.Processor
                             if (contactService.UpdateContactDetails(contact))
                             {
                                 taskExecutionStatus.DestUpdateRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing EmailClient Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
                             }
                         }
                     }
@@ -537,9 +561,10 @@ namespace CMI.Processor
                         Note note = new Note()
                         {
                             ClientId = offenderNoteDetails.Pin,
-                            NoteId = Convert.ToString(offenderNoteDetails.NoteId),
-                            NoteText = offenderNoteDetails.Value,
-                            NoteDatetime = offenderNoteDetails.NoteDate.ToString()
+                            NoteId = Convert.ToString(offenderNoteDetails.Id),
+                            NoteText = offenderNoteDetails.Text,
+                            NoteDatetime = offenderNoteDetails.Date.ToString(),
+                            NoteAuthor = offenderNoteDetails.AuthorEmail
                         };
 
                         if (noteService.GetNoteDetails(note.ClientId, note.NoteId) == null)

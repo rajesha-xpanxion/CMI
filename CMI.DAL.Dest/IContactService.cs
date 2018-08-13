@@ -11,5 +11,7 @@ namespace CMI.DAL.Dest
         Contact GetContactDetails(string clientId, string contactId);
 
         bool UpdateContactDetails(Contact contact);
+
+        bool DeleteContactDetails(string clientId, string contactId);
     }
 }
