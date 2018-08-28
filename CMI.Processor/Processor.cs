@@ -563,8 +563,7 @@ namespace CMI.Processor
                             ClientId = offenderNoteDetails.Pin,
                             NoteId = Convert.ToString(offenderNoteDetails.Id),
                             NoteText = offenderNoteDetails.Text,
-                            NoteDatetime = offenderNoteDetails.Date.ToString(),
-                            NoteAuthor = offenderNoteDetails.AuthorEmail
+                            NoteDatetime = offenderNoteDetails.Date.ToString()
                         };
 
                         if (noteService.GetNoteDetails(note.ClientId, note.NoteId) == null)

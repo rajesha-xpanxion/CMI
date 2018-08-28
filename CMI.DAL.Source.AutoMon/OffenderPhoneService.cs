@@ -17,99 +17,100 @@ namespace CMI.DAL.Source.AutoMon
 
         public IEnumerable<OffenderPhone> GetAllOffenderPhones(DateTime lastExecutionDateTime)
         {
-            
-            
-            List<OffenderPhone> offenderPhones = new List<OffenderPhone>();
-
-            using (SqlConnection conn = new SqlConnection(sourceConfig.AutoMonDBConnString))
+            if (sourceConfig.IsDevMode)
             {
-                conn.Open();
-
-                using (SqlCommand cmd = new SqlCommand())
+                //test data
+                return new List<OffenderPhone>()
                 {
-                    cmd.CommandText = SQLQuery.GET_ALL_OFFENDER_ADDRESS_DETAILS;
-                    cmd.CommandType = System.Data.CommandType.Text;
-                    cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME, SqlDbType = System.Data.SqlDbType.DateTime, Value = lastExecutionDateTime });
-                    cmd.Connection = conn;
-
-                    using (var reader = cmd.ExecuteReader())
+                    new OffenderPhone()
                     {
-                        while (reader.Read())
+                        Pin = "5824",
+                        Id = 75182,
+                        PhoneNumberType = "Mobile",
+                        Phone = "(530)957-1521",
+                        Comment = null,
+                        IsPrimary = false,
+                        IsActive = false
+                    },
+                    new OffenderPhone()
+                    {
+                        Pin = "5824",
+                        Id = 84580,
+                        PhoneNumberType = "Mobile",
+                        Phone = "(530)308-3607",
+                        Comment = null,
+                        IsPrimary = false,
+                        IsActive = false
+                    },
+                    new OffenderPhone()
+                    {
+                        Pin = "5824",
+                        Id = 92112,
+                        PhoneNumberType = "Mobile",
+                        Phone = "(530)334-0991",
+                        Comment = null,
+                        IsPrimary = false,
+                        IsActive = false
+                    },
+                    new OffenderPhone()
+                    {
+                        Pin = "5824",
+                        Id = 98937,
+                        PhoneNumberType = "Message",
+                        Phone = "(997)032-7365",
+                        Comment = "test phone number",
+                        IsPrimary = false,
+                        IsActive = false
+                    },
+                    new OffenderPhone()
+                    {
+                        Pin = "5824",
+                        Id = 97560,
+                        PhoneNumberType = "Mobile",
+                        Phone = "(530)320-8045",
+                        Comment = "test update revert",
+                        IsPrimary = false,
+                        IsActive = true
+                    }
+                };
+            }
+            else
+            {
+
+                List<OffenderPhone> offenderPhones = new List<OffenderPhone>();
+
+                using (SqlConnection conn = new SqlConnection(sourceConfig.AutoMonDBConnString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = SQLQuery.GET_ALL_OFFENDER_ADDRESS_DETAILS;
+                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME, SqlDbType = System.Data.SqlDbType.DateTime, Value = lastExecutionDateTime });
+                        cmd.Connection = conn;
+
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            offenderPhones.Add(new OffenderPhone()
+                            while (reader.Read())
                             {
-                                Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                Id = Convert.ToInt32(reader[DBColumnName.ID]),
-                                PhoneNumberType = Convert.ToString(reader[DBColumnName.PHONE_NUMBER_TYPE]),
-                                Phone = Convert.ToString(reader[DBColumnName.PHONE]),
-                                IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY]),
-                                Comment = Convert.ToString(reader[DBColumnName.COMMENT]),
-                                IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
-                            });
+                                offenderPhones.Add(new OffenderPhone()
+                                {
+                                    Pin = Convert.ToString(reader[DBColumnName.PIN]),
+                                    Id = Convert.ToInt32(reader[DBColumnName.ID]),
+                                    PhoneNumberType = Convert.ToString(reader[DBColumnName.PHONE_NUMBER_TYPE]),
+                                    Phone = Convert.ToString(reader[DBColumnName.PHONE]),
+                                    IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY]),
+                                    Comment = Convert.ToString(reader[DBColumnName.COMMENT]),
+                                    IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
+                                });
+                            }
                         }
                     }
                 }
-            }
 
-            return offenderPhones;
-            
-            
-            /*
-            //test data
-            return new List<OffenderPhone>()
-            {
-                new OffenderPhone()
-                {
-                    Pin = "5824",
-                    Id = 75182,
-                    PhoneNumberType = "Mobile",
-                    Phone = "(530)957-1521",
-                    Comment = null,
-                    IsPrimary = false,
-                    IsActive = false
-                },
-                new OffenderPhone()
-                {
-                    Pin = "5824",
-                    Id = 84580,
-                    PhoneNumberType = "Mobile",
-                    Phone = "(530)308-3607",
-                    Comment = null,
-                    IsPrimary = false,
-                    IsActive = false
-                },
-                new OffenderPhone()
-                {
-                    Pin = "5824",
-                    Id = 92112,
-                    PhoneNumberType = "Mobile",
-                    Phone = "(530)334-0991",
-                    Comment = null,
-                    IsPrimary = false,
-                    IsActive = false
-                },
-                new OffenderPhone()
-                {
-                    Pin = "5824",
-                    Id = 98937,
-                    PhoneNumberType = "Message",
-                    Phone = "(997)032-7365",
-                    Comment = "test phone number",
-                    IsPrimary = false,
-                    IsActive = false
-                },
-                new OffenderPhone()
-                {
-                    Pin = "5824",
-                    Id = 97560,
-                    PhoneNumberType = "Mobile",
-                    Phone = "(530)320-8045",
-                    Comment = "test update revert",
-                    IsPrimary = false,
-                    IsActive = true
-                }
-            };
-            */
+                return offenderPhones;
+            }
         }
     }
 }
