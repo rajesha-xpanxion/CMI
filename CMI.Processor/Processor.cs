@@ -145,26 +145,6 @@ namespace CMI.Processor
         #endregion
 
         #region Private Processor Methods
-        private void UpdateExecutionStatus(Common.Notification.TaskExecutionStatus taskExecutionStatus)
-        {
-            processorExecutionStatus.NumTaskProcessed++;
-            if (taskExecutionStatus != null)
-            {
-                if (taskExecutionStatus.IsSuccessful)
-                {
-                    processorExecutionStatus.NumTaskSucceeded++;
-                }
-                else
-                {
-                    processorExecutionStatus.NumTaskFailed++;
-                }
-
-                processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
-                taskExecutionStatuses.Add(taskExecutionStatus);
-            }
-        }
-
-
         private Common.Notification.TaskExecutionStatus ProcessClientProfiles()
         {
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Client Profile processing initiated." });
@@ -267,28 +247,31 @@ namespace CMI.Processor
                             IsActive = offenderAddressDetails.IsActive
                         };
 
-                        if (addressService.GetAddressDetails(address.ClientId, address.AddressId) == null)
+                        if (clientService.GetClientDetails(address.ClientId) != null)
                         {
-                            if (address.IsActive && addressService.AddNewAddressDetails(address))
+                            if (addressService.GetAddressDetails(address.ClientId, address.AddressId) == null)
                             {
-                                taskExecutionStatus.DestAddRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "New Client Address details added successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                if (address.IsActive && addressService.AddNewAddressDetails(address))
+                                {
+                                    taskExecutionStatus.DestAddRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "New Client Address details added successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                }
                             }
-                        }
-                        else if (!address.IsActive)
-                        {
-                            if (addressService.DeleteAddressDetails(address.ClientId, address.AddressId))
+                            else if (!address.IsActive)
                             {
-                                taskExecutionStatus.DestDeleteRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details deleted successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                if (addressService.DeleteAddressDetails(address.ClientId, address.AddressId))
+                                {
+                                    taskExecutionStatus.DestDeleteRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details deleted successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (addressService.UpdateAddressDetails(address))
+                            else
                             {
-                                taskExecutionStatus.DestUpdateRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details updated successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                if (addressService.UpdateAddressDetails(address))
+                                {
+                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details updated successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                }
                             }
                         }
                     }
@@ -344,28 +327,31 @@ namespace CMI.Processor
                             IsActive = offenderPhoneDetails.IsActive
                         };
 
-                        if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
+                        if (clientService.GetClientDetails(contact.ClientId) != null)
                         {
-                            if (contact.IsActive && contactService.AddNewContactDetails(contact))
+                            if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
                             {
-                                taskExecutionStatus.DestAddRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "New Client Phone Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                if (contact.IsActive && contactService.AddNewContactDetails(contact))
+                                {
+                                    taskExecutionStatus.DestAddRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "New Client Phone Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                }
                             }
-                        }
-                        else if (!contact.IsActive)
-                        {
-                            if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
+                            else if (!contact.IsActive)
                             {
-                                taskExecutionStatus.DestDeleteRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
+                                {
+                                    taskExecutionStatus.DestDeleteRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (contactService.UpdateContactDetails(contact))
+                            else
                             {
-                                taskExecutionStatus.DestUpdateRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                if (contactService.UpdateContactDetails(contact))
+                                {
+                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                }
                             }
                         }
                     }
@@ -419,28 +405,31 @@ namespace CMI.Processor
                             IsActive = offenderEmailDetails.IsActive
                         };
 
-                        if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
+                        if (clientService.GetClientDetails(contact.ClientId) != null)
                         {
-                            if (contact.IsActive && contactService.AddNewContactDetails(contact))
+                            if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
                             {
-                                taskExecutionStatus.DestAddRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "New Client Email Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                if (contact.IsActive && contactService.AddNewContactDetails(contact))
+                                {
+                                    taskExecutionStatus.DestAddRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "New Client Email Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                }
                             }
-                        }
-                        else if (!contact.IsActive)
-                        {
-                            if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
+                            else if (!contact.IsActive)
                             {
-                                taskExecutionStatus.DestDeleteRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
+                                {
+                                    taskExecutionStatus.DestDeleteRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (contactService.UpdateContactDetails(contact))
+                            else
                             {
-                                taskExecutionStatus.DestUpdateRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                if (contactService.UpdateContactDetails(contact))
+                                {
+                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                }
                             }
                         }
                     }
@@ -503,20 +492,23 @@ namespace CMI.Processor
                             }).ToList()
                         };
 
-                        if (caseService.GetCaseDetails(@case.ClientId, @case.CaseNumber) == null)
+                        if (clientService.GetClientDetails(@case.ClientId) != null)
                         {
-                            if (caseService.AddNewCaseDetails(@case))
+                            if (caseService.GetCaseDetails(@case.ClientId, @case.CaseNumber) == null)
                             {
-                                taskExecutionStatus.DestAddRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "New Client Case details added successfully.", CustomParams = JsonConvert.SerializeObject(@case) });
+                                if (caseService.AddNewCaseDetails(@case))
+                                {
+                                    taskExecutionStatus.DestAddRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "New Client Case details added successfully.", CustomParams = JsonConvert.SerializeObject(@case) });
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (caseService.UpdateCaseDetails(@case))
+                            else
                             {
-                                taskExecutionStatus.DestUpdateRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Existing Client Case details updated successfully.", CustomParams = JsonConvert.SerializeObject(@case) });
+                                if (caseService.UpdateCaseDetails(@case))
+                                {
+                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Existing Client Case details updated successfully.", CustomParams = JsonConvert.SerializeObject(@case) });
+                                }
                             }
                         }
                     }
@@ -569,20 +561,23 @@ namespace CMI.Processor
                             NoteType = offenderNoteDetails.NoteType
                         };
 
-                        if (noteService.GetNoteDetails(note.ClientId, note.NoteId) == null)
+                        if (clientService.GetClientDetails(note.ClientId) != null)
                         {
-                            if (noteService.AddNewNoteDetails(note))
+                            if (noteService.GetNoteDetails(note.ClientId, note.NoteId) == null)
                             {
-                                taskExecutionStatus.DestAddRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "New Client Note details added successfully.", CustomParams = JsonConvert.SerializeObject(note) });
+                                if (noteService.AddNewNoteDetails(note))
+                                {
+                                    taskExecutionStatus.DestAddRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "New Client Note details added successfully.", CustomParams = JsonConvert.SerializeObject(note) });
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (noteService.UpdateNoteDetails(note))
+                            else
                             {
-                                taskExecutionStatus.DestUpdateRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Existing Client Note details updated successfully.", CustomParams = JsonConvert.SerializeObject(note) });
+                                if (noteService.UpdateNoteDetails(note))
+                                {
+                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Existing Client Note details updated successfully.", CustomParams = JsonConvert.SerializeObject(note) });
+                                }
                             }
                         }
                     }
@@ -613,7 +608,26 @@ namespace CMI.Processor
         #endregion
 
         #region Private Helper Methods
-        #region Processor DAL
+        private void UpdateExecutionStatus(Common.Notification.TaskExecutionStatus taskExecutionStatus)
+        {
+            processorExecutionStatus.NumTaskProcessed++;
+            if (taskExecutionStatus != null)
+            {
+                if (taskExecutionStatus.IsSuccessful)
+                {
+                    processorExecutionStatus.NumTaskSucceeded++;
+                }
+                else
+                {
+                    processorExecutionStatus.NumTaskFailed++;
+                }
+
+                processorExecutionStatus.IsSuccessful = processorExecutionStatus.IsSuccessful & taskExecutionStatus.IsSuccessful;
+                taskExecutionStatuses.Add(taskExecutionStatus);
+            }
+        }
+
+        #region Processor DAL Methods
         private void RetrieveLastExecutionDateTime()
         {
             try
@@ -641,7 +655,7 @@ namespace CMI.Processor
         }
         #endregion
 
-        #region Mapping
+        #region Mapping Helper Methods
         private string MapFullAddress(string line1, string line2, string city, string state, string zip)
         {
             string destFullAddress = string.Empty;

@@ -29,7 +29,9 @@ WHERE
 (
 	SELECT
 		CA.[CaseId],
-		L.[PermDesc]
+		L.[PermDesc],
+		CA.[FromTime],
+		CA.[ToTime]
 	FROM
 		[dbo].[CaseAttribute] CA JOIN [dbo].[AttributeDef] AD
 			ON CA.[AttributeId] = AD.[Id]
@@ -37,8 +39,6 @@ WHERE
 				ON CA.[Value] = L.[Id]
 	WHERE
 		AD.[PermDesc] = 'Case_CaseStatus'
-		AND CA.[FromTime] IS NOT NULL AND CA.[ToTime] IS NULL
-		AND CA.[FromTime] > @LastExecutionDateTime
 )
 SELECT DISTINCT
 	O.[Pin],
@@ -46,7 +46,7 @@ SELECT DISTINCT
 	AN.[MiddleName],
 	AN.[LastName],
 
-	P.[DOB],
+	P.[DOB] AS [DateOfBirth],
 	P.[Gender],
 	
 	CT.[PermDesc] AS [ClientType],
@@ -100,7 +100,15 @@ WHERE
 	AND P.[FromTime] IS NOT NULL AND P.[ToTime] IS NULL
 	AND OFCL.[FromTime] IS NOT NULL AND OFCL.[ToTime] IS NULL AND OFCL.[IsPrimary] = 1
 	AND CC.[FromTime] IS NOT NULL AND CC.[CloseDateTime] IS NULL AND CT.[IsActive] = 1
-	AND (AN.[FromTime] > @LastExecutionDateTime OR OCL.[FromTime] > @LastExecutionDateTime OR P.[LastModified] > @LastExecutionDateTime OR OFCL.[FromTime] > @LastExecutionDateTime)
+	AND CSD.[FromTime] IS NOT NULL AND CSD.[ToTime] IS NULL
+	AND 
+	(
+		AN.[FromTime] > @LastExecutionDateTime 
+		OR OCL.[FromTime] > @LastExecutionDateTime 
+		OR P.[LastModified] > @LastExecutionDateTime 
+		OR OFCL.[FromTime] > @LastExecutionDateTime 
+		OR CSD.[FromTime] > @LastExecutionDateTime
+	)
 	AND CSD.[PermDesc] = 'Active'
 	AND CSCT.[PermDesc] = 'Service'
 	AND (CT.[PermDesc] = 'Formal' OR CT.[PermDesc] = 'PRCS' OR CT.[PermDesc] = 'MCS' OR CT.[PermDesc] = 'Adult.Interstate')

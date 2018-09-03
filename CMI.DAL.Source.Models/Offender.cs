@@ -26,8 +26,6 @@ namespace CMI.DAL.Source
 
         public string CaseloadName { get; set; }
 
-        public string CaseloadType { get; set; }
-
         public string OfficerLogon { get; set; }
 
         public string OfficerEmail { get; set; }

@@ -93,7 +93,6 @@ namespace CMI.DAL.Source.AutoMon
                                     Gender = Convert.ToString(reader[DBColumnName.GENDER]),
                                     Race = Convert.ToString(reader[DBColumnName.RACE]),
                                     CaseloadName = Convert.ToString(reader[DBColumnName.CASELOAD_NAME]),
-                                    CaseloadType = Convert.ToString(reader[DBColumnName.CASELOAD_TYPE]),
                                     OfficerLogon = Convert.ToString(reader[DBColumnName.OFFICER_LOGON]),
                                     OfficerEmail = Convert.ToString(reader[DBColumnName.OFFICER_EMAIL]),
                                     OfficerFirstName = Convert.ToString(reader[DBColumnName.OFFICER_FIRST_NAME]),
