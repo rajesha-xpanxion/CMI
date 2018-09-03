@@ -270,7 +270,9 @@ SELECT DISTINCT
 	CRG.[MostSeriousCharge] AS [IsPrimary],
 	CRG.[ViolationDate] AS [OffenseDate],
 
-	COALESCE(CSSD.[Value], CSED.[Value]) AS [CaseDate]
+	COALESCE(CSSD.[Value], CSED.[Value]) AS [CaseDate],
+    CSSD.[Value] AS [SupervisionStartDate],
+    CSED.[Value] AS [SupervisionEndDate]
 FROM
 	[dbo].[Offender] O JOIN [dbo].[CourtCase] CC
 		ON O.[Id] = CC.[OffenderId]
@@ -371,7 +373,8 @@ SELECT DISTINCT
 	[Id],
 	[Value] AS [Text],
 	[Email] AS [AuthorEmail],
-	[FromTime] AS [Date]
+	[FromTime] AS [Date],
+    'Client' As [NoteType]
 FROM
 	ClientNameChangeNotesData
 UNION
@@ -380,7 +383,8 @@ SELECT DISTINCT
 	[Id],
 	[Value] AS [Text],
 	[Email] AS [AuthorEmail],
-	[FromTime] AS [Date]
+	[FromTime] AS [Date],
+    'Address' As [NoteType]
 FROM
 	ClientAddressChangeNotesData
 UNION
@@ -389,7 +393,8 @@ SELECT DISTINCT
 	[Id],
 	[Value] AS [Text],
 	[Email] AS [AuthorEmail],
-	[FromTime] AS [Date]
+	[FromTime] AS [Date],
+    'Phone' As [NoteType]
 FROM
 	ClientPhoneNumberChangeNotesData
 ";

@@ -490,6 +490,8 @@ namespace CMI.Processor
                             ClientId = offenderCaseDetails.Pin,
                             CaseNumber = offenderCaseDetails.CaseNumber,
                             CaseDate = offenderCaseDetails.CaseDate.HasValue ? offenderCaseDetails.CaseDate.Value.ToShortDateString() : currentTimestamp.ToString(),
+                            StartDate = offenderCaseDetails.SupervisionStartDate.HasValue ? offenderCaseDetails.SupervisionStartDate.Value.ToShortDateString() : string.Empty,
+                            EndDate = offenderCaseDetails.SupervisionEndDate.HasValue ? offenderCaseDetails.SupervisionEndDate.Value.ToShortDateString() : string.Empty,
                             Status = offenderCaseDetails.CaseStatus,
                             Offenses = allOffenderCaseDetails.Where(z => z.Pin == offenderCaseDetails.Pin && z.CaseNumber == offenderCaseDetails.CaseNumber).Select(p => new Offense
                             {
@@ -563,7 +565,8 @@ namespace CMI.Processor
                             ClientId = offenderNoteDetails.Pin,
                             NoteId = Convert.ToString(offenderNoteDetails.Id),
                             NoteText = offenderNoteDetails.Text,
-                            NoteDatetime = offenderNoteDetails.Date.ToString()
+                            NoteDatetime = offenderNoteDetails.Date.ToString(),
+                            NoteType = offenderNoteDetails.NoteType
                         };
 
                         if (noteService.GetNoteDetails(note.ClientId, note.NoteId) == null)

@@ -104,6 +104,7 @@ namespace CMI.DAL.Source.AutoMon
                                     IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY])
                                 };
 
+                                //case date
                                 if (Convert.IsDBNull(reader[DBColumnName.CASE_DATE]))
                                 {
                                     offenderCase.CaseDate = null;
@@ -111,6 +112,26 @@ namespace CMI.DAL.Source.AutoMon
                                 else
                                 {
                                     offenderCase.CaseDate = (DateTime?)reader[DBColumnName.CASE_DATE];
+                                }
+
+                                //supervision start date
+                                if (Convert.IsDBNull(reader[DBColumnName.SUPERVISION_START_DATE]))
+                                {
+                                    offenderCase.SupervisionStartDate = null;
+                                }
+                                else
+                                {
+                                    offenderCase.SupervisionStartDate = (DateTime?)reader[DBColumnName.SUPERVISION_START_DATE];
+                                }
+
+                                //supervision end date
+                                if (Convert.IsDBNull(reader[DBColumnName.SUPERVISION_END_DATE]))
+                                {
+                                    offenderCase.SupervisionEndDate = null;
+                                }
+                                else
+                                {
+                                    offenderCase.SupervisionEndDate = (DateTime?)reader[DBColumnName.SUPERVISION_END_DATE];
                                 }
 
                                 if (Convert.IsDBNull(reader[DBColumnName.OFFENSE_DATE]))

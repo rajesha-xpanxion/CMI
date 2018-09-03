@@ -15,5 +15,7 @@ namespace CMI.DAL.Dest.Models
         public string NoteAuthor { get; set; }
 
         public string NoteDatetime { get; set; }
+
+        public string NoteType { get; set; }
     }
 }

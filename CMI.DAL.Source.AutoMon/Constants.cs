@@ -47,10 +47,13 @@ namespace CMI.DAL.Source.AutoMon
         public const string OFFENSE_CATEGORY = "OffenseCategory";
         public const string OFFENSE_DATE = "OffenseDate";
         public const string CASE_DATE = "CaseDate";
+        public const string SUPERVISION_START_DATE = "SupervisionStartDate";
+        public const string SUPERVISION_END_DATE = "SupervisionEndDate";
         public const string EMAIL_ADDRESS = "EmailAddress";
         public const string DATE = "Date";
         public const string TEXT = "Text";
         public const string AUTHOR_EMAIL = "AuthorEmail";
         public const string IS_ACTIVE = "IsActive";
+        public const string NOTE_TYPE = "NoteType";
     }
 }

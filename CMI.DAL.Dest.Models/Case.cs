@@ -9,6 +9,8 @@ namespace CMI.DAL.Dest
         public string ClientId { get; set; }
         public string CaseNumber { get; set; }
         public string CaseDate { get; set; }
+        public string StartDate { get; set; }
+        public string EndDate { get; set; }
         public string Status { get; set; }
         public List<Offense> Offenses { get; set; }
     }

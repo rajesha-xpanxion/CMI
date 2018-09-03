@@ -106,7 +106,8 @@ namespace CMI.DAL.Source.AutoMon
                                     Id = Convert.ToInt32(reader[DBColumnName.ID]),
                                     Date = Convert.ToDateTime(reader[DBColumnName.DATE]),
                                     Text = Convert.ToString(reader[DBColumnName.TEXT]),
-                                    AuthorEmail = Convert.ToString(reader[DBColumnName.AUTHOR_EMAIL])
+                                    AuthorEmail = Convert.ToString(reader[DBColumnName.AUTHOR_EMAIL]),
+                                    NoteType = Convert.ToString(reader[DBColumnName.NOTE_TYPE])
                                 });
                             }
                         }

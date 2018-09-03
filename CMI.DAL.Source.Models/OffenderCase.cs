@@ -12,6 +12,10 @@ namespace CMI.DAL.Source
 
         public DateTime? CaseDate { get; set; }
 
+        public DateTime? SupervisionStartDate { get; set; }
+
+        public DateTime? SupervisionEndDate { get; set; }
+
         public string OffenseLabel { get; set; }
 
         public string OffenseStatute { get; set; }
