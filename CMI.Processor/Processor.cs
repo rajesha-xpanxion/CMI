@@ -555,7 +555,7 @@ namespace CMI.Processor
             {
                 allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(lastExecutionDateTime);
 
-                foreach (var offenderNoteDetails in allOffenderNoteDetails.GroupBy(x => new { x.Pin }).Select(y => y.First()))
+                foreach (var offenderNoteDetails in allOffenderNoteDetails)
                 {
                     taskExecutionStatus.SourceReceivedRecordCount++;
                     try
