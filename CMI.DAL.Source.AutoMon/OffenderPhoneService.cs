@@ -85,7 +85,7 @@ namespace CMI.DAL.Source.AutoMon
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = SQLQuery.GET_ALL_OFFENDER_ADDRESS_DETAILS;
+                        cmd.CommandText = SQLQuery.GET_ALL_OFFENDER_PHONE_DETAILS;
                         cmd.CommandType = System.Data.CommandType.Text;
                         cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME, SqlDbType = System.Data.SqlDbType.DateTime, Value = lastExecutionDateTime });
                         cmd.Connection = conn;
