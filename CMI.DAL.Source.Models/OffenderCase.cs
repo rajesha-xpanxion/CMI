@@ -16,6 +16,8 @@ namespace CMI.DAL.Source
 
         public DateTime? SupervisionEndDate { get; set; }
 
+        public string ClosureReason { get; set; }
+
         public string OffenseLabel { get; set; }
 
         public string OffenseStatute { get; set; }

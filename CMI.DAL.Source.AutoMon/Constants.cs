@@ -42,6 +42,7 @@ namespace CMI.DAL.Source.AutoMon
         public const string COMMENT = "Comment";
         public const string CASE_NUMBER = "CaseNumber";
         public const string CASE_STATUS = "CaseStatus";
+        public const string CLOSURE_REASON = "ClosureReason";
         public const string OFFENSE_LABEL = "OffenseLabel";
         public const string OFFENSE_STATUTE = "OffenseStatute";
         public const string OFFENSE_CATEGORY = "OffenseCategory";

@@ -97,6 +97,7 @@ namespace CMI.DAL.Source.AutoMon
                                     Pin = Convert.ToString(reader[DBColumnName.PIN]),
                                     CaseNumber = Convert.ToString(reader[DBColumnName.CASE_NUMBER]),
                                     CaseStatus = Convert.ToString(reader[DBColumnName.CASE_STATUS]),
+                                    ClosureReason = Convert.ToString(reader[DBColumnName.CLOSURE_REASON]),
 
                                     OffenseLabel = Convert.ToString(reader[DBColumnName.OFFENSE_LABEL]),
                                     OffenseStatute = Convert.ToString(reader[DBColumnName.OFFENSE_STATUTE]),

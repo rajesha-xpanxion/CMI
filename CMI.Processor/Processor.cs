@@ -482,6 +482,7 @@ namespace CMI.Processor
                             StartDate = offenderCaseDetails.SupervisionStartDate.HasValue ? offenderCaseDetails.SupervisionStartDate.Value.ToShortDateString() : string.Empty,
                             EndDate = offenderCaseDetails.SupervisionEndDate.HasValue ? offenderCaseDetails.SupervisionEndDate.Value.ToShortDateString() : string.Empty,
                             Status = offenderCaseDetails.CaseStatus,
+                            EndReason = offenderCaseDetails.ClosureReason,
                             Offenses = allOffenderCaseDetails.Where(z => z.Pin == offenderCaseDetails.Pin && z.CaseNumber == offenderCaseDetails.CaseNumber).Select(p => new Offense
                             {
                                 Label = p.OffenseLabel,

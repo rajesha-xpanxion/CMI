@@ -265,6 +265,16 @@ WHERE
 		CaseAttributeData
 	WHERE
 		[PermDesc] = 'Case_SupervisionEnd'
+), CaseClosureReasonData AS
+(
+	SELECT
+		CAD.[CaseId],
+		L.[Description]
+	FROM
+		CaseAttributeData CAD JOIN [dbo].[Lookup] L
+			ON CAD.[Value] = L.[Id]
+	WHERE
+		CAD.[PermDesc] = 'Case_TerminationType'
 )
 SELECT DISTINCT
 	O.[Pin],
@@ -280,7 +290,8 @@ SELECT DISTINCT
 
 	COALESCE(CSSD.[Value], CSED.[Value]) AS [CaseDate],
     CSSD.[Value] AS [SupervisionStartDate],
-    CSED.[Value] AS [SupervisionEndDate]
+    CSED.[Value] AS [SupervisionEndDate],
+	CCRD.[Description] AS [ClosureReason]
 FROM
 	[dbo].[Offender] O JOIN [dbo].[CourtCase] CC
 		ON O.[Id] = CC.[OffenderId]
@@ -303,6 +314,9 @@ FROM
 
 								LEFT JOIN [dbo].[CaseType] CT
 									ON CC.[CaseTypeId] = CT.[Id]
+
+									LEFT JOIN CaseClosureReasonData CCRD
+										ON CC.[Id] = CCRD.[CaseId]
 
 WHERE
 	CRG.[FromTime] IS NOT NULL AND CRG.[ToTime] IS NULL
