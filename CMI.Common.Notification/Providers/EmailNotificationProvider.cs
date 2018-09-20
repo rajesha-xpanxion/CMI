@@ -28,6 +28,7 @@ namespace CMI.Common.Notification
                         emailNotificationConfig.SMTPServerHost,
                         emailNotificationConfig.MailServerUserName,
                         emailNotificationConfig.MailServerPassword,
+                        emailNotificationConfig.IsEnableSsl,
                         emailNotificationConfig.FromEmailAddress,
                         request.ToEmailAddress,
                         string.Empty,
@@ -48,7 +49,7 @@ namespace CMI.Common.Notification
             return response;
         }
 
-        void SendEmail(string smtpServerHostName, string mailServerUserName, string mailServerPassword, string fromEmailAddress, string toEmailAddresses, string ccEmailAddresses, string subject, string body, MailPriority priority, List<string> attachmentFiles)
+        void SendEmail(string smtpServerHostName, string mailServerUserName, string mailServerPassword, bool isEnableSsl, string fromEmailAddress, string toEmailAddresses, string ccEmailAddresses, string subject, string body, MailPriority priority, List<string> attachmentFiles)
         {
             if (
                 !string.IsNullOrEmpty(smtpServerHostName)
@@ -63,7 +64,7 @@ namespace CMI.Common.Notification
                         ? System.Net.CredentialCache.DefaultNetworkCredentials
                         : new NetworkCredential(mailServerUserName, mailServerPassword)
                         );
-                    smtpClient.EnableSsl = true;
+                    smtpClient.EnableSsl = isEnableSsl;
 
                     MailMessage mailMessage = new MailMessage();
                     mailMessage.From = new MailAddress(fromEmailAddress);

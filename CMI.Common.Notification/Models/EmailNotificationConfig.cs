@@ -10,6 +10,7 @@ namespace CMI.Common.Notification
         public string SMTPServerHost { get; set; }
         public string MailServerUserName { get; set; }
         public string MailServerPassword { get; set; }
+        public bool IsEnableSsl { get; set; }
         public string FromEmailAddress { get; set; }
         public string EmailAlertTemplatesPath { get; set; }
     }
