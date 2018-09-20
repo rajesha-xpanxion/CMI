@@ -15,9 +15,9 @@ namespace CMI.Common.Notification
             this.emailNotificationConfig = emailNotificationConfig.Value;
         }
 
-        public bool SendExecutionStatusReportEmail(ExecutionStatusReportEmailRequest request)
+        public ExecutionStatusReportEmailResponse SendExecutionStatusReportEmail(ExecutionStatusReportEmailRequest request)
         {
-            bool isSuccessful = true;
+            var response = new ExecutionStatusReportEmailResponse() { IsSuccessful = true };
             try
             {
                 if (emailNotificationConfig.IsEmailNotificationEnabled)
@@ -41,27 +41,28 @@ namespace CMI.Common.Notification
             }
             catch(Exception ex)
             {
-                string exMsg = ex.Message;
-                string exStackTrace = ex.StackTrace;
-                isSuccessful = false;
+                response.IsSuccessful = false;
+                response.Exception = ex;
             }
 
-            return isSuccessful;
+            return response;
         }
 
         void SendEmail(string smtpServerHostName, string mailServerUserName, string mailServerPassword, string fromEmailAddress, string toEmailAddresses, string ccEmailAddresses, string subject, string body, MailPriority priority, List<string> attachmentFiles)
         {
             if (
                 !string.IsNullOrEmpty(smtpServerHostName)
-                && !string.IsNullOrEmpty(mailServerUserName)
-                && !string.IsNullOrEmpty(mailServerPassword)
                 && !string.IsNullOrEmpty(fromEmailAddress)
                 && !string.IsNullOrEmpty(toEmailAddresses)
             )
                 using (SmtpClient smtpClient = new SmtpClient(smtpServerHostName))
                 {
-                    smtpClient.UseDefaultCredentials = false;
-                    smtpClient.Credentials = new NetworkCredential(mailServerUserName, mailServerPassword);
+                    smtpClient.UseDefaultCredentials = true;
+                    smtpClient.Credentials = (
+                        (string.IsNullOrEmpty(mailServerUserName) || string.IsNullOrEmpty(mailServerPassword))
+                        ? System.Net.CredentialCache.DefaultNetworkCredentials
+                        : new NetworkCredential(mailServerUserName, mailServerPassword)
+                        );
                     smtpClient.EnableSsl = true;
 
                     MailMessage mailMessage = new MailMessage();

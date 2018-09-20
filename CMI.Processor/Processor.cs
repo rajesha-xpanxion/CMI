@@ -131,13 +131,23 @@ namespace CMI.Processor
             SaveExecutionStatus(processorExecutionStatus);
 
             //send execution status report email
-            emailNotificationProvider.SendExecutionStatusReportEmail(
-                new Common.Notification.ExecutionStatusReportEmailRequest()
-                {
-                    ToEmailAddress = processorConfig.ExecutionStatusReportReceiverEmailAddresses,
-                    Subject = processorConfig.ExecutionStatusReportEmailSubject,
-                    TaskExecutionStatuses = taskExecutionStatuses
-                });
+            var executionStatusReportEmailRequest = new Common.Notification.ExecutionStatusReportEmailRequest()
+            {
+                ToEmailAddress = processorConfig.ExecutionStatusReportReceiverEmailAddresses,
+                Subject = processorConfig.ExecutionStatusReportEmailSubject,
+                TaskExecutionStatuses = taskExecutionStatuses
+            };
+
+            var response = emailNotificationProvider.SendExecutionStatusReportEmail(executionStatusReportEmailRequest);
+
+            if (response.IsSuccessful)
+            {
+                logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "Execute", Message = "Execution status report email sent successfully.", CustomParams = JsonConvert.SerializeObject(executionStatusReportEmailRequest) });
+            }
+            else
+            {
+                logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "Execute", Message = "Error occurred while sending execution status report email.", Exception = response.Exception, CustomParams = JsonConvert.SerializeObject(executionStatusReportEmailRequest) });
+            }
 
             //log info message for end of processing
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "Execute", Message = "Processor execution completed.", CustomParams = JsonConvert.SerializeObject(processorExecutionStatus) });

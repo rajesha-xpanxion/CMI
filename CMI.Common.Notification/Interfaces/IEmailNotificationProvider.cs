@@ -6,6 +6,6 @@ namespace CMI.Common.Notification
 {
     public interface IEmailNotificationProvider
     {
-        bool SendExecutionStatusReportEmail(ExecutionStatusReportEmailRequest request);
+        ExecutionStatusReportEmailResponse SendExecutionStatusReportEmail(ExecutionStatusReportEmailRequest request);
     }
 }
