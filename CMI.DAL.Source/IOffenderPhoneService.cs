@@ -6,6 +6,6 @@ namespace CMI.DAL.Source
 {
     public interface IOffenderPhoneService
     {
-        IEnumerable<OffenderPhone> GetAllOffenderPhones(DateTime lastExecutionDateTime);
+        IEnumerable<OffenderPhone> GetAllOffenderPhones(DateTime? lastExecutionDateTime);
     }
 }

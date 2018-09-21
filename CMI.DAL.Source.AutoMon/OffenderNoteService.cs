@@ -15,7 +15,7 @@ namespace CMI.DAL.Source.AutoMon
             this.sourceConfig = sourceConfig.Value;
         }
 
-        public IEnumerable<OffenderNote> GetAllOffenderNotes(DateTime lastExecutionDateTime)
+        public IEnumerable<OffenderNote> GetAllOffenderNotes(DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
@@ -93,7 +93,13 @@ namespace CMI.DAL.Source.AutoMon
                     {
                         cmd.CommandText = SQLQuery.GET_ALL_OFFENDER_NOTE_DETAILS;
                         cmd.CommandType = System.Data.CommandType.Text;
-                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME, SqlDbType = System.Data.SqlDbType.DateTime, Value = lastExecutionDateTime });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
+                            SqlDbType = System.Data.SqlDbType.DateTime,
+                            Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
+                            IsNullable = true
+                        });
                         cmd.Connection = conn;
 
                         using (var reader = cmd.ExecuteReader())

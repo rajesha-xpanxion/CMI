@@ -108,6 +108,7 @@ WHERE
 		OR P.[LastModified] > @LastExecutionDateTime 
 		OR OFCL.[FromTime] > @LastExecutionDateTime 
 		OR CSD.[FromTime] > @LastExecutionDateTime
+        OR @LastExecutionDateTime IS NULL
 	)
 	AND CSD.[PermDesc] = 'Active'
 	AND CSCT.[PermDesc] = 'Service'
@@ -158,6 +159,7 @@ FROM
 						ON A.[NoteId] = N.[Id]
 WHERE
 	A.[FromTime] > @LastExecutionDateTime
+    OR @LastExecutionDateTime IS NULL
 ";
 
         public const string GET_ALL_OFFENDER_PHONE_DETAILS = @"
@@ -202,6 +204,7 @@ FROM
 						ON PN.[NoteId] = N.[Id]
 WHERE
 	PN.[FromTime] > @LastExecutionDateTime
+    OR @LastExecutionDateTime IS NULL
 ";
 
         public const string GET_ALL_OFFENDER_EMAIL_DETAILS = @"
@@ -222,6 +225,7 @@ FROM
 			ON P.[Id] = E.[PersonId]
 WHERE
 	E.[FromTime] > @LastExecutionDateTime
+    OR @LastExecutionDateTime IS NULL
 ";
 
         public const string GET_ALL_OFFENDER_CASE_DETAILS = @"
@@ -235,8 +239,13 @@ WHERE
 		[dbo].[CaseAttribute] CA JOIN [dbo].[AttributeDef] AD
 			ON CA.[AttributeId] = AD.[Id]
 	WHERE
-		CA.[FromTime] IS NOT NULL AND CA.[ToTime] IS NULL
-		AND CA.[FromTime] > @LastExecutionDateTime 
+		CA.[ToTime] IS NULL
+		AND
+		(
+			CA.[FromTime] > @LastExecutionDateTime
+			OR @LastExecutionDateTime IS NULL
+		)
+
 ), CaseStatusLookupData AS
 (
 	SELECT
@@ -323,7 +332,8 @@ WHERE
 	AND 
 	(
 		CC.[FromTime] > @LastExecutionDateTime 
-		OR CRG.[FromTime] > @LastExecutionDateTime 
+		OR CRG.[FromTime] > @LastExecutionDateTime
+		OR @LastExecutionDateTime IS NULL
 	)
 	AND CSLD.[Description] IS NOT NULL
 	AND (CT.[PermDesc] = 'Formal' OR CT.[PermDesc] = 'PRCS' OR CT.[PermDesc] = 'MCS' OR CT.[PermDesc] = 'Adult.Interstate')
@@ -350,6 +360,7 @@ WHERE
 						ON N.[EnteredByPId] = OFCR.[PersonId]
 	WHERE
 		N.[FromTime] > @LastExecutionDateTime
+		OR @LastExecutionDateTime IS NULL
 
 ), ClientAddressChangeNotesData AS
 (
@@ -370,6 +381,7 @@ WHERE
 							ON N.[EnteredByPId] = OFCR.[PersonId]
 	WHERE
 		N.[FromTime] > @LastExecutionDateTime
+		OR @LastExecutionDateTime IS NULL
 ), ClientPhoneNumberChangeNotesData AS
 (
 	SELECT DISTINCT
@@ -389,6 +401,7 @@ WHERE
 						ON N.[EnteredByPId] = OFCR.[PersonId]
 	WHERE
 		N.[FromTime] > @LastExecutionDateTime
+		OR @LastExecutionDateTime IS NULL
 )
 SELECT DISTINCT
 	[Pin],

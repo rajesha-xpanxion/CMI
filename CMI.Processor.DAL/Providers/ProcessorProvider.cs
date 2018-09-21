@@ -14,9 +14,9 @@ namespace CMI.Processor.DAL
             this.processorConfig = processorConfig.Value;
         }
 
-        public DateTime GetLastExecutionDateTime()
+        public DateTime? GetLastExecutionDateTime()
         {
-            DateTime lastExecutionDateTime = DateTime.Now.AddDays(-1);
+            DateTime? lastExecutionDateTime = null;
 
             using (SqlConnection conn = new SqlConnection(processorConfig.CMIDBConnString))
             {

@@ -6,7 +6,7 @@ namespace CMI.Processor.DAL
 {
     public interface IProcessorProvider
     {
-        DateTime GetLastExecutionDateTime();
+        DateTime? GetLastExecutionDateTime();
 
         void SaveExecutionStatus(ExecutionStatus executionStatus);
     }

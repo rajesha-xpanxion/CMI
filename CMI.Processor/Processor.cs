@@ -32,7 +32,7 @@ namespace CMI.Processor
         ILookupService lookupService;
         #endregion
 
-        DateTime lastExecutionDateTime;
+        DateTime? lastExecutionDateTime;
         DAL.ExecutionStatus processorExecutionStatus = null;
 
         CMI.Common.Logging.ILogger logger;
