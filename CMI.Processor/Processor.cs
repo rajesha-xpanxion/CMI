@@ -103,6 +103,9 @@ namespace CMI.Processor
             //get last execution date time so that differential dataset is pulled from source
             RetrieveLastExecutionDateTime();
 
+            //first loads required lookup data
+            LoadLookupData();
+
             //process client profiles
             UpdateExecutionStatus(ProcessClientProfiles());
 
@@ -170,13 +173,23 @@ namespace CMI.Processor
                 {
                     taskExecutionStatus.SourceReceivedRecordCount++;
 
+                    Client client = null;
                     try
                     {
-                        Client client = new Client()
+                        client = new Client()
                         {
-                            IntegrationId = offenderDetails.Pin,
+                            IntegrationId = (
+                                offenderDetails.Pin.Length >= 3 
+                                ? 
+                                offenderDetails.Pin 
+                                : (
+                                    offenderDetails.Pin.Length == 2 
+                                    ? string.Format("0{0}", offenderDetails.Pin)
+                                    : string.Format("00{0}", offenderDetails.Pin)
+                                )
+                            ),
                             FirstName = offenderDetails.FirstName,
-                            MiddleName = offenderDetails.MiddleName,
+                            MiddleName = string.IsNullOrEmpty(offenderDetails.MiddleName) ? null : offenderDetails.MiddleName,
                             LastName = offenderDetails.LastName,
                             ClientType = offenderDetails.ClientType,
                             TimeZone = offenderDetails.TimeZone,
@@ -208,7 +221,7 @@ namespace CMI.Processor
                     catch (ApplicationException ae)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred in API while processing a Client Profile.", Exception = ae, CustomParams = JsonConvert.SerializeObject(offenderDetails) });
+                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred in API while processing a Client Profile.", Exception = ae, CustomParams = JsonConvert.SerializeObject(client) });
                     }
                     catch (Exception ex)
                     {
@@ -619,6 +632,126 @@ namespace CMI.Processor
         #endregion
 
         #region Private Helper Methods
+        private void LoadLookupData()
+        {
+            //load AddressTypes lookup data
+            try
+            {
+                if (lookupService.AddressTypes != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved AddressTypes from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.AddressTypes) });
+                }
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading AddressTypes lookup data", Exception = ex });
+            }
+
+            //load CaseLoads lookup data
+            try
+            {
+                if (lookupService.CaseLoads != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved Caseloads from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.CaseLoads) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading CaseLoads lookup data", Exception = ex });
+            }
+
+            //load ClientTypes lookup data
+            try
+            {
+                if (lookupService.ClientTypes != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved ClientTypes from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.ClientTypes) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading ClientTypes lookup data", Exception = ex });
+            }
+
+            //load ContactTypes lookup data
+            try
+            {
+                if (lookupService.ContactTypes != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved ContactTypes from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.ContactTypes) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading ContactTypes lookup data", Exception = ex });
+            }
+
+            //load Ethnicities lookup data
+            try
+            {
+                if (lookupService.Ethnicities != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved Ethnicities from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.Ethnicities) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading Ethnicities lookup data", Exception = ex });
+            }
+
+            //load Genders lookup data
+            try
+            {
+                if (lookupService.Genders != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved Genders from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.Genders) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading Genders lookup data", Exception = ex });
+            }
+
+            //load Offenses lookup data
+            try
+            {
+                if (lookupService.Offenses != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved Offenses from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.Offenses) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading Offenses lookup data", Exception = ex });
+            }
+
+            //load SupervisingOfficers lookup data
+            try
+            {
+                if (lookupService.SupervisingOfficers != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved SupervisingOfficers from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.SupervisingOfficers) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading SupervisingOfficers lookup data", Exception = ex });
+            }
+
+            //load TimeZones lookup data
+            try
+            {
+                if (lookupService.TimeZones != null)
+                {
+                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Successfully retrieved TimeZones from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.TimeZones) });
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "LoadLookupData", Message = "Error occurred while loading TimeZones lookup data", Exception = ex });
+            }
+        }
+
         private void UpdateExecutionStatus(Common.Notification.TaskExecutionStatus taskExecutionStatus)
         {
             processorExecutionStatus.NumTaskProcessed++;
@@ -763,8 +896,6 @@ namespace CMI.Processor
         {
             if (lookupService.CaseLoads != null)
             {
-                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "MapCaseload", Message = "Successfully retrieved Caseloads from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.CaseLoads) });
-
                 if (lookupService.CaseLoads.Where(c => c.Name.Equals(sourceCaseloadName, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
                 {
                     return lookupService.CaseLoads.Where(c => c.Name.Equals(sourceCaseloadName, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault().Id.ToString();
@@ -778,8 +909,6 @@ namespace CMI.Processor
         {
             if (lookupService.SupervisingOfficers != null)
             {
-                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "MapSupervisingOfficer", Message = "Successfully retrieved Supervising Officers from lookup", CustomParams = JsonConvert.SerializeObject(lookupService.SupervisingOfficers) });
-
                 if (lookupService.SupervisingOfficers.Where(s => s.FirstName.Equals(sourceFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(sourceLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(sourceEmailAddress, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
                 {
                     return lookupService.SupervisingOfficers.Where(s => s.FirstName.Equals(sourceFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(sourceLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(sourceEmailAddress, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault().Email;
