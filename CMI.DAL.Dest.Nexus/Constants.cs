@@ -15,5 +15,7 @@ namespace CMI.DAL.Dest.Nexus
         /// Represents content type format - JSON
         /// </summary>
         public const string ContentTypeFormatJSON = "application/json";
+
+        public const int ExpectedMinLenghOfId = 3;
     }
 }

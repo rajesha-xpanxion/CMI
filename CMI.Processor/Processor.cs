@@ -178,16 +178,7 @@ namespace CMI.Processor
                     {
                         client = new Client()
                         {
-                            IntegrationId = (
-                                offenderDetails.Pin.Length >= 3 
-                                ? 
-                                offenderDetails.Pin 
-                                : (
-                                    offenderDetails.Pin.Length == 2 
-                                    ? string.Format("0{0}", offenderDetails.Pin)
-                                    : string.Format("00{0}", offenderDetails.Pin)
-                                )
-                            ),
+                            IntegrationId = FormatId(offenderDetails.Pin),
                             FirstName = offenderDetails.FirstName,
                             MiddleName = string.IsNullOrEmpty(offenderDetails.MiddleName) ? null : offenderDetails.MiddleName,
                             LastName = offenderDetails.LastName,
@@ -263,8 +254,8 @@ namespace CMI.Processor
                     {
                         address = new Address()
                         {
-                            ClientId = offenderAddressDetails.Pin,
-                            AddressId = string.Format("{0}-{1}", offenderAddressDetails.Pin, offenderAddressDetails.Id),
+                            ClientId = FormatId(offenderAddressDetails.Pin),
+                            AddressId = string.Format("{0}-{1}", FormatId(offenderAddressDetails.Pin), offenderAddressDetails.Id),
                             AddressType = MapAddressType(offenderAddressDetails.AddressType),
                             FullAddress = MapFullAddress(offenderAddressDetails.Line1, offenderAddressDetails.Line2, offenderAddressDetails.City, offenderAddressDetails.State, offenderAddressDetails.Zip),
                             IsPrimary = offenderAddressDetails.IsPrimary,
@@ -345,8 +336,8 @@ namespace CMI.Processor
                     {
                         contact = new Contact()
                         {
-                            ClientId = offenderPhoneDetails.Pin,
-                            ContactId = string.Format("{0}-{1}", offenderPhoneDetails.Pin, offenderPhoneDetails.Id),
+                            ClientId = FormatId(offenderPhoneDetails.Pin),
+                            ContactId = string.Format("{0}-{1}", FormatId(offenderPhoneDetails.Pin), offenderPhoneDetails.Id),
                             ContactType = MapContactType(offenderPhoneDetails.PhoneNumberType),
                             ContactValue = offenderPhoneDetails.Phone,
                             IsPrimary = offenderPhoneDetails.IsPrimary,
@@ -426,8 +417,8 @@ namespace CMI.Processor
                     {
                         contact = new Contact()
                         {
-                            ClientId = offenderEmailDetails.Pin,
-                            ContactId = string.Format("{0}-{1}", offenderEmailDetails.Pin, offenderEmailDetails.Id),
+                            ClientId = FormatId(offenderEmailDetails.Pin),
+                            ContactId = string.Format("{0}-{1}", FormatId(offenderEmailDetails.Pin), offenderEmailDetails.Id),
                             ContactType = DAL.Constants.CONTACT_TYPE_EMAIL_DEST,
                             ContactValue = offenderEmailDetails.EmailAddress,
                             IsPrimary = offenderEmailDetails.IsPrimary,
@@ -507,13 +498,13 @@ namespace CMI.Processor
                     {
                         @case = new Case()
                         {
-                            ClientId = offenderCaseDetails.Pin,
+                            ClientId = FormatId(offenderCaseDetails.Pin),
                             CaseNumber = offenderCaseDetails.CaseNumber,
                             CaseDate = offenderCaseDetails.CaseDate.HasValue ? offenderCaseDetails.CaseDate.Value.ToShortDateString() : currentTimestamp.ToString(),
-                            StartDate = offenderCaseDetails.SupervisionStartDate.HasValue ? offenderCaseDetails.SupervisionStartDate.Value.ToShortDateString() : string.Empty,
-                            EndDate = offenderCaseDetails.SupervisionEndDate.HasValue ? offenderCaseDetails.SupervisionEndDate.Value.ToShortDateString() : string.Empty,
+                            StartDate = offenderCaseDetails.SupervisionStartDate.HasValue ? offenderCaseDetails.SupervisionStartDate.Value.ToShortDateString() : null,
+                            EndDate = offenderCaseDetails.SupervisionEndDate.HasValue ? offenderCaseDetails.SupervisionEndDate.Value.ToShortDateString() : null,
                             Status = offenderCaseDetails.CaseStatus,
-                            EndReason = offenderCaseDetails.ClosureReason,
+                            EndReason = string.IsNullOrEmpty(offenderCaseDetails.ClosureReason) ? null : offenderCaseDetails.ClosureReason,
                             Offenses = allOffenderCaseDetails.Where(z => z.Pin == offenderCaseDetails.Pin && z.CaseNumber == offenderCaseDetails.CaseNumber).Select(p => new Offense
                             {
                                 Label = p.OffenseLabel,
@@ -588,8 +579,8 @@ namespace CMI.Processor
                     {
                         note = new Note()
                         {
-                            ClientId = offenderNoteDetails.Pin,
-                            NoteId = Convert.ToString(offenderNoteDetails.Id),
+                            ClientId = FormatId(offenderNoteDetails.Pin),
+                            NoteId = FormatId(Convert.ToString(offenderNoteDetails.Id)),
                             NoteText = offenderNoteDetails.Text,
                             NoteDatetime = offenderNoteDetails.Date.ToString(),
                             NoteType = offenderNoteDetails.NoteType
@@ -806,6 +797,30 @@ namespace CMI.Processor
             {
                 logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "SaveExecutionStatus", Message = "Error occurred while saving processor execution status.", Exception = ex, CustomParams = JsonConvert.SerializeObject(executionStatus) });
             }
+        }
+
+        private string FormatId(string oldId)
+        {
+            string newId = string.Empty;
+            try
+            {
+                if (oldId.Length >= CMI.DAL.Dest.Nexus.Constants.ExpectedMinLenghOfId)
+                {
+                    newId = oldId;
+                }
+                else
+                {
+                    string[] zeros = Enumerable.Repeat("0", (CMI.DAL.Dest.Nexus.Constants.ExpectedMinLenghOfId - oldId.Length)).ToArray();
+
+                    newId = string.Format("{0}{1}", string.Join("", zeros), oldId);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "FormatId", Message = "Error occurred while formatting Id", Exception = ex });
+            }
+
+            return newId;
         }
         #endregion
 
