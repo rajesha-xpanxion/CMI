@@ -34,7 +34,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     return true;
-                    //Console.WriteLine("New client case details added successfully.{0}Response: {1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -62,7 +61,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     caseDetails = apiResponse.Content.ReadAsAsync<Case>().Result;
-                    Console.WriteLine("{0}Client case details received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -91,7 +89,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     return true;
-                    //Console.WriteLine("Existing client case details updated successfully.{0}Response: {1}", Environment.NewLine, responseString);
                 }
                 else
                 {

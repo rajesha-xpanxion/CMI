@@ -863,7 +863,7 @@ namespace CMI.Processor
         {
             string destAddressType = string.Empty;
 
-            switch(sourceAddressType)
+            switch (sourceAddressType)
             {
                 case "Mailing":
                     destAddressType = "Shipping Address";

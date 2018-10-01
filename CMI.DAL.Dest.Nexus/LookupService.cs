@@ -186,7 +186,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _AddressTypes = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                    Console.WriteLine("{0}Lookup Address Types received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -215,7 +214,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _CaseLoads = apiResponse.Content.ReadAsAsync<List<CaseLoad>>().Result;
-                    Console.WriteLine("{0}Lookup Caseloads received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -244,7 +242,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _ClientTypes = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                    Console.WriteLine("{0}Lookup Client Types received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -273,7 +270,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _ContactTypes = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                    Console.WriteLine("{0}Lookup Contact Types received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -302,7 +298,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _Ethnicities = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                    Console.WriteLine("{0}Lookup Ethnicities received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -331,7 +326,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _Genders = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                    Console.WriteLine("{0}Lookup Genders received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -360,7 +354,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _Offenses = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                    Console.WriteLine("{0}Lookup Offenses received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -389,7 +382,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _SupervisingOfficers = apiResponse.Content.ReadAsAsync<List<SupervisingOfficer>>().Result;
-                    Console.WriteLine("{0}Lookup Supervising Officers received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
@@ -418,7 +410,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _TimeZones = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                    Console.WriteLine("{0}Lookup TimeZones received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {

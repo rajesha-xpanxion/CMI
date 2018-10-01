@@ -63,7 +63,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     clientDetails = apiResponse.Content.ReadAsAsync<Client>().Result;
-                    Console.WriteLine("{0}Client details received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {

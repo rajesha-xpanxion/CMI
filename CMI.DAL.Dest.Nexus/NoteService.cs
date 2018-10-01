@@ -61,7 +61,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     noteDetails = apiResponse.Content.ReadAsAsync<Note>().Result;
-                    Console.WriteLine("{0}Note details received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {

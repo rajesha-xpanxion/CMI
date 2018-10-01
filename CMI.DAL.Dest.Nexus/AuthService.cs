@@ -52,7 +52,6 @@ namespace CMI.DAL.Dest.Nexus
 
                     if (apiResponse.IsSuccessStatusCode)
                     {
-                        //Console.WriteLine("Token validated successfully...");
                         isAuthorized = true;
                     }
                     else if (apiResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
@@ -61,7 +60,6 @@ namespace CMI.DAL.Dest.Nexus
                     }
                     else
                     {
-                        Console.WriteLine("Error occurred while validating token: {0}{1}", Environment.NewLine, responseString);
                         throw new ApplicationException(string.Format("Error occurred while validating token. API Response: {0}", responseString));
                     }
                 }

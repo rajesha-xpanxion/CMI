@@ -61,7 +61,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     contactDetails = apiResponse.Content.ReadAsAsync<Contact>().Result;
-                    Console.WriteLine("{0}Client contact details received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {

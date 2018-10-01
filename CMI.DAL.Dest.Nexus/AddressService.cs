@@ -61,7 +61,6 @@ namespace CMI.DAL.Dest.Nexus
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     addressDetails = apiResponse.Content.ReadAsAsync<Address>().Result;
-                    Console.WriteLine("{0}Client address details received:{0}{1}", Environment.NewLine, responseString);
                 }
                 else
                 {
