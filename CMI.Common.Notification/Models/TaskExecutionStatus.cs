@@ -13,6 +13,5 @@ namespace CMI.Common.Notification
         public int DestUpdateRecordCount { get; set; }
         public int DestDeleteRecordCount { get; set; }
         public int DestFailureRecordCount { get; set; }
-        public int SkippedRecordCount { get; set; }
     }
 }

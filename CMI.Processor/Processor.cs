@@ -311,7 +311,7 @@ namespace CMI.Processor
                         }
                         else
                         {
-                            taskExecutionStatus.SkippedRecordCount++;
+                            taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
                     catch (ApplicationException ae)
@@ -397,7 +397,7 @@ namespace CMI.Processor
                         }
                         else
                         {
-                            taskExecutionStatus.SkippedRecordCount++;
+                            taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
                     catch (ApplicationException ae)
@@ -481,7 +481,7 @@ namespace CMI.Processor
                         }
                         else
                         {
-                            taskExecutionStatus.SkippedRecordCount++;
+                            taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
                     catch (ApplicationException ae)
@@ -567,7 +567,7 @@ namespace CMI.Processor
                         }
                         else
                         {
-                            taskExecutionStatus.SkippedRecordCount++;
+                            taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
                     catch (ApplicationException ae)
@@ -642,7 +642,7 @@ namespace CMI.Processor
                         }
                         else
                         {
-                            taskExecutionStatus.SkippedRecordCount++;
+                            taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
                     catch (ApplicationException ae)
