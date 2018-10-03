@@ -24,7 +24,7 @@ namespace CMI.Processor.DAL
 
                 using (SqlCommand cmd = new SqlCommand())
                 {
-                    cmd.CommandText = SQLQuery.GET_LAST_EXECUTION_DATE_TIME;
+                    cmd.CommandText = StoredProc.GET_LAST_EXECUTION_DATE_TIME;
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Connection = conn;
 
@@ -50,7 +50,7 @@ namespace CMI.Processor.DAL
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = SQLQuery.SAVE_EXECUTION_STATUS;
+                        cmd.CommandText = StoredProc.SAVE_EXECUTION_STATUS;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Connection = conn;
 

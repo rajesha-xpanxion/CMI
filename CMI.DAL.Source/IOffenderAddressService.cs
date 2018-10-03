@@ -6,6 +6,6 @@ namespace CMI.DAL.Source
 {
     public interface IOffenderAddressService
     {
-        IEnumerable<OffenderAddress> GetAllOffenderAddresses(DateTime? lastExecutionDateTime);
+        IEnumerable<OffenderAddress> GetAllOffenderAddresses(string CMIDBConnString, DateTime? lastExecutionDateTime);
     }
 }

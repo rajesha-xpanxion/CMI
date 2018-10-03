@@ -42,6 +42,7 @@ namespace CMI.Processor
         DAL.ProcessorConfig processorConfig;
 
         List<Common.Notification.TaskExecutionStatus> taskExecutionStatuses = null;
+
         #endregion
 
         #region Constructor
@@ -107,22 +108,40 @@ namespace CMI.Processor
             LoadLookupData();
 
             //process client profiles
-            UpdateExecutionStatus(ProcessClientProfiles());
+            if (processorConfig.StagesToProcess != null && processorConfig.StagesToProcess.Where(a => a.Equals(DAL.ProcessorStage.PROCESS_CLIENT_PROFILES, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
+            {
+                UpdateExecutionStatus(ProcessClientProfiles());
+            }
 
             //process client addresses
-            UpdateExecutionStatus(ProcessAddresses());
+            if (processorConfig.StagesToProcess != null && processorConfig.StagesToProcess.Where(a => a.Equals(DAL.ProcessorStage.PROCESS_ADDRESSES, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
+            {
+                UpdateExecutionStatus(ProcessAddresses());
+            }
 
             //process client phone contacts
-            UpdateExecutionStatus(ProcessPhoneContacts());
+            if (processorConfig.StagesToProcess != null && processorConfig.StagesToProcess.Where(a => a.Equals(DAL.ProcessorStage.PROCESS_PHONE_CONTACTS, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
+            {
+                UpdateExecutionStatus(ProcessPhoneContacts());
+            }
 
             //process client email contacts
-            UpdateExecutionStatus(ProcessEmailContacts());
+            if (processorConfig.StagesToProcess != null && processorConfig.StagesToProcess.Where(a => a.Equals(DAL.ProcessorStage.PROCESS_EMAIL_CONTACTS, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
+            {
+                UpdateExecutionStatus(ProcessEmailContacts());
+            }
 
             //process client cases
-            UpdateExecutionStatus(ProcessCases());
+            if (processorConfig.StagesToProcess != null && processorConfig.StagesToProcess.Where(a => a.Equals(DAL.ProcessorStage.PROCESS_CASES, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
+            {
+                UpdateExecutionStatus(ProcessCases());
+            }
 
             //process client notes
-            UpdateExecutionStatus(ProcessNotes());
+            if (processorConfig.StagesToProcess != null && processorConfig.StagesToProcess.Where(a => a.Equals(DAL.ProcessorStage.PROCESS_NOTES, StringComparison.InvariantCultureIgnoreCase)).Count() > 0)
+            {
+                UpdateExecutionStatus(ProcessNotes());
+            }
 
             //derive final processor execution status and save it to database
             processorExecutionStatus.ExecutionStatusMessage = processorExecutionStatus.IsSuccessful 
@@ -167,7 +186,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderDetails = offenderService.GetAllOffenderDetails(lastExecutionDateTime);
+                allOffenderDetails = offenderService.GetAllOffenderDetails(processorConfig.CMIDBConnString, lastExecutionDateTime);
 
                 foreach (var offenderDetails in allOffenderDetails)
                 {
@@ -243,7 +262,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderAddresses = offenderAddressService.GetAllOffenderAddresses(lastExecutionDateTime);
+                allOffenderAddresses = offenderAddressService.GetAllOffenderAddresses(processorConfig.CMIDBConnString, lastExecutionDateTime);
 
                 foreach (var offenderAddressDetails in allOffenderAddresses)
                 {
@@ -290,6 +309,10 @@ namespace CMI.Processor
                                 }
                             }
                         }
+                        else
+                        {
+                            taskExecutionStatus.SkippedRecordCount++;
+                        }
                     }
                     catch (ApplicationException ae)
                     {
@@ -325,7 +348,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderPhones = offenderPhoneService.GetAllOffenderPhones(lastExecutionDateTime);
+                allOffenderPhones = offenderPhoneService.GetAllOffenderPhones(processorConfig.CMIDBConnString, lastExecutionDateTime);
 
                 foreach (var offenderPhoneDetails in allOffenderPhones)
                 {
@@ -372,6 +395,10 @@ namespace CMI.Processor
                                 }
                             }
                         }
+                        else
+                        {
+                            taskExecutionStatus.SkippedRecordCount++;
+                        }
                     }
                     catch (ApplicationException ae)
                     {
@@ -406,7 +433,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderEmails = offenderEmailService.GetAllOffenderEmails(lastExecutionDateTime);
+                allOffenderEmails = offenderEmailService.GetAllOffenderEmails(processorConfig.CMIDBConnString, lastExecutionDateTime);
 
                 foreach (var offenderEmailDetails in allOffenderEmails)
                 {
@@ -452,6 +479,10 @@ namespace CMI.Processor
                                 }
                             }
                         }
+                        else
+                        {
+                            taskExecutionStatus.SkippedRecordCount++;
+                        }
                     }
                     catch (ApplicationException ae)
                     {
@@ -487,7 +518,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderCaseDetails = offenderCaseService.GetAllOffenderCases(lastExecutionDateTime);
+                allOffenderCaseDetails = offenderCaseService.GetAllOffenderCases(processorConfig.CMIDBConnString, lastExecutionDateTime);
 
                 foreach (var offenderCaseDetails in allOffenderCaseDetails.GroupBy(x => new { x.Pin, x.CaseNumber }).Select(y => y.First()))
                 {
@@ -534,6 +565,10 @@ namespace CMI.Processor
                                 }
                             }
                         }
+                        else
+                        {
+                            taskExecutionStatus.SkippedRecordCount++;
+                        }
                     }
                     catch (ApplicationException ae)
                     {
@@ -568,7 +603,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(lastExecutionDateTime);
+                allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(processorConfig.CMIDBConnString, lastExecutionDateTime);
 
                 foreach (var offenderNoteDetails in allOffenderNoteDetails)
                 {
@@ -604,6 +639,10 @@ namespace CMI.Processor
                                     logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Existing Client Note details updated successfully.", CustomParams = JsonConvert.SerializeObject(note) });
                                 }
                             }
+                        }
+                        else
+                        {
+                            taskExecutionStatus.SkippedRecordCount++;
                         }
                     }
                     catch (ApplicationException ae)

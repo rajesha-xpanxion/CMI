@@ -71,5 +71,11 @@
     <Build Include="dbo\Stored Procedures\SaveLogDetails.sql" />
     <Build Include="dbo\Stored Procedures\GetLastExecutionDateTime.sql" />
     <Build Include="dbo\Stored Procedures\SaveExecutionStatus.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderPhoneDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderNoteDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderEmailDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderCaseDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderAddressDetails.sql" />
   </ItemGroup>
 </Project>

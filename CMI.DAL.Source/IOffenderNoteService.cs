@@ -7,6 +7,6 @@ namespace CMI.DAL.Source
 {
     public interface IOffenderNoteService
     {
-        IEnumerable<OffenderNote> GetAllOffenderNotes(DateTime? lastExecutionDateTime);
+        IEnumerable<OffenderNote> GetAllOffenderNotes(string CMIDBConnString, DateTime? lastExecutionDateTime);
     }
 }

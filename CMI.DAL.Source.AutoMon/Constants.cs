@@ -10,6 +10,7 @@ namespace CMI.DAL.Source.AutoMon
 
     public class SQLParamName
     {
+        public const string SOURCE_DATABASE_NAME = "@SourceDatabaseName";
         public const string LAST_EXECUTION_DATE_TIME = "@LastExecutionDateTime";
     }
 

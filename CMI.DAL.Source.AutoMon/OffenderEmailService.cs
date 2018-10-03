@@ -15,7 +15,7 @@ namespace CMI.DAL.Source.AutoMon
             this.sourceConfig = sourceConfig.Value;
         }
 
-        public IEnumerable<OffenderEmail> GetAllOffenderEmails(DateTime? lastExecutionDateTime)
+        public IEnumerable<OffenderEmail> GetAllOffenderEmails(string CMIDBConnString, DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
@@ -69,14 +69,20 @@ namespace CMI.DAL.Source.AutoMon
 
                 List<OffenderEmail> offenderEmails = new List<OffenderEmail>();
 
-                using (SqlConnection conn = new SqlConnection(sourceConfig.AutoMonDBConnString))
+                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = SQLQuery.GET_ALL_OFFENDER_EMAIL_DETAILS;
-                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_EMAIL_DETAILS;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                        });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,

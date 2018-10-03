@@ -10,5 +10,6 @@ namespace CMI.Processor.DAL
         public string CMIDBConnString { get; set; }
         public string ExecutionStatusReportReceiverEmailAddresses { get; set; }
         public string ExecutionStatusReportEmailSubject { get; set; }
+        public IEnumerable<string> StagesToProcess { get; set; }
     }
 }

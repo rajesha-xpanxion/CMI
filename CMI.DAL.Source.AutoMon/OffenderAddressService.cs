@@ -15,201 +15,45 @@ namespace CMI.DAL.Source.AutoMon
             this.sourceConfig = sourceConfig.Value;
         }
 
-        public IEnumerable<OffenderAddress> GetAllOffenderAddresses(DateTime? lastExecutionDateTime)
+        public IEnumerable<OffenderAddress> GetAllOffenderAddresses(string CMIDBConnString, DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
                 //test data
                 return new List<OffenderAddress>()
                 {
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 20653,
-                        AddressType = "Mailing",
-                        Line1 = "7434 Wentworth Springs Rd",
-                        Line2 = "Apt 2",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive = false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 20603,
-                        AddressType = "Mailing",
-                        Line1 = "5050 Hope Mountain Rd",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95633",
-                        IsPrimary = false,
-                        IsActive = false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 20602,
-                        AddressType = "Residential",
-                        Line1 = "5050 Hope Mountain Rd",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95633",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 24855,
-                        AddressType = "Mailing",
-                        Line1 = "4211 Shoemaker Rd",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = true,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 24856,
-                        AddressType = "Residential",
-                        Line1 = "4211 Shoemaker Rd",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 55364,
-                        AddressType = "Residential",
-                        Line1 = "3821 Quest  Ct",
-                        Line2 = "Spc 5",
-                        City = "Cameron Park",
-                        State = "CA",
-                        Zip = "95682",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 44974,
-                        AddressType = "Residential",
-                        Line1 = "transient",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 56024,
-                        AddressType = "Residential",
-                        Line1 = "9097 Wentworth Springs Rd",
-                        Line2 = "Spc 8",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 52350,
-                        AddressType = "Mailing",
-                        Line1 = "9400 Wentworth Springs Rd",
-                        Line2 = "Spc 8",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 56738,
-                        AddressType = "Residential",
-                        Line1 = "Transient",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 57285,
-                        AddressType = "Residential",
-                        Line1 = "9092 Wentworth springs Rd",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive =false
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 57284,
-                        AddressType = "Mailing",
-                        Line1 = "9092 Wentworth Springs Rd",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95634",
-                        IsPrimary = false,
-                        IsActive = true
-                    },
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 59763,
-                        AddressType = "School",
-                        Line1 = "test line 1",
-                        City = "Anaheim",
-                        State = "CA",
-                        Zip = "11007",
-                        IsPrimary = false,
-                        IsActive =false
-                    }
-    ,
-                    new OffenderAddress()
-                    {
-                        Pin = "5824",
-                        Id = 58639,
-                        AddressType = "Residential",
-                        Line1 = "1 Transient",
-                        City = "Georgetown",
-                        State = "CA",
-                        Zip = "95636",
-                        Comment = "test update revert",
-                        IsPrimary = false,
-                        IsActive = true
-                    }
+                    new OffenderAddress() {Pin = "226",Id = 869,Line1 = "685 Berk Av, Apt 8, Richmond, CA, 94804",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "401",Id = 1253,Line1 = "1 Transient, South Lake Tahoe, CA, 96150",AddressType = "Home Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "016",Id = 215,Line1 = "916 Mesa St, Morro Bay, CA, 93442",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "553",Id = 1699,Line1 = "1393 Friant Ct, South Lake Tahoe, CA, 96150",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "563",Id = 1869,Line1 = "1017 Carson Av, 3, South Lake Tahoe, CA, 96150",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "563",Id = 1870,Line1 = "3743 Paradise Av, 1, South Lake Tahoe, CA, 96150",AddressType = "Home Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "719",Id = 1991,Line1 = "PO Box 5273, Stateline, NV, 89449",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "098",Id = 682,Line1 = "PO Box 17465, South Lake Tahoe, CA, 96151",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "167",Id = 782,Line1 = "3178 Neveda Av, South Lake Tahoe, CA, 96151",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "178",Id = 799,Line1 = "PO Box 5228, Stateline, NV, 89449",AddressType = "Shipping Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "178",Id = 798,Line1 = "4055 Manzanita, Apt 22, South Lake Tahoe, CA, 96150",AddressType = "Home Address",IsPrimary = false,IsActive = true},
+                    new OffenderAddress() {Pin = "058",Id = 523,Line1 = "PO Box 8588, South Lake Tahoe, CA, 96158",AddressType = "Shipping Address",IsPrimary = false,IsActive = true}
                 };
             }
             else
             {
                 List<OffenderAddress> offenderAddresses = new List<OffenderAddress>();
 
-                using (SqlConnection conn = new SqlConnection(sourceConfig.AutoMonDBConnString))
+                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = SQLQuery.GET_ALL_OFFENDER_ADDRESS_DETAILS;
-                        cmd.CommandType = System.Data.CommandType.Text;
+                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_ADDRESS_DETAILS;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                        });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
@@ -218,7 +62,7 @@ namespace CMI.DAL.Source.AutoMon
                             IsNullable = true
                         });
                         cmd.Connection = conn;
-
+                        
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
