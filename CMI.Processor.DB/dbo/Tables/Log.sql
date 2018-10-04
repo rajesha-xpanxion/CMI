@@ -8,6 +8,10 @@
     [StackTrace]    NVARCHAR (MAX) NULL,
     [CustomParams]  NVARCHAR (MAX) NULL,
     [CreateDate]    DATETIME       CONSTRAINT [DF_Log_CreateDate] DEFAULT (getdate()) NOT NULL,
-    CONSTRAINT [PK_Log_Id] PRIMARY KEY CLUSTERED ([Id] ASC)
+    [SourceData]    NVARCHAR (MAX) NULL,
+    [DestData]      NVARCHAR (MAX) NULL,
+    CONSTRAINT [PK_Log_Id] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (FILLFACTOR = 90)
 );
+
+
 

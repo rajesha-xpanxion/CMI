@@ -97,6 +97,16 @@ namespace CMI.Common.Logging
                             cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.CUSTOM_PARAMS, Value = logRequest.CustomParams, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
+                        if (!string.IsNullOrEmpty(logRequest.SourceData))
+                        {
+                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.SOURCE_DATA, Value = logRequest.SourceData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                        }
+
+                        if (!string.IsNullOrEmpty(logRequest.DestData))
+                        {
+                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.DEST_DATA, Value = logRequest.DestData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                        }
+
                         await cmd.ExecuteNonQueryAsync();
                     }
                 }

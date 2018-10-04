@@ -15,11 +15,14 @@ EXEC
 		@ErrorType = 1,
 		@Message = 'test error message',
 		@StackTrace = 'test error stack trace',
-		@CustomParams = 'test custom params'
+		@CustomParams = 'test custom params',
+		@SourceData = 'test source data',
+		@DestData = 'test dest data'
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
 03-July-18		Rajesh Awate	Created.
+04-Oct-18		Rajesh Awate	Changes for 2 new parameters
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveLogDetails]
 	@LogLevel [NVARCHAR](50),
@@ -28,7 +31,9 @@ CREATE PROCEDURE [dbo].[SaveLogDetails]
 	@ErrorType [INT] = NULL,
 	@Message [NVARCHAR](MAX) = NULL,
 	@StackTrace [NVARCHAR](MAX) = NULL,
-	@CustomParams [NVARCHAR](MAX) = NULL
+	@CustomParams [NVARCHAR](MAX) = NULL,
+	@SourceData [NVARCHAR](MAX) = NULL,
+	@DestData [NVARCHAR](MAX) = NULL
 AS
 BEGIN
 	
@@ -40,7 +45,9 @@ BEGIN
 		[ErrorType],
 		[Message],
 		[StackTrace],
-		[CustomParams]
+		[CustomParams],
+		[SourceData],
+		[DestData]
 	)
 	VALUES
 	(
@@ -50,7 +57,9 @@ BEGIN
 		@ErrorType,
 		@Message,
 		@StackTrace,
-		@CustomParams
+		@CustomParams,
+		@SourceData,
+		@DestData
 	)
 
 	SELECT IDENT_CURRENT('[dbo].[Log]') AS [LogId];

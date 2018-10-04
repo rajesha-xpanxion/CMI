@@ -22,62 +22,8 @@ namespace CMI.DAL.Source.AutoMon
                 //test data
                 return new List<OffenderNote>()
                 {
-                    new OffenderNote()
-                    {
-                        Pin = "5824",
-                        Id = 774140,
-                        Date = Convert.ToDateTime("2018-08-13 03:25:30.480"),
-                        Text = "test change on 13th August 2018 03:55 PM.",
-                        AuthorEmail = "rajesha@xpanxion.co.in"
-                    },
-                    new OffenderNote()
-                    {
-                        Pin = "5824",
-                        Id = 774141,
-                        Date = Convert.ToDateTime("2018-07-03 01:09:26.863"),
-                        Text = "test change on 07/03/2018 - 13:39",
-                        AuthorEmail = "rajesha@xpanxion.co.in"
-                    },
-                    new OffenderNote()
-                    {
-                        Pin = "5824",
-                        Id = 774142,
-                        Date = Convert.ToDateTime("2018 - 07 - 03 01:51:18.847"),
-                        Text = "test change on 07 / 03 / 2018 - 14:21",
-                        AuthorEmail = "rajesha@xpanxion.co.in"
-                    },
-                    new OffenderNote()
-                    {
-                        Pin = "5824",
-                        Id = 774143,
-                        Date = Convert.ToDateTime("2018 - 07 - 03 02:22:45.110"),
-                        Text = "test change on 07 / 03 / 2018 - 14:52",
-                        AuthorEmail = "rajesha@xpanxion.co.in"
-                    },
-                    new OffenderNote()
-                    {
-                        Pin = "5824",
-                        Id = 774144,
-                        Date = Convert.ToDateTime("2018 - 08 - 10 07:09:07.860"),
-                        Text = "test change on 10th August 2018 7:38 PM.",
-                        AuthorEmail = "rajesha@xpanxion.co.in"
-                    },
-                    new OffenderNote()
-                    {
-                        Pin = "5824",
-                        Id = 774145,
-                        Date = Convert.ToDateTime("2018 - 08 - 13 02:22:07.893"),
-                        Text = "test change on 13th August 2018 02:50 PM.",
-                        AuthorEmail = "rajesha@xpanxion.co.in"
-                    },
-                    new OffenderNote()
-                    {
-                        Pin = "5824",
-                        Id = 774146,
-                        Date = Convert.ToDateTime("2018 - 08 - 13 02:25:49.933"),
-                        Text = "test change on 13th August 2018 02:55 PM.",
-                        AuthorEmail = "rajesha@xpanxion.co.in"
-                    }
+                    new OffenderNote {Pin="1000956", Id=70829,Date=Convert.ToDateTime("2008-08-07T13:52:41.43"),Text="Minor's brother's cell phone. (Johnathan Lemus)",AuthorEmail="jorge.soriano@edcgov.us",NoteType="Phone"},
+                    new OffenderNote {Pin="1003906",Id=304163,Text="Father's cellular",AuthorEmail=null,Date=Convert.ToDateTime("4/4/2011 4:24:44 PM"),NoteType="Phone"}
                 };
             }
             else

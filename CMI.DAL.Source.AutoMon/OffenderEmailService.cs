@@ -20,49 +20,7 @@ namespace CMI.DAL.Source.AutoMon
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return new List<OffenderEmail>()
-                {
-                    new OffenderEmail()
-                    {
-                        Pin = "5824",
-                        Id = 362,
-                        EmailAddress = "yougotmail@yahoo.com",
-                        IsPrimary = true,
-                        IsActive = true
-                    },
-                    new OffenderEmail()
-                    {
-                        Pin = "13475",
-                        Id = 364,
-                        EmailAddress = "destinyg@yahoo.com",
-                        IsPrimary = true,
-                        IsActive = true
-                    },
-                    new OffenderEmail()
-                    {
-                        Pin = "1008383",
-                        Id = 30,
-                        EmailAddress = "christanickelllosrios@gmail.com",
-                        IsPrimary = false,
-                        IsActive = false
-                    },
-                    new OffenderEmail()
-                    {
-                        Pin = "1008383",
-                        Id = 31,
-                        EmailAddress = "christanickell96@gmail.com",
-                        IsPrimary = false,
-                        IsActive = false
-                    },
-                    new OffenderEmail()
-                    {
-                        Pin = "1008383",
-                        Id = 203,
-                        EmailAddress = "christanickelll96@gmail.com",
-                        IsPrimary = true,
-                        IsActive = true
-                    }
-                };
+                return new List<OffenderEmail>();
             }
             else
             {

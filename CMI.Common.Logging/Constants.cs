@@ -23,6 +23,10 @@ namespace CMI.Common.Logging
         public const string STACK_TRACE = "@StackTrace";
 
         public const string CUSTOM_PARAMS = "@CustomParams";
+
+        public const string SOURCE_DATA = "@SourceData";
+
+        public const string DEST_DATA = "@DestData";
     }
 
     public class SQLQuery

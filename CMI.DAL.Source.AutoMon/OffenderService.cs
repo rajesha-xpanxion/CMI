@@ -24,12 +24,8 @@ namespace CMI.DAL.Source.AutoMon
                 //test data
                 return new List<Offender>()
                 {
-                    new Offender {Pin="13",FirstName="Thomas",MiddleName="Matthew",LastName="Adams",DateOfBirth=Convert.ToDateTime("1970-03-12T00:00:00"),ClientType="MCS",TimeZone="Pacific Standard Time",Gender="Male",Race="White",CaseloadName="SLT MCS Sup 1",OfficerLogon="alandry",OfficerEmail="anne.landry@edcgov.us",OfficerFirstName="Anne",OfficerLastName="Landry"}//,
-                    //new Offender {Pin="16",FirstName="Derek",MiddleName="Ernest",LastName="Bogard",DateOfBirth=Convert.ToDateTime("1979-05-20T00:00:00"),ClientType="Formal",TimeZone="Pacific Standard Time",Gender="Male",Race="White",CaseloadName="SLT Adult Sup 3",OfficerLogon="ldaley",OfficerEmail="leianna.daley@edcgov.us",OfficerFirstName="Leianna",OfficerLastName="Daley"},
-                    //new Offender {Pin="34",FirstName="Timothy",MiddleName="Michael",LastName="Angel",DateOfBirth=Convert.ToDateTime("1970-05-09T00:00:00"),ClientType="Formal",TimeZone="Pacific Standard Time",Gender="Male",Race="White",CaseloadName="SLT PRCS Sup 1",OfficerLogon="alandry",OfficerEmail="anne.landry@edcgov.us",OfficerFirstName="Anne",OfficerLastName="Landry"},
-                    //new Offender {Pin="34",FirstName="Timothy",MiddleName="Michael",LastName="Angel",DateOfBirth=Convert.ToDateTime("1970-05-09T00:00:00"),ClientType="PRCS",TimeZone="Pacific Standard Time",Gender="Male",Race="White",CaseloadName="SLT PRCS Sup 1",OfficerLogon="alandry",OfficerEmail="anne.landry@edcgov.us",OfficerFirstName="Anne",OfficerLastName="Landry"},
-                    //new Offender {Pin="58",FirstName="Eric",MiddleName="James",LastName="Brown",DateOfBirth=Convert.ToDateTime("1965-08-04T00:00:00"),ClientType="MCS",TimeZone="Pacific Standard Time",Gender="Male",Race="White",CaseloadName="SLT MCS Sup 1",OfficerLogon="alandry",OfficerEmail="anne.landry@edcgov.us",OfficerFirstName="Anne",OfficerLastName="Landry"},
-                    //new Offender {Pin="98",FirstName="Jorge",MiddleName="Lemus",LastName="Campos",DateOfBirth=Convert.ToDateTime("1958-11-30T00:00:00"),ClientType="Formal",TimeZone="Pacific Standard Time",Gender="Male",Race="Hispanic",CaseloadName="SLT Adult Sup 3",OfficerLogon="ldaley",OfficerEmail="leianna.daley@edcgov.us",OfficerFirstName="Leianna",OfficerLastName="Daley"}
+                    new Offender {Pin="14105",FirstName="William",MiddleName="Jean",LastName="Witter",ClientType="Formal",TimeZone="Pacific Standard Time",Gender="Male",Race="Unknown",DateOfBirth=Convert.ToDateTime("7/27/1972")},
+                    new Offender {Pin="8877",FirstName="Marshall",MiddleName="Jesse",LastName="Baldwin",ClientType="MCS",TimeZone="Pacific Standard Time",Gender="Male",Race="Unknown",DateOfBirth=Convert.ToDateTime("12/18/1989")}
                 };
             }
             else

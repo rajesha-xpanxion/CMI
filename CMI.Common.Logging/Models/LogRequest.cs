@@ -17,6 +17,10 @@ namespace CMI.Common.Logging
         public Exception Exception { get; set; }
 
         public string CustomParams { get; set; }
+
+        public string SourceData { get; set; }
+
+        public string DestData { get; set; }
     }
 
     public enum LogLevel

@@ -216,7 +216,7 @@ namespace CMI.Processor
                             if (clientService.AddNewClientDetails(client))
                             {
                                 taskExecutionStatus.DestAddRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "New Client Profile added successfully.", CustomParams = JsonConvert.SerializeObject(client) });
+                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "New Client Profile added successfully.", SourceData = JsonConvert.SerializeObject(offenderDetails), DestData = JsonConvert.SerializeObject(client) });
                             }
                         }
                         else
@@ -224,19 +224,19 @@ namespace CMI.Processor
                             if (clientService.UpdateClientDetails(client))
                             {
                                 taskExecutionStatus.DestUpdateRecordCount++;
-                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Existing Client Profile updated successfully.", CustomParams = JsonConvert.SerializeObject(client) });
+                                logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Existing Client Profile updated successfully.", SourceData = JsonConvert.SerializeObject(offenderDetails), DestData = JsonConvert.SerializeObject(client) });
                             }
                         }
                     }
                     catch (ApplicationException ae)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred in API while processing a Client Profile.", Exception = ae, CustomParams = JsonConvert.SerializeObject(client) });
+                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred in API while processing a Client Profile.", Exception = ae, SourceData = JsonConvert.SerializeObject(offenderDetails), DestData = JsonConvert.SerializeObject(client) });
                     }
                     catch (Exception ex)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred while processing a Client Profile.", Exception = ex, CustomParams = string.Format("{0},{1}", JsonConvert.SerializeObject(client), JsonConvert.SerializeObject(offenderDetails)) });
+                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred while processing a Client Profile.", Exception = ex, SourceData = JsonConvert.SerializeObject(offenderDetails), DestData = JsonConvert.SerializeObject(client) });
                     }
                 }
 
@@ -245,7 +245,7 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
-                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred while processing Client Profiles.", Exception = ex, CustomParams = JsonConvert.SerializeObject(allOffenderDetails) });
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Error occurred while processing Client Profiles.", Exception = ex, SourceData = JsonConvert.SerializeObject(allOffenderDetails) });
             }
 
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessClientProfiles", Message = "Client Profile processing completed.", CustomParams = JsonConvert.SerializeObject(taskExecutionStatus) });
@@ -289,7 +289,7 @@ namespace CMI.Processor
                                 if (address.IsActive && addressService.AddNewAddressDetails(address))
                                 {
                                     taskExecutionStatus.DestAddRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "New Client Address details added successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "New Client Address details added successfully.", SourceData = JsonConvert.SerializeObject(offenderAddressDetails), DestData = JsonConvert.SerializeObject(address) });
                                 }
                             }
                             else if (!address.IsActive)
@@ -297,7 +297,7 @@ namespace CMI.Processor
                                 if (addressService.DeleteAddressDetails(address.ClientId, address.AddressId))
                                 {
                                     taskExecutionStatus.DestDeleteRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details deleted successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details deleted successfully.", SourceData = JsonConvert.SerializeObject(offenderAddressDetails), DestData = JsonConvert.SerializeObject(address) });
                                 }
                             }
                             else
@@ -305,7 +305,7 @@ namespace CMI.Processor
                                 if (addressService.UpdateAddressDetails(address))
                                 {
                                     taskExecutionStatus.DestUpdateRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details updated successfully.", CustomParams = JsonConvert.SerializeObject(address) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Existing Client Address details updated successfully.", SourceData = JsonConvert.SerializeObject(offenderAddressDetails), DestData = JsonConvert.SerializeObject(address) });
                                 }
                             }
                         }
@@ -317,12 +317,12 @@ namespace CMI.Processor
                     catch (ApplicationException ae)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Error occurred in API while processing a Client Address.", Exception = ae, CustomParams = JsonConvert.SerializeObject(address) });
+                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Error occurred in API while processing a Client Address.", Exception = ae, SourceData = JsonConvert.SerializeObject(offenderAddressDetails), DestData = JsonConvert.SerializeObject(address) });
                     }
                     catch (Exception ex)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Error occurred while processing a Client Address.", Exception = ex, CustomParams = string.Format("{0},{1}", JsonConvert.SerializeObject(address), JsonConvert.SerializeObject(offenderAddressDetails)) });
+                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Error occurred while processing a Client Address.", Exception = ex, SourceData = JsonConvert.SerializeObject(offenderAddressDetails), DestData = JsonConvert.SerializeObject(address) });
                     }
                 }
 
@@ -331,7 +331,7 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
-                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Error occurred while processing Addresses.", Exception = ex, CustomParams = JsonConvert.SerializeObject(allOffenderAddresses) });
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Error occurred while processing Addresses.", Exception = ex, SourceData = JsonConvert.SerializeObject(allOffenderAddresses) });
             }
 
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "Addresses processing completed.", CustomParams = JsonConvert.SerializeObject(taskExecutionStatus) });
@@ -375,7 +375,7 @@ namespace CMI.Processor
                                 if (contact.IsActive && contactService.AddNewContactDetails(contact))
                                 {
                                     taskExecutionStatus.DestAddRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "New Client Phone Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "New Client Phone Contact details added successfully.", SourceData = JsonConvert.SerializeObject(offenderPhoneDetails), DestData = JsonConvert.SerializeObject(contact) });
                                 }
                             }
                             else if (!contact.IsActive)
@@ -383,7 +383,7 @@ namespace CMI.Processor
                                 if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
                                 {
                                     taskExecutionStatus.DestDeleteRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details deleted successfully.", SourceData = JsonConvert.SerializeObject(offenderPhoneDetails), DestData = JsonConvert.SerializeObject(contact) });
                                 }
                             }
                             else
@@ -391,7 +391,7 @@ namespace CMI.Processor
                                 if (contactService.UpdateContactDetails(contact))
                                 {
                                     taskExecutionStatus.DestUpdateRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Existing Client Phone Contact details updated successfully.", SourceData = JsonConvert.SerializeObject(offenderPhoneDetails), DestData = JsonConvert.SerializeObject(contact) });
                                 }
                             }
                         }
@@ -403,12 +403,12 @@ namespace CMI.Processor
                     catch (ApplicationException ae)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Error occurred in API while processing a Client Phone Contact.", Exception = ae, CustomParams = JsonConvert.SerializeObject(contact) });
+                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Error occurred in API while processing a Client Phone Contact.", Exception = ae, SourceData = JsonConvert.SerializeObject(offenderPhoneDetails), DestData = JsonConvert.SerializeObject(contact) });
                     }
                     catch (Exception ex)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Error occurred while processing a Client Phone Contact.", Exception = ex, CustomParams = string.Format("{0},{1}", JsonConvert.SerializeObject(contact), JsonConvert.SerializeObject(offenderPhoneDetails)) });
+                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Error occurred while processing a Client Phone Contact.", Exception = ex, SourceData = JsonConvert.SerializeObject(offenderPhoneDetails), DestData = JsonConvert.SerializeObject(contact) });
                     }
                 }
                 taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
@@ -416,7 +416,7 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
-                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Error occurred while processing Contacts.", Exception = ex, CustomParams = JsonConvert.SerializeObject(allOffenderPhones) });
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Error occurred while processing Contacts.", Exception = ex, SourceData = JsonConvert.SerializeObject(allOffenderPhones) });
             }
 
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "Phone Contact processing completed.", CustomParams = JsonConvert.SerializeObject(taskExecutionStatus) });
@@ -459,7 +459,7 @@ namespace CMI.Processor
                                 if (contact.IsActive && contactService.AddNewContactDetails(contact))
                                 {
                                     taskExecutionStatus.DestAddRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "New Client Email Contact details added successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "New Client Email Contact details added successfully.", SourceData = JsonConvert.SerializeObject(offenderEmailDetails), DestData = JsonConvert.SerializeObject(contact) });
                                 }
                             }
                             else if (!contact.IsActive)
@@ -467,7 +467,7 @@ namespace CMI.Processor
                                 if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
                                 {
                                     taskExecutionStatus.DestDeleteRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details deleted successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details deleted successfully.", SourceData = JsonConvert.SerializeObject(offenderEmailDetails), DestData = JsonConvert.SerializeObject(contact) });
                                 }
                             }
                             else
@@ -475,7 +475,7 @@ namespace CMI.Processor
                                 if (contactService.UpdateContactDetails(contact))
                                 {
                                     taskExecutionStatus.DestUpdateRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details updated successfully.", CustomParams = JsonConvert.SerializeObject(contact) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Existing Client Email Contact details updated successfully.", SourceData = JsonConvert.SerializeObject(offenderEmailDetails), DestData = JsonConvert.SerializeObject(contact) });
                                 }
                             }
                         }
@@ -487,12 +487,12 @@ namespace CMI.Processor
                     catch (ApplicationException ae)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Error occurred in API while processing a Client Email Contact.", Exception = ae, CustomParams = JsonConvert.SerializeObject(contact) });
+                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Error occurred in API while processing a Client Email Contact.", Exception = ae, SourceData = JsonConvert.SerializeObject(offenderEmailDetails), DestData = JsonConvert.SerializeObject(contact) });
                     }
                     catch (Exception ex)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Error occurred while processing a Client Email Contact.", Exception = ex, CustomParams = string.Format("{0},{1}", JsonConvert.SerializeObject(contact), JsonConvert.SerializeObject(offenderEmailDetails)) });
+                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Error occurred while processing a Client Email Contact.", Exception = ex, SourceData = JsonConvert.SerializeObject(offenderEmailDetails), DestData = JsonConvert.SerializeObject(contact) });
                     }
                 }
                 taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
@@ -500,7 +500,7 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
-                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Error occurred while processing Email Contacts.", Exception = ex, CustomParams = JsonConvert.SerializeObject(allOffenderEmails) });
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Error occurred while processing Email Contacts.", Exception = ex, SourceData = JsonConvert.SerializeObject(allOffenderEmails) });
             }
 
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "Email Contact processing completed.", CustomParams = JsonConvert.SerializeObject(taskExecutionStatus) });
@@ -553,7 +553,7 @@ namespace CMI.Processor
                                 if (caseService.AddNewCaseDetails(@case))
                                 {
                                     taskExecutionStatus.DestAddRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "New Client Case details added successfully.", CustomParams = JsonConvert.SerializeObject(@case) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "New Client Case details added successfully.", SourceData = JsonConvert.SerializeObject(offenderCaseDetails), DestData = JsonConvert.SerializeObject(@case) });
                                 }
                             }
                             else
@@ -561,7 +561,7 @@ namespace CMI.Processor
                                 if (caseService.UpdateCaseDetails(@case))
                                 {
                                     taskExecutionStatus.DestUpdateRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Existing Client Case details updated successfully.", CustomParams = JsonConvert.SerializeObject(@case) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Existing Client Case details updated successfully.", SourceData = JsonConvert.SerializeObject(offenderCaseDetails), DestData = JsonConvert.SerializeObject(@case) });
                                 }
                             }
                         }
@@ -573,12 +573,12 @@ namespace CMI.Processor
                     catch (ApplicationException ae)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Error occurred in API while processing a Client Case.", Exception = ae, CustomParams = JsonConvert.SerializeObject(@case) });
+                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Error occurred in API while processing a Client Case.", Exception = ae, SourceData = JsonConvert.SerializeObject(offenderCaseDetails), DestData = JsonConvert.SerializeObject(@case) });
                     }
                     catch (Exception ex)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Error occurred while processing a Client Case.", Exception = ex, CustomParams = string.Format("{0},{1}", JsonConvert.SerializeObject(@case), JsonConvert.SerializeObject(offenderCaseDetails)) });
+                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Error occurred while processing a Client Case.", Exception = ex, SourceData = JsonConvert.SerializeObject(offenderCaseDetails), DestData = JsonConvert.SerializeObject(@case) });
                     }
                 }
                 taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
@@ -586,7 +586,7 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
-                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Error occurred while processing Cases.", Exception = ex, CustomParams = JsonConvert.SerializeObject(allOffenderCaseDetails) });
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Error occurred while processing Cases.", Exception = ex, SourceData = JsonConvert.SerializeObject(allOffenderCaseDetails) });
             }
 
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessCases", Message = "Case processing completed.", CustomParams = JsonConvert.SerializeObject(taskExecutionStatus) });
@@ -628,7 +628,7 @@ namespace CMI.Processor
                                 if (noteService.AddNewNoteDetails(note))
                                 {
                                     taskExecutionStatus.DestAddRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "New Client Note details added successfully.", CustomParams = JsonConvert.SerializeObject(note) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "New Client Note details added successfully.", SourceData = JsonConvert.SerializeObject(offenderNoteDetails), DestData = JsonConvert.SerializeObject(note) });
                                 }
                             }
                             else
@@ -636,7 +636,7 @@ namespace CMI.Processor
                                 if (noteService.UpdateNoteDetails(note))
                                 {
                                     taskExecutionStatus.DestUpdateRecordCount++;
-                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Existing Client Note details updated successfully.", CustomParams = JsonConvert.SerializeObject(note) });
+                                    logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Existing Client Note details updated successfully.", SourceData = JsonConvert.SerializeObject(offenderNoteDetails), DestData = JsonConvert.SerializeObject(note) });
                                 }
                             }
                         }
@@ -648,12 +648,12 @@ namespace CMI.Processor
                     catch (ApplicationException ae)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Error occurred in API while processing a Client Note.", Exception = ae, CustomParams = JsonConvert.SerializeObject(note) });
+                        logger.LogWarning(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Error occurred in API while processing a Client Note.", Exception = ae, SourceData = JsonConvert.SerializeObject(offenderNoteDetails), DestData = JsonConvert.SerializeObject(note) });
                     }
                     catch (Exception ex)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
-                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Error occurred while processing a Client Note.", Exception = ex, CustomParams = string.Format("{0},{1}", JsonConvert.SerializeObject(note), JsonConvert.SerializeObject(offenderNoteDetails)) });
+                        logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Error occurred while processing a Client Note.", Exception = ex, SourceData = JsonConvert.SerializeObject(offenderNoteDetails), DestData = JsonConvert.SerializeObject(note) });
                     }
                 }
 
@@ -662,7 +662,7 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
-                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Error occurred while processing Notes.", Exception = ex, CustomParams = JsonConvert.SerializeObject(allOffenderNoteDetails) });
+                logger.LogError(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Error occurred while processing Notes.", Exception = ex, SourceData = JsonConvert.SerializeObject(allOffenderNoteDetails) });
             }
 
             logger.LogInfo(new LogRequest() { OperationName = "Processor", MethodName = "ProcessNotes", Message = "Notes processing completed.", CustomParams = JsonConvert.SerializeObject(taskExecutionStatus) });
