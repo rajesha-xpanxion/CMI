@@ -13,7 +13,8 @@ EXEC
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
-04-July-18		Rajesh Awate	Created.
+03-Oct-18		Rajesh Awate	Created.
+04-Oct-18		Rajesh Awate	Fix for type casting issue in application
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderCaseDetails]
 	@SourceDatabaseName NVARCHAR(128),
@@ -94,9 +95,9 @@ BEGIN
 			CRG.[MostSeriousCharge] AS [IsPrimary],
 			CRG.[ViolationDate] AS [OffenseDate],
 
-			COALESCE(CSSD.[Value], CSED.[Value]) AS [CaseDate],
-			CSSD.[Value] AS [SupervisionStartDate],
-			CSED.[Value] AS [SupervisionEndDate],
+			CAST(COALESCE(CSSD.[Value], CSED.[Value]) AS DATE) AS [CaseDate],
+			CAST(CSSD.[Value] AS DATE) AS [SupervisionStartDate],
+			CAST(CSED.[Value] AS DATE) AS [SupervisionEndDate],
 			CCRD.[Description] AS [ClosureReason]
 		FROM
 			[$SourceDatabaseName].[dbo].[Offender] O JOIN [$SourceDatabaseName].[dbo].[CourtCase] CC
@@ -307,9 +308,9 @@ BEGIN
 			CRG.[MostSeriousCharge] AS [IsPrimary],
 			CRG.[ViolationDate] AS [OffenseDate],
 
-			COALESCE(CSSD.[Value], CSED.[Value]) AS [CaseDate],
-			CSSD.[Value] AS [SupervisionStartDate],
-			CSED.[Value] AS [SupervisionEndDate],
+			CAST(COALESCE(CSSD.[Value], CSED.[Value]) AS DATE) AS [CaseDate],
+			CAST(CSSD.[Value] AS DATE) AS [SupervisionStartDate],
+			CAST(CSED.[Value] AS DATE) AS [SupervisionEndDate],
 			CCRD.[Description] AS [ClosureReason]
 		FROM
 			[$SourceDatabaseName].[dbo].[Offender] O JOIN [$SourceDatabaseName].[dbo].[CourtCase] CC

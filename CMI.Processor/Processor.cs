@@ -278,7 +278,7 @@ namespace CMI.Processor
                             AddressType = MapAddressType(offenderAddressDetails.AddressType),
                             FullAddress = MapFullAddress(offenderAddressDetails.Line1, offenderAddressDetails.Line2, offenderAddressDetails.City, offenderAddressDetails.State, offenderAddressDetails.Zip),
                             IsPrimary = offenderAddressDetails.IsPrimary,
-                            Comment = offenderAddressDetails.Comment,
+                            Comment = string.IsNullOrEmpty(offenderAddressDetails.Comment) ? offenderAddressDetails.Comment : offenderAddressDetails.Comment.Replace("/", "-"),
                             IsActive = offenderAddressDetails.IsActive
                         };
 
@@ -364,7 +364,7 @@ namespace CMI.Processor
                             ContactType = MapContactType(offenderPhoneDetails.PhoneNumberType),
                             ContactValue = offenderPhoneDetails.Phone,
                             IsPrimary = offenderPhoneDetails.IsPrimary,
-                            Comment = offenderPhoneDetails.Comment,
+                            Comment = string.IsNullOrEmpty(offenderPhoneDetails.Comment) ? offenderPhoneDetails.Comment : offenderPhoneDetails.Comment.Replace("/", "-"),
                             IsActive = offenderPhoneDetails.IsActive
                         };
 
@@ -895,7 +895,7 @@ namespace CMI.Processor
 
             destFullAddress = destFullAddress.Trim(new char[] { ',', ' ' });
 
-            return destFullAddress;
+            return string.IsNullOrEmpty(destFullAddress) ? destFullAddress : destFullAddress.Replace("/", "-");
         }
 
         private string MapAddressType(string sourceAddressType)
