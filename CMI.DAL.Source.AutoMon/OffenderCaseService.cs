@@ -1,7 +1,9 @@
 ﻿using CMI.DAL.Source.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Text;
 //using System.Linq;
 
@@ -21,57 +23,7 @@ namespace CMI.DAL.Source.AutoMon
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return new List<OffenderCase>
-                {
-                    new OffenderCase
-                    {
-                        Pin = "5824",
-                        FirstName = "John",
-                        MiddleName = "Brent",
-                        LastName = "Aitkens",
-
-                        CaseNumber = "P15CRF0407",
-                        CaseStatus = "Active",
-                        CaseDate = DateTime.Now,
-
-                        OffenseLabel = "11351.5 HS F",
-                        OffenseStatute = "11351.5",
-                        OffenseCategory = "F",
-                        IsPrimary = false
-                    },
-                    new OffenderCase
-                    {
-                        Pin = "5824",
-                        FirstName = "John",
-                        MiddleName = "Brent",
-                        LastName = "Aitkens",
-
-                        CaseNumber = "P15CRF0407",
-                        CaseStatus = "Active",
-                        CaseDate = DateTime.Now,
-
-                        OffenseLabel = "11357(A) HS  F",
-                        OffenseStatute = "11357(A)",
-                        OffenseCategory = "F",
-                        IsPrimary = false
-                    },
-                    new OffenderCase
-                    {
-                        Pin = "7478",
-                        FirstName = "John",
-                        MiddleName= "Charles",
-                        LastName = "Morrissey",
-
-                        CaseNumber = "FOR-S11CRF0110-1",
-                        CaseStatus = "Closed",
-                        CaseDate = new DateTime(2013, 8, 9),
-
-                        OffenseLabel = "11366.5(A) HS  F",
-                        OffenseStatute = "11366.5(A)",
-                        OffenseCategory = "F",
-                        IsPrimary = false
-                    }
-                };
+                return JsonConvert.DeserializeObject<IEnumerable<OffenderCase>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_CASE_DETAILS)));
             }
             else
             {

@@ -291,6 +291,10 @@ namespace CMI.Processor
                                     taskExecutionStatus.DestAddRecordCount++;
                                     logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessAddresses", Message = "New Client Address details added successfully.", SourceData = JsonConvert.SerializeObject(offenderAddressDetails), DestData = JsonConvert.SerializeObject(address) });
                                 }
+                                else
+                                {
+                                    taskExecutionStatus.SourceReceivedRecordCount--;
+                                }
                             }
                             else if (!address.IsActive)
                             {
@@ -377,6 +381,10 @@ namespace CMI.Processor
                                     taskExecutionStatus.DestAddRecordCount++;
                                     logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessPhoneContacts", Message = "New Client Phone Contact details added successfully.", SourceData = JsonConvert.SerializeObject(offenderPhoneDetails), DestData = JsonConvert.SerializeObject(contact) });
                                 }
+                                else
+                                {
+                                    taskExecutionStatus.SourceReceivedRecordCount--;
+                                }
                             }
                             else if (!contact.IsActive)
                             {
@@ -460,6 +468,10 @@ namespace CMI.Processor
                                 {
                                     taskExecutionStatus.DestAddRecordCount++;
                                     logger.LogDebug(new LogRequest() { OperationName = "Processor", MethodName = "ProcessEmailContacts", Message = "New Client Email Contact details added successfully.", SourceData = JsonConvert.SerializeObject(offenderEmailDetails), DestData = JsonConvert.SerializeObject(contact) });
+                                }
+                                else
+                                {
+                                    taskExecutionStatus.SourceReceivedRecordCount--;
                                 }
                             }
                             else if (!contact.IsActive)

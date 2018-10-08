@@ -6,6 +6,12 @@ namespace CMI.DAL.Source.AutoMon
 {
     public class Constants
     {
+        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_DETAILS = "AllOffenderDetails.json";
+        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_ADDRESS_DETAILS = "AllOffenderAddressDetails.json";
+        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_PHONE_CONTACT_DETAILS = "AllOffenderPhoneContactDetails.json";
+        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_EMAIL_CONTACT_DETAILS = "AllOffenderEmailContactDetails.json";
+        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_CASE_DETAILS = "AllOffenderCaseDetails.json";
+        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_NOTE_DETAILS = "AllOffenderNoteDetails.json";
     }
 
     public class SQLParamName

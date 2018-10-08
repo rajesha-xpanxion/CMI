@@ -1,7 +1,9 @@
 ﻿using CMI.DAL.Source.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Text;
 
 namespace CMI.DAL.Source.AutoMon
@@ -20,7 +22,7 @@ namespace CMI.DAL.Source.AutoMon
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return new List<OffenderEmail>();
+                return JsonConvert.DeserializeObject<IEnumerable<OffenderEmail>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_EMAIL_CONTACT_DETAILS)));
             }
             else
             {

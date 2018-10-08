@@ -1,7 +1,9 @@
 ﻿using CMI.DAL.Source.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Text;
 
 namespace CMI.DAL.Source.AutoMon
@@ -20,11 +22,7 @@ namespace CMI.DAL.Source.AutoMon
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return new List<OffenderNote>()
-                {
-                    new OffenderNote {Pin="1000956", Id=70829,Date=Convert.ToDateTime("2008-08-07T13:52:41.43"),Text="Minor's brother's cell phone. (Johnathan Lemus)",AuthorEmail="jorge.soriano@edcgov.us",NoteType="Phone"},
-                    new OffenderNote {Pin="1003906",Id=304163,Text="Father's cellular",AuthorEmail=null,Date=Convert.ToDateTime("4/4/2011 4:24:44 PM"),NoteType="Phone"}
-                };
+                return JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_NOTE_DETAILS)));
             }
             else
             {
