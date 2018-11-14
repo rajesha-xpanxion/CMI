@@ -91,7 +91,7 @@ namespace CMI.Processor
             this.processorConfig = processorConfig.Value;
 
             taskExecutionStatuses = new List<Common.Notification.TaskExecutionStatus>();
-            processorExecutionStatus = new DAL.ExecutionStatus() { IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
+            processorExecutionStatus = new DAL.ExecutionStatus() { ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
         }
         #endregion
 
@@ -147,7 +147,6 @@ namespace CMI.Processor
             processorExecutionStatus.ExecutionStatusMessage = processorExecutionStatus.IsSuccessful 
                 ? "Processor execution completed successfully." 
                 : "Processor execution failed. Please check logs for more details.";
-            processorExecutionStatus.ExecutedOn = DateTime.Now;
             
             //save execution status details in history table
             SaveExecutionStatus(processorExecutionStatus);
