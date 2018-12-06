@@ -1,31 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
+using System.Data;
+using Microsoft.Extensions.Options;
 
 namespace CMI.Processor.DAL
 {
     public class ProcessorProvider : IProcessorProvider
     {
-        private ProcessorConfig processorConfig;
+        #region Private Member Variables
+        private readonly ProcessorConfig processorConfig;
+        #endregion
 
-        public ProcessorProvider(Microsoft.Extensions.Options.IOptions<ProcessorConfig> processorConfig)
+        #region Constructor
+        public ProcessorProvider(
+            IOptions<ProcessorConfig> processorConfig
+        )
         {
             this.processorConfig = processorConfig.Value;
         }
+        #endregion
 
+        #region Public Methods
         public DateTime? GetLastExecutionDateTime()
         {
             DateTime? lastExecutionDateTime = null;
 
-            using (SqlConnection conn = new SqlConnection(processorConfig.CMIDBConnString))
+            using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
             {
                 conn.Open();
 
                 using (SqlCommand cmd = new SqlCommand())
                 {
-                    cmd.CommandText = StoredProc.GET_LAST_EXECUTION_DATE_TIME;
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.CommandText = StoredProc.GetLastExecutionDateTime;
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Connection = conn;
 
                     object objLastExecutionDateTime = cmd.ExecuteScalar();
@@ -44,34 +51,70 @@ namespace CMI.Processor.DAL
         {
             if (executionStatus != null)
             {
-                using (SqlConnection conn = new SqlConnection(processorConfig.CMIDBConnString))
+                using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.SAVE_EXECUTION_STATUS;
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.CommandText = StoredProc.SaveExecutionStatus;
+                        cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Connection = conn;
 
-                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.EXECUTED_ON, Value = executionStatus.ExecutedOn, SqlDbType = System.Data.SqlDbType.DateTime, Direction = System.Data.ParameterDirection.Input });
-
-                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.IS_SUCCESSFUL, Value = executionStatus.IsSuccessful, SqlDbType = System.Data.SqlDbType.Bit, Direction = System.Data.ParameterDirection.Input });
-
-                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.NUM_TASK_PROCESSED, Value = executionStatus.NumTaskProcessed, SqlDbType = System.Data.SqlDbType.Int, Direction = System.Data.ParameterDirection.Input });
-
-                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.NUM_TASK_SUCCEEDED, Value = executionStatus.NumTaskSucceeded, SqlDbType = System.Data.SqlDbType.Int, Direction = System.Data.ParameterDirection.Input });
-
-                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.NUM_TASK_FAILED, Value = executionStatus.NumTaskFailed, SqlDbType = System.Data.SqlDbType.Int, Direction = System.Data.ParameterDirection.Input });
-
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.ExecutedOn,
+                            Value = executionStatus.ExecutedOn,
+                            SqlDbType = SqlDbType.DateTime,
+                            Direction = ParameterDirection.Input
+                        });
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.IsSuccessful,
+                            Value = executionStatus.IsSuccessful,
+                            SqlDbType = SqlDbType.Bit,
+                            Direction = ParameterDirection.Input
+                        });
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.NumTaskProcessed,
+                            Value = executionStatus.NumTaskProcessed,
+                            SqlDbType = SqlDbType.Int,
+                            Direction = ParameterDirection.Input
+                        });
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.NumTaskSucceeded,
+                            Value = executionStatus.NumTaskSucceeded,
+                            SqlDbType = SqlDbType.Int,
+                            Direction = ParameterDirection.Input
+                        });
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.NumTaskFailed,
+                            Value = executionStatus.NumTaskFailed,
+                            SqlDbType = SqlDbType.Int,
+                            Direction = ParameterDirection.Input
+                        });
                         if (!string.IsNullOrEmpty(executionStatus.ExecutionStatusMessage))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.MESSAGE, Value = executionStatus.ExecutionStatusMessage, SqlDbType = System.Data.SqlDbType.NVarChar, Direction = System.Data.ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter
+                            {
+                                ParameterName = SqlParamName.Message,
+                                Value = executionStatus.ExecutionStatusMessage,
+                                SqlDbType = SqlDbType.NVarChar,
+                                Direction = ParameterDirection.Input
+                            });
                         }
-
                         if (!string.IsNullOrEmpty(executionStatus.ErrorDetails))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.ERROR_DETAILS, Value = executionStatus.ErrorDetails, SqlDbType = System.Data.SqlDbType.NVarChar, Direction = System.Data.ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter
+                            {
+                                ParameterName = SqlParamName.ErrorDetails,
+                                Value = executionStatus.ErrorDetails,
+                                SqlDbType = SqlDbType.NVarChar,
+                                Direction = ParameterDirection.Input
+                            });
                         }
 
                         cmd.ExecuteNonQuery();
@@ -79,5 +122,6 @@ namespace CMI.Processor.DAL
                 }
             }
         }
+        #endregion
     }
 }

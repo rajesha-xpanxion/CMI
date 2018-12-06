@@ -1,48 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace CMI.Processor.DAL
 {
-    public class Constants
+    public static class Constants
     {
-        public const string CONTACT_TYPE_EMAIL_DEST = "E-mail";
+        public static string ContactTypeEmailDest { get { return "E-mail"; } }
 
-        public const string ETHNICITY_UNKNOWN = "Unknown";
+        public static string EthnicityUnknown { get { return "Unknown"; } }
     }
 
-    public class SQLParamName
+    public static class SqlParamName
     {
-        public const string EXECUTED_ON = "@ExecutedOn";
+        public static string ExecutedOn { get { return "@ExecutedOn"; } }
 
-        public const string IS_SUCCESSFUL = "@IsSuccessful";
+        public static string IsSuccessful { get { return "@IsSuccessful"; } }
 
-        public const string NUM_TASK_PROCESSED = "@NumTaskProcessed";
+        public static string NumTaskProcessed { get { return "@NumTaskProcessed"; } }
 
-        public const string NUM_TASK_SUCCEEDED = "@NumTaskSucceeded";
+        public static string NumTaskSucceeded { get { return "@NumTaskSucceeded"; } }
 
-        public const string NUM_TASK_FAILED = "@NumTaskFailed";
+        public static string NumTaskFailed { get { return "@NumTaskFailed"; } }
 
-        public const string MESSAGE = "@Message";
+        public static string Message { get { return "@Message"; } }
 
-        public const string ERROR_DETAILS = "@ErrorDetails";
+        public static string ErrorDetails { get { return "@ErrorDetails"; } }
 
     }
 
-    public class StoredProc
+    public static class StoredProc
     {
-        public const string GET_LAST_EXECUTION_DATE_TIME = @"[dbo].[GetLastExecutionDateTime]";
+        public static string GetLastExecutionDateTime { get { return @"[dbo].[GetLastExecutionDateTime]"; } }
 
-        public const string SAVE_EXECUTION_STATUS = @"[dbo].[SaveExecutionStatus]";
+        public static string SaveExecutionStatus { get { return @"[dbo].[SaveExecutionStatus]"; } }
     }
 
-    public class ProcessorStage
+    public static class ProcessorStage
     {
-        public const string PROCESS_CLIENT_PROFILES = "ProcessClientProfiles";
-        public const string PROCESS_ADDRESSES = "ProcessAddresses";
-        public const string PROCESS_PHONE_CONTACTS = "ProcessPhoneContacts";
-        public const string PROCESS_EMAIL_CONTACTS = "ProcessEmailContacts";
-        public const string PROCESS_CASES = "ProcessCases";
-        public const string PROCESS_NOTES = "ProcessNotes";
+        public static string ProcessClientProfiles { get { return "ProcessClientProfiles"; } }
+        public static string ProcessAddresses { get { return "ProcessAddresses"; } }
+        public static string ProcessPhoneContacts { get { return "ProcessPhoneContacts"; } }
+        public static string ProcessEmailContacts { get { return "ProcessEmailContacts"; } }
+        public static string ProcessCases { get { return "ProcessCases"; } }
+        public static string ProcessNotes { get { return "ProcessNotes"; } }
     }
 }

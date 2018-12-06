@@ -1,67 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace CMI.DAL.Source.AutoMon
 {
-    public class Constants
+    public static class Constants
     {
-        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_DETAILS = "AllOffenderDetails.json";
-        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_ADDRESS_DETAILS = "AllOffenderAddressDetails.json";
-        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_PHONE_CONTACT_DETAILS = "AllOffenderPhoneContactDetails.json";
-        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_EMAIL_CONTACT_DETAILS = "AllOffenderEmailContactDetails.json";
-        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_CASE_DETAILS = "AllOffenderCaseDetails.json";
-        public const string TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_NOTE_DETAILS = "AllOffenderNoteDetails.json";
+        public static string TestDataJsonFileNameAllOffenderDetails { get { return "AllOffenderDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderAddressDetails { get { return "AllOffenderAddressDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderPhoneContactDetails { get { return "AllOffenderPhoneContactDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderEmailContactDetails { get { return "AllOffenderEmailContactDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderCaseDetails { get { return "AllOffenderCaseDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderNoteDetails { get { return "AllOffenderNoteDetails.json"; } }
     }
 
-    public class SQLParamName
+    public static class SqlParamName
     {
-        public const string SOURCE_DATABASE_NAME = "@SourceDatabaseName";
-        public const string LAST_EXECUTION_DATE_TIME = "@LastExecutionDateTime";
+        public static string SourceDatabaseName { get { return "@SourceDatabaseName"; } }
+        public static string LastExecutionDateTime { get { return "@LastExecutionDateTime"; } }
     }
 
-    public class DBColumnName
+    public static class DbColumnName
     {
-        public const string PIN = "Pin";
-        public const string ID = "Id";
-        public const string ADDRESS_TYPE = "AddressType";
-        public const string LINE1 = "Line1";
-        public const string LINE2 = "Line2";
-        public const string CITY = "City";
-        public const string STATE = "State";
-        public const string ZIP = "Zip";
-        public const string FIRST_NAME = "FirstName";
-        public const string MIDDLE_NAME = "MiddleName";
-        public const string LAST_NAME = "LastName";
-        public const string DATE_OF_BIRTH = "DateOfBirth";
-        public const string CLIENT_TYPE = "ClientType";
-        public const string GENDER = "Gender";
-        public const string RACE = "Race";
-        public const string CASELOAD_NAME = "CaseloadName";
-        public const string CASELOAD_TYPE = "CaseloadType";
-        public const string OFFICER_LOGON = "OfficerLogon";
-        public const string OFFICER_EMAIL = "OfficerEmail";
-        public const string OFFICER_FIRST_NAME = "OfficerFirstName";
-        public const string OFFICER_LAST_NAME = "OfficerLastName";
-        public const string PHONE_NUMBER_TYPE = "PhoneNumberType";
-        public const string PHONE = "Phone";
-        public const string IS_PRIMARY = "IsPrimary";
-        public const string COMMENT = "Comment";
-        public const string CASE_NUMBER = "CaseNumber";
-        public const string CASE_STATUS = "CaseStatus";
-        public const string CLOSURE_REASON = "ClosureReason";
-        public const string OFFENSE_LABEL = "OffenseLabel";
-        public const string OFFENSE_STATUTE = "OffenseStatute";
-        public const string OFFENSE_CATEGORY = "OffenseCategory";
-        public const string OFFENSE_DATE = "OffenseDate";
-        public const string CASE_DATE = "CaseDate";
-        public const string SUPERVISION_START_DATE = "SupervisionStartDate";
-        public const string SUPERVISION_END_DATE = "SupervisionEndDate";
-        public const string EMAIL_ADDRESS = "EmailAddress";
-        public const string DATE = "Date";
-        public const string TEXT = "Text";
-        public const string AUTHOR_EMAIL = "AuthorEmail";
-        public const string IS_ACTIVE = "IsActive";
-        public const string NOTE_TYPE = "NoteType";
+        public static string Pin { get { return "Pin"; } }
+        public static string Id { get { return "Id"; } }
+        public static string AddressType { get { return "AddressType"; } }
+        public static string Line1 { get { return "Line1"; } }
+        public static string Line2 { get { return "Line2"; } }
+        public static string City { get { return "City"; } }
+        public static string State { get { return "State"; } }
+        public static string Zip { get { return "Zip"; } }
+        public static string FirstName { get { return "FirstName"; } }
+        public static string MiddleName { get { return "MiddleName"; } }
+        public static string LastName { get { return "LastName"; } }
+        public static string DateOfBirth { get { return "DateOfBirth"; } }
+        public static string ClientType { get { return "ClientType"; } }
+        public static string Gender { get { return "Gender"; } }
+        public static string Race { get { return "Race"; } }
+        public static string CaseloadName { get { return "CaseloadName"; } }
+        public static string CaseloadType { get { return "CaseloadType"; } }
+        public static string OfficerLogon { get { return "OfficerLogon"; } }
+        public static string OfficerEmail { get { return "OfficerEmail"; } }
+        public static string OfficerFirstName { get { return "OfficerFirstName"; } }
+        public static string OfficerLastName { get { return "OfficerLastName"; } }
+        public static string PhoneNumberType { get { return "PhoneNumberType"; } }
+        public static string Phone { get { return "Phone"; } }
+        public static string IsPrimary { get { return "IsPrimary"; } }
+        public static string Comment { get { return "Comment"; } }
+        public static string CaseNumber { get { return "CaseNumber"; } }
+        public static string CaseStatus { get { return "CaseStatus"; } }
+        public static string ClosureReason { get { return "ClosureReason"; } }
+        public static string OffenseLabel { get { return "OffenseLabel"; } }
+        public static string OffenseStatute { get { return "OffenseStatute"; } }
+        public static string OffenseCategory { get { return "OffenseCategory"; } }
+        public static string OffenseDate { get { return "OffenseDate"; } }
+        public static string CaseDate { get { return "CaseDate"; } }
+        public static string SupervisionStartDate { get { return "SupervisionStartDate"; } }
+        public static string SupervisionEndDate { get { return "SupervisionEndDate"; } }
+        public static string EmailAddress { get { return "EmailAddress"; } }
+        public static string Date { get { return "Date"; } }
+        public static string Text { get { return "Text"; } }
+        public static string AuthorEmail { get { return "AuthorEmail"; } }
+        public static string IsActive { get { return "IsActive"; } }
+        public static string NoteType { get { return "NoteType"; } }
     }
 }

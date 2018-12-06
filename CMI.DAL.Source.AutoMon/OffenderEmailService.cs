@@ -4,48 +4,58 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Source.AutoMon
 {
     public class OffenderEmailService : IOffenderEmailService
     {
-        SourceConfig sourceConfig;
+        #region Private Member Variables
+        private readonly SourceConfig sourceConfig;
+        #endregion
 
-        public OffenderEmailService(Microsoft.Extensions.Options.IOptions<SourceConfig> sourceConfig)
+        #region Constructor
+        public OffenderEmailService(
+            IOptions<SourceConfig> sourceConfig
+        )
         {
             this.sourceConfig = sourceConfig.Value;
         }
+        #endregion
 
-        public IEnumerable<OffenderEmail> GetAllOffenderEmails(string CMIDBConnString, DateTime? lastExecutionDateTime)
+        #region Public Methods
+        public IEnumerable<OffenderEmail> GetAllOffenderEmails(string CmiDbConnString, DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return JsonConvert.DeserializeObject<IEnumerable<OffenderEmail>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_EMAIL_CONTACT_DETAILS)));
+                string testDataJsonFileName = Path.Combine(sourceConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderEmailContactDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<OffenderEmail>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderEmail>();
             }
             else
             {
-
                 List<OffenderEmail> offenderEmails = new List<OffenderEmail>();
 
-                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_EMAIL_DETAILS;
+                        cmd.CommandText = StoredProc.GetAllOffenderEmailDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            ParameterName = SqlParamName.SourceDatabaseName,
                             SqlDbType = System.Data.SqlDbType.NVarChar,
-                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDbConnString).InitialCatalog
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
+                            ParameterName = SqlParamName.LastExecutionDateTime,
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
@@ -58,11 +68,11 @@ namespace CMI.DAL.Source.AutoMon
                             {
                                 offenderEmails.Add(new OffenderEmail()
                                 {
-                                    Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                    Id = Convert.ToInt32(reader[DBColumnName.ID]),
-                                    EmailAddress = Convert.ToString(reader[DBColumnName.EMAIL_ADDRESS]),
-                                    IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY]),
-                                    IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    Id = Convert.ToInt32(reader[DbColumnName.Id]),
+                                    EmailAddress = Convert.ToString(reader[DbColumnName.EmailAddress]),
+                                    IsPrimary = Convert.ToBoolean(reader[DbColumnName.IsPrimary]),
+                                    IsActive = Convert.ToBoolean(reader[DbColumnName.IsActive])
                                 });
                             }
                         }
@@ -72,5 +82,6 @@ namespace CMI.DAL.Source.AutoMon
                 return offenderEmails;
             }
         }
+        #endregion
     }
 }

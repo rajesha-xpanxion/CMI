@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace CMI.DAL.Source
 {
     public class OffenderEmail : Offender

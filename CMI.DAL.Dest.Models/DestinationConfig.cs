@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace CMI.DAL.Dest.Models
 {
     public class DestinationConfig
     {
-        public string CaseIntegrationAPIBaseURL { get; set; }
+        public string CaseIntegrationApiBaseUrl { get; set; }
 
-        public string CaseIntegrationAPIVersion { get; set; }
+        public string CaseIntegrationApiVersion { get; set; }
 
         public TokenGeneratorConfig TokenGeneratorConfig { get; set; }
     }
 
     public class TokenGeneratorConfig
     {
-        public string TokenGeneratorAPIBaseURL { get; set; }
+        public string TokenGeneratorApiBaseUrl { get; set; }
 
         public string GrantType { get; set; }
 

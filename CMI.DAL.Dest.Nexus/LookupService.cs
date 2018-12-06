@@ -3,23 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Dest.Nexus
 {
     public class LookupService : ILookupService
     {
         #region Private Member Variables
-        DestinationConfig destinationConfig;
-        IAuthService authService;
+        private readonly DestinationConfig destinationConfig;
+        private readonly IAuthService authService;
         List<string> _AddressTypes;
         List<CaseLoad> _CaseLoads;
         List<string> _ClientTypes;
         List<string> _ContactTypes;
         List<string> _Ethnicities;
         List<string> _Genders;
-        List<string> _Offenses;
         List<SupervisingOfficer> _SupervisingOfficers;
         List<string> _TimeZones;
+        List<string> _OffenseCategories;
         #endregion
 
         #region Public Properties
@@ -52,7 +53,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
-        
+
         public List<string> ClientTypes
         {
             get
@@ -67,7 +68,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
-        
+
         public List<string> ContactTypes
         {
             get
@@ -82,7 +83,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
-        
+
         public List<string> Ethnicities
         {
             get
@@ -97,7 +98,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
-        
+
         public List<string> Genders
         {
             get
@@ -112,22 +113,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
-        
-        public List<string> Offenses
-        {
-            get
-            {
-                if (_Offenses != null)
-                {
-                    return _Offenses;
-                }
-                else
-                {
-                    return GetOffenses();
-                }
-            }
-        }
-        
+
         public List<SupervisingOfficer> SupervisingOfficers
         {
             get
@@ -142,7 +128,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
-        
+
         public List<string> TimeZones
         {
             get
@@ -157,10 +143,28 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
+
+        public List<string> OffenseCategories
+        {
+            get
+            {
+                if (_OffenseCategories != null)
+                {
+                    return _OffenseCategories;
+                }
+                else
+                {
+                    return GetOffenseCategories();
+                }
+            }
+        }
         #endregion
 
         #region Constructor
-        public LookupService(Microsoft.Extensions.Options.IOptions<DestinationConfig> destinationConfig, IAuthService authService)
+        public LookupService(
+            IOptions<DestinationConfig> destinationConfig,
+            IAuthService authService
+        )
         {
             this.destinationConfig = destinationConfig.Value;
             this.authService = authService;
@@ -173,15 +177,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/AddressType").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/addressTypes", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -193,7 +195,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _AddressTypes;
         }
 
@@ -201,15 +202,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/Caseloads").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/caseloads", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -221,7 +220,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _CaseLoads;
         }
 
@@ -229,15 +227,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/ClientType").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clientTypes", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -249,7 +245,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _ClientTypes;
         }
 
@@ -257,15 +252,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/ContactType").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/contactTypes", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -277,7 +270,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _ContactTypes;
         }
 
@@ -285,15 +277,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/Ethnicity").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/ethnicities", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -305,7 +295,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _Ethnicities;
         }
 
@@ -313,15 +302,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/Gender").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/genders", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -333,51 +320,20 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _Genders;
-        }
-
-        private List<string> GetOffenses()
-        {
-            using (HttpClient apiHost = new HttpClient())
-            {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
-
-                apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
-
-                var apiResponse = apiHost.GetAsync("api/LookUp/Offense").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
-
-                if (apiResponse.IsSuccessStatusCode)
-                {
-                    _Offenses = apiResponse.Content.ReadAsAsync<List<string>>().Result;
-                }
-                else
-                {
-                    _Offenses = null;
-                }
-            }
-
-
-            return _Offenses;
         }
 
         private List<SupervisingOfficer> GetSupervisingOfficers()
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/SupervisingOfficers").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/supervisingOfficers", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -389,7 +345,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _SupervisingOfficers;
         }
 
@@ -397,15 +352,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync("api/LookUp/TimeZone").Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/timeZones", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -417,8 +370,32 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return _TimeZones;
+        }
+
+        private List<string> GetOffenseCategories()
+        {
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/OffenseCategory", destinationConfig.CaseIntegrationApiVersion)).Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    _OffenseCategories = apiResponse.Content.ReadAsAsync<List<string>>().Result;
+                }
+                else
+                {
+                    _OffenseCategories = null;
+                }
+            }
+
+            return _OffenseCategories;
         }
         #endregion
     }

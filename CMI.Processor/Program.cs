@@ -9,8 +9,9 @@ using System.IO;
 
 namespace CMI.Processor
 {
-    class Program
+    static class Program
     {
+        #region Entry Point
         static void Main(string[] args)
         {
 
@@ -31,8 +32,9 @@ namespace CMI.Processor
 
             Console.WriteLine("{0}Processor execution completed successfully...", Environment.NewLine);
         }
+        #endregion
 
-
+        #region Private Helper Methods
         private static void ConfigureServices(IServiceCollection serviceCollection)
         {
             //service configuration for source
@@ -50,17 +52,14 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<ICaseService, CaseService>();
             serviceCollection.AddSingleton<INoteService, NoteService>();
             serviceCollection.AddSingleton<ILookupService, LookupService>();
-
             serviceCollection.AddSingleton<IAuthService, AuthService>();
 
-            serviceCollection.AddSingleton<Common.Logging.ILogger, Common.Logging.DBLogger>();
-
-            serviceCollection.AddSingleton<CMI.Processor.DAL.IProcessorProvider, CMI.Processor.DAL.ProcessorProvider>();
+            //common services
+            serviceCollection.AddSingleton<Common.Logging.ILogger, Common.Logging.DbLogger>();
+            serviceCollection.AddSingleton<DAL.IProcessorProvider, DAL.ProcessorProvider>();
             serviceCollection.AddSingleton<Common.Notification.IEmailNotificationProvider, Common.Notification.EmailNotificationProvider>();
 
-
-
-            // add scheduler
+            // add processor as service
             serviceCollection.AddTransient<Processor>();
 
             //read configuration from appsettings.json
@@ -72,11 +71,11 @@ namespace CMI.Processor
             //configure required configurations in service
             serviceCollection.Configure<CMI.DAL.Dest.Models.DestinationConfig>(configuration.GetSection("DestinationConfig"));
             serviceCollection.Configure<CMI.DAL.Source.Models.SourceConfig>(configuration.GetSection("SourceConfig"));
-            serviceCollection.Configure<CMI.Processor.DAL.ProcessorConfig>(configuration.GetSection("ProcessorConfig"));
-            serviceCollection.Configure<CMI.Common.Logging.LogConfig>(configuration.GetSection("LogConfig"));
+            serviceCollection.Configure<DAL.ProcessorConfig>(configuration.GetSection("ProcessorConfig"));
+            serviceCollection.Configure<Common.Logging.LogConfig>(configuration.GetSection("LogConfig"));
             serviceCollection.Configure<Common.Notification.EmailNotificationConfig>(configuration.GetSection("NotificationConfig:EmailNotificationConfig"));
             serviceCollection.AddOptions();
         }
-
+        #endregion
     }
 }

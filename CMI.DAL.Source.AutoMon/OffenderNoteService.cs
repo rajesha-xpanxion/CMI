@@ -4,48 +4,58 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Source.AutoMon
 {
     public class OffenderNoteService : IOffenderNoteService
     {
-        SourceConfig sourceConfig;
+        #region Private Member Variables
+        private readonly SourceConfig sourceConfig;
+        #endregion
 
-        public OffenderNoteService(Microsoft.Extensions.Options.IOptions<SourceConfig> sourceConfig)
+        #region Constructor
+        public OffenderNoteService(
+            IOptions<SourceConfig> sourceConfig
+        )
         {
             this.sourceConfig = sourceConfig.Value;
         }
+        #endregion
 
-        public IEnumerable<OffenderNote> GetAllOffenderNotes(string CMIDBConnString, DateTime? lastExecutionDateTime)
+        #region Public Methods
+        public IEnumerable<OffenderNote> GetAllOffenderNotes(string CmiDbConnString, DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_NOTE_DETAILS)));
+                string testDataJsonFileName = Path.Combine(sourceConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderNoteDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderNote>();
             }
             else
             {
-
                 List<OffenderNote> offenderNotes = new List<OffenderNote>();
 
-                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_NOTE_DETAILS;
+                        cmd.CommandText = StoredProc.GetAllOffenderNoteDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            ParameterName = SqlParamName.SourceDatabaseName,
                             SqlDbType = System.Data.SqlDbType.NVarChar,
-                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDbConnString).InitialCatalog
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
+                            ParameterName = SqlParamName.LastExecutionDateTime,
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
@@ -58,12 +68,12 @@ namespace CMI.DAL.Source.AutoMon
                             {
                                 offenderNotes.Add(new OffenderNote()
                                 {
-                                    Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                    Id = Convert.ToInt32(reader[DBColumnName.ID]),
-                                    Date = Convert.ToDateTime(reader[DBColumnName.DATE]),
-                                    Text = Convert.ToString(reader[DBColumnName.TEXT]),
-                                    AuthorEmail = Convert.ToString(reader[DBColumnName.AUTHOR_EMAIL]),
-                                    NoteType = Convert.ToString(reader[DBColumnName.NOTE_TYPE])
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    Id = Convert.ToInt32(reader[DbColumnName.Id]),
+                                    Date = Convert.ToDateTime(reader[DbColumnName.Date]),
+                                    Text = Convert.ToString(reader[DbColumnName.Text]),
+                                    AuthorEmail = Convert.ToString(reader[DbColumnName.AuthorEmail]),
+                                    NoteType = Convert.ToString(reader[DbColumnName.NoteType])
                                 });
                             }
                         }
@@ -73,5 +83,6 @@ namespace CMI.DAL.Source.AutoMon
                 return offenderNotes;
             }
         }
+        #endregion
     }
 }

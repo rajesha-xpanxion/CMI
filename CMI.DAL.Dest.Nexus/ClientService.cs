@@ -1,36 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CMI.DAL.Dest.Models;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Dest.Nexus
 {
     public class ClientService : IClientService
     {
-        DestinationConfig destinationConfig;
-        IAuthService authService;
+        #region Private Member Variables
+        private readonly DestinationConfig destinationConfig;
+        private readonly IAuthService authService;
+        #endregion
 
-        public ClientService(Microsoft.Extensions.Options.IOptions<DestinationConfig> destinationConfig, IAuthService authService)
+        #region Constructor
+        public ClientService(
+            IOptions<DestinationConfig> destinationConfig, 
+            IAuthService authService
+        )
         {
             this.destinationConfig = destinationConfig.Value;
             this.authService = authService;
         }
+        #endregion
 
+        #region Public Methods
         public bool AddNewClientDetails(Client client)
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PostAsJsonAsync<Client>(string.Format("api/{0}/clients", destinationConfig.CaseIntegrationAPIVersion), client).Result;
+                var apiResponse = apiHost.PostAsJsonAsync<Client>(string.Format("api/{0}/clients", destinationConfig.CaseIntegrationApiVersion), client).Result;
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
@@ -50,15 +55,13 @@ namespace CMI.DAL.Dest.Nexus
 
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}", destinationConfig.CaseIntegrationAPIVersion, clientId)).Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}", destinationConfig.CaseIntegrationApiVersion, clientId)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -70,7 +73,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return clientDetails;
         }
 
@@ -78,13 +80,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PutAsJsonAsync<Client>(string.Format("api/{0}/clients", destinationConfig.CaseIntegrationAPIVersion), client).Result;
+                var apiResponse = apiHost.PutAsJsonAsync<Client>(string.Format("api/{0}/clients", destinationConfig.CaseIntegrationApiVersion), client).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
@@ -98,5 +100,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
+        #endregion
     }
 }

@@ -4,49 +4,60 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Source.AutoMon
 {
     public class OffenderService : IOffenderService
     {
-        SourceConfig sourceConfig;
+        #region Private Member Variables
+        private readonly SourceConfig sourceConfig;
+        #endregion
 
-        public OffenderService(Microsoft.Extensions.Options.IOptions<SourceConfig> sourceConfig)
+        #region Constructor
+        public OffenderService(
+            IOptions<SourceConfig> sourceConfig
+        )
         {
             this.sourceConfig = sourceConfig.Value;
         }
+        #endregion
 
-        public IEnumerable<Offender> GetAllOffenderDetails(string CMIDBConnString, DateTime? lastExecutionDateTime)
+        #region Public Methods
+        public IEnumerable<Offender> GetAllOffenderDetails(string CmiDbConnString, DateTime? lastExecutionDateTime)
         {
             string timeZone = GetTimeZone();
 
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return JsonConvert.DeserializeObject<IEnumerable<Offender>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_DETAILS)));
+                string testDataJsonFileName = Path.Combine(sourceConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<Offender>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<Offender>();
             }
             else
             {
                 List<Offender> offenders = new List<Offender>();
 
-                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_DETAILS;
+                        cmd.CommandText = StoredProc.GetAllOffenderDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            ParameterName = SqlParamName.SourceDatabaseName,
                             SqlDbType = System.Data.SqlDbType.NVarChar,
-                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDbConnString).InitialCatalog
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
+                            ParameterName = SqlParamName.LastExecutionDateTime,
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
@@ -59,20 +70,20 @@ namespace CMI.DAL.Source.AutoMon
                             {
                                 offenders.Add(new Offender()
                                 {
-                                    Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                    FirstName = Convert.ToString(reader[DBColumnName.FIRST_NAME]),
-                                    MiddleName = Convert.ToString(reader[DBColumnName.MIDDLE_NAME]),
-                                    LastName = Convert.ToString(reader[DBColumnName.LAST_NAME]),
-                                    DateOfBirth = Convert.ToDateTime(reader[DBColumnName.DATE_OF_BIRTH]),
-                                    ClientType = Convert.ToString(reader[DBColumnName.CLIENT_TYPE]),
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    FirstName = Convert.ToString(reader[DbColumnName.FirstName]),
+                                    MiddleName = Convert.ToString(reader[DbColumnName.MiddleName]),
+                                    LastName = Convert.ToString(reader[DbColumnName.LastName]),
+                                    DateOfBirth = Convert.ToDateTime(reader[DbColumnName.DateOfBirth]),
+                                    ClientType = Convert.ToString(reader[DbColumnName.ClientType]),
                                     TimeZone = timeZone,
-                                    Gender = Convert.ToString(reader[DBColumnName.GENDER]),
-                                    Race = Convert.ToString(reader[DBColumnName.RACE]),
-                                    CaseloadName = Convert.ToString(reader[DBColumnName.CASELOAD_NAME]),
-                                    OfficerLogon = Convert.ToString(reader[DBColumnName.OFFICER_LOGON]),
-                                    OfficerEmail = Convert.ToString(reader[DBColumnName.OFFICER_EMAIL]),
-                                    OfficerFirstName = Convert.ToString(reader[DBColumnName.OFFICER_FIRST_NAME]),
-                                    OfficerLastName = Convert.ToString(reader[DBColumnName.OFFICER_LAST_NAME])
+                                    Gender = Convert.ToString(reader[DbColumnName.Gender]),
+                                    Race = Convert.ToString(reader[DbColumnName.Race]),
+                                    CaseloadName = Convert.ToString(reader[DbColumnName.CaseloadName]),
+                                    OfficerLogon = Convert.ToString(reader[DbColumnName.OfficerLogon]),
+                                    OfficerEmail = Convert.ToString(reader[DbColumnName.OfficerEmail]),
+                                    OfficerFirstName = Convert.ToString(reader[DbColumnName.OfficerFirstName]),
+                                    OfficerLastName = Convert.ToString(reader[DbColumnName.OfficerLastName])
                                 });
                             }
                         }
@@ -82,7 +93,9 @@ namespace CMI.DAL.Source.AutoMon
                 return offenders;
             }
         }
+        #endregion
 
+        #region Private Helper Methods
         private string GetTimeZone()
         {
             if (sourceConfig.IsDevMode)
@@ -94,13 +107,13 @@ namespace CMI.DAL.Source.AutoMon
             {
                 string timeZone = string.Empty;
 
-                using (SqlConnection conn = new SqlConnection(sourceConfig.AutoMonDBConnString))
+                using (SqlConnection conn = new SqlConnection(sourceConfig.AutoMonDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = SQLQuery.GET_TIME_ZONE;
+                        cmd.CommandText = SqlQuery.GetTimeZone;
                         cmd.CommandType = System.Data.CommandType.Text;
                         cmd.Connection = conn;
 
@@ -111,5 +124,6 @@ namespace CMI.DAL.Source.AutoMon
                 return timeZone;
             }
         }
+        #endregion
     }
 }

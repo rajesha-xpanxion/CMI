@@ -1,34 +1,41 @@
 ﻿using CMI.DAL.Dest.Models;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Dest.Nexus
 {
     public class AddressService : IAddressService
     {
-        DestinationConfig destinationConfig;
-        IAuthService authService;
+        #region Private Member Variables
+        private readonly DestinationConfig destinationConfig;
+        private readonly IAuthService authService;
+        #endregion
 
-        public AddressService(Microsoft.Extensions.Options.IOptions<DestinationConfig> destinationConfig, IAuthService authService)
+        #region Constructor
+        public AddressService(
+            IOptions<DestinationConfig> destinationConfig, 
+            IAuthService authService
+        )
         {
             this.destinationConfig = destinationConfig.Value;
             this.authService = authService;
         }
+        #endregion
 
+        #region Public Methods
         public bool AddNewAddressDetails(Address address)
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PostAsJsonAsync<Address>(string.Format("api/{0}/clients/{1}/addresses", destinationConfig.CaseIntegrationAPIVersion, address.ClientId), address).Result;
+                var apiResponse = apiHost.PostAsJsonAsync<Address>(string.Format("api/{0}/clients/{1}/addresses", destinationConfig.CaseIntegrationApiVersion, address.ClientId), address).Result;
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
@@ -48,15 +55,13 @@ namespace CMI.DAL.Dest.Nexus
 
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/addresses/{2}", destinationConfig.CaseIntegrationAPIVersion, clientId, addressId)).Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/addresses/{2}", destinationConfig.CaseIntegrationApiVersion, clientId, addressId)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
@@ -68,7 +73,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
 
-
             return addressDetails;
         }
 
@@ -76,13 +80,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PutAsJsonAsync<Address>(string.Format("api/{0}/clients/{1}/addresses", destinationConfig.CaseIntegrationAPIVersion, address.ClientId), address).Result;
+                var apiResponse = apiHost.PutAsJsonAsync<Address>(string.Format("api/{0}/clients/{1}/addresses", destinationConfig.CaseIntegrationApiVersion, address.ClientId), address).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
@@ -101,13 +105,13 @@ namespace CMI.DAL.Dest.Nexus
         {
             using (HttpClient apiHost = new HttpClient())
             {
-                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                 apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.DeleteAsync(string.Format("api/{0}/clients/{1}/addresses/{2}", destinationConfig.CaseIntegrationAPIVersion, clientId, addressId)).Result;
+                var apiResponse = apiHost.DeleteAsync(string.Format("api/{0}/clients/{1}/addresses/{2}", destinationConfig.CaseIntegrationApiVersion, clientId, addressId)).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
@@ -121,5 +125,6 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
+        #endregion
     }
 }

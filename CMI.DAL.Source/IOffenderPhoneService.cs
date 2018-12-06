@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CMI.DAL.Source
 {
     public interface IOffenderPhoneService
     {
-        IEnumerable<OffenderPhone> GetAllOffenderPhones(string CMIDBConnString, DateTime? lastExecutionDateTime);
+        IEnumerable<OffenderPhone> GetAllOffenderPhones(string CmiDbConnString, DateTime? lastExecutionDateTime);
     }
 }

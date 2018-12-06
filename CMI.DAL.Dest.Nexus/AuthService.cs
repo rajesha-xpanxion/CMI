@@ -4,14 +4,18 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Dest.Nexus
 {
     public class AuthService : IAuthService
     {
-        DestinationConfig destinationConfig;
-
+        #region Private Member Variables
+        private readonly DestinationConfig destinationConfig;
         private AuthTokenResponse _AuthToken;
+        #endregion
+
+        #region Public Member Property
         public AuthTokenResponse AuthToken
         {
             get
@@ -26,12 +30,18 @@ namespace CMI.DAL.Dest.Nexus
                 }
             }
         }
+        #endregion
 
-        public AuthService(Microsoft.Extensions.Options.IOptions<DestinationConfig> destinationConfig)
+        #region Constructor
+        public AuthService(
+            IOptions<DestinationConfig> destinationConfig
+        )
         {
             this.destinationConfig = destinationConfig.Value;
         }
+        #endregion
 
+        #region Private Helper Methods
         private bool IsAuthorized()
         {
             bool isAuthorized = false;
@@ -40,13 +50,13 @@ namespace CMI.DAL.Dest.Nexus
             {
                 using (HttpClient apiHost = new HttpClient())
                 {
-                    apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationAPIBaseURL);
+                    apiHost.BaseAddress = new Uri(destinationConfig.CaseIntegrationApiBaseUrl);
 
                     apiHost.DefaultRequestHeaders.Accept.Clear();
-                    apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJSON));
+                    apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                     apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", _AuthToken.token_type, _AuthToken.access_token));
 
-                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/IAmAlive", destinationConfig.CaseIntegrationAPIVersion)).Result;
+                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/IAmAlive", destinationConfig.CaseIntegrationApiVersion)).Result;
 
                     var responseString = apiResponse.Content.ReadAsStringAsync();
 
@@ -73,7 +83,7 @@ namespace CMI.DAL.Dest.Nexus
             using (HttpClient apiHost = new HttpClient())
             {
                 //set base address
-                apiHost.BaseAddress = new Uri(destinationConfig.TokenGeneratorConfig.TokenGeneratorAPIBaseURL);
+                apiHost.BaseAddress = new Uri(destinationConfig.TokenGeneratorConfig.TokenGeneratorApiBaseUrl);
 
                 //set headers
                 var idAndSecret = string.Format("{0}:{1}", destinationConfig.TokenGeneratorConfig.ClientId, destinationConfig.TokenGeneratorConfig.ClientSecret);
@@ -94,7 +104,6 @@ namespace CMI.DAL.Dest.Nexus
 
                 string responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
-
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     _AuthToken = apiResponse.Content.ReadAsAsync<AuthTokenResponse>().Result;
@@ -103,10 +112,10 @@ namespace CMI.DAL.Dest.Nexus
                 {
                     throw new ApplicationException(string.Format("Token could not be generated!!!{0}Response: {1}", Environment.NewLine, responseString));
                 }
-
             }
 
             return _AuthToken;
         }
+        #endregion
     }
 }

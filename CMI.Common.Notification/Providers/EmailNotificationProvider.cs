@@ -4,20 +4,29 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.Common.Notification
 {
     public class EmailNotificationProvider : IEmailNotificationProvider
     {
-        private EmailNotificationConfig emailNotificationConfig;
-        public EmailNotificationProvider(Microsoft.Extensions.Options.IOptions<EmailNotificationConfig> emailNotificationConfig)
+        #region Private Member Variables
+        private readonly EmailNotificationConfig emailNotificationConfig;
+        #endregion
+
+        #region Constructor
+        public EmailNotificationProvider(
+            IOptions<EmailNotificationConfig> emailNotificationConfig
+        )
         {
             this.emailNotificationConfig = emailNotificationConfig.Value;
         }
+        #endregion
 
+        #region Public Methods
         public ExecutionStatusReportEmailResponse SendExecutionStatusReportEmail(ExecutionStatusReportEmailRequest request)
         {
-            var response = new ExecutionStatusReportEmailResponse() { IsSuccessful = true };
+            var response = new ExecutionStatusReportEmailResponse { IsSuccessful = true };
             try
             {
                 if (emailNotificationConfig.IsEmailNotificationEnabled)
@@ -25,7 +34,8 @@ namespace CMI.Common.Notification
                     string emailBody = GetEmailBodyForProcessorExecutionStatusReportEmail(request.TaskExecutionStatuses);
 
                     SendEmail(
-                        emailNotificationConfig.SMTPServerHost,
+                        emailNotificationConfig.SmtpServerHost,
+                        emailNotificationConfig.SmtpServerPort,
                         emailNotificationConfig.MailServerUserName,
                         emailNotificationConfig.MailServerPassword,
                         emailNotificationConfig.IsEnableSsl,
@@ -36,8 +46,7 @@ namespace CMI.Common.Notification
                         emailBody,
                         MailPriority.Normal,
                         null
-                        );
-
+                    );
                 }
             }
             catch(Exception ex)
@@ -48,27 +57,50 @@ namespace CMI.Common.Notification
 
             return response;
         }
+        #endregion
 
-        void SendEmail(string smtpServerHostName, string mailServerUserName, string mailServerPassword, bool isEnableSsl, string fromEmailAddress, string toEmailAddresses, string ccEmailAddresses, string subject, string body, MailPriority priority, List<string> attachmentFiles)
+        #region Private Helper Methods
+        private void SendEmail(
+            string smtpServerHostName,
+            int smtpServerPort,
+            string mailServerUserName,
+            string mailServerPassword,
+            bool isEnableSsl,
+            string fromEmailAddress,
+            string toEmailAddresses,
+            string ccEmailAddresses,
+            string subject,
+            string body,
+            MailPriority priority,
+            List<string> attachmentFiles
+        )
         {
             if (
                 !string.IsNullOrEmpty(smtpServerHostName)
                 && !string.IsNullOrEmpty(fromEmailAddress)
                 && !string.IsNullOrEmpty(toEmailAddresses)
             )
+            {
                 using (SmtpClient smtpClient = new SmtpClient(smtpServerHostName))
                 {
-                    smtpClient.UseDefaultCredentials = true;
+                    if (smtpServerPort > 0)
+                    {
+                        smtpClient.Port = smtpServerPort;
+                    }
+
+                    smtpClient.UseDefaultCredentials = (string.IsNullOrEmpty(mailServerUserName) || string.IsNullOrEmpty(mailServerPassword));
+
                     smtpClient.Credentials = (
                         (string.IsNullOrEmpty(mailServerUserName) || string.IsNullOrEmpty(mailServerPassword))
-                        ? System.Net.CredentialCache.DefaultNetworkCredentials
+                        ? CredentialCache.DefaultNetworkCredentials
                         : new NetworkCredential(mailServerUserName, mailServerPassword)
-                        );
+                    );
+
                     smtpClient.EnableSsl = isEnableSsl;
 
                     MailMessage mailMessage = new MailMessage();
                     mailMessage.From = new MailAddress(fromEmailAddress);
-                    mailMessage.Priority = (MailPriority)priority;
+                    mailMessage.Priority = priority;
 
                     foreach (string toEmailAddress in ConvertDelimitedEmailAddressToList(toEmailAddresses))
                     {
@@ -83,13 +115,12 @@ namespace CMI.Common.Notification
                         }
                     }
 
-
                     mailMessage.Subject = subject;
 
                     string mailBody = body;
 
-                    AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mailBody, System.Text.Encoding.Default, "text/html");
-                    AlternateView textView = AlternateView.CreateAlternateViewFromString(mailBody, System.Text.Encoding.Default, "text/plain");
+                    AlternateView htmlView = AlternateView.CreateAlternateViewFromString(mailBody, Encoding.Default, Constants.MediaTypeHtml);
+                    AlternateView textView = AlternateView.CreateAlternateViewFromString(mailBody, Encoding.Default, Constants.MediaTypePlain);
 
                     mailMessage.AlternateViews.Add(textView);
                     mailMessage.AlternateViews.Add(htmlView);
@@ -107,39 +138,44 @@ namespace CMI.Common.Notification
 
                     smtpClient.Send(mailMessage);
                 }
+            }
         }
 
-        IEnumerable<string> ConvertDelimitedEmailAddressToList(string emailAddresses)
+        private IEnumerable<string> ConvertDelimitedEmailAddressToList(string emailAddresses)
         {
-            return new List<string>(emailAddresses.Split(new string[] { ";", ",", "|" }, StringSplitOptions.RemoveEmptyEntries));
+            return new List<string>(emailAddresses.Split(Constants.EmailAddressSeparators, StringSplitOptions.RemoveEmptyEntries));
         }
 
-        string GetEmailBodyForProcessorExecutionStatusReportEmail(IEnumerable<TaskExecutionStatus> taskExecutionStatuses)
+        private string GetEmailBodyForProcessorExecutionStatusReportEmail(IEnumerable<TaskExecutionStatus> taskExecutionStatuses)
         {
-            string body = string.Empty, dataHtml = string.Empty;
+            string body = string.Empty;
 
             using (StreamReader reader = new StreamReader(Path.Combine(emailNotificationConfig.EmailAlertTemplatesPath, Constants.ProcessorExecutionStatusReportEmailTemplateFileName)))
             {
                 body = reader.ReadToEnd();
             }
 
+            StringBuilder dataHtmlBuilder = new StringBuilder();
             foreach (var taskExecutionStatus in taskExecutionStatuses)
             {
-                dataHtml += string.Format(
-                    "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td></tr>",
-                    taskExecutionStatus.TaskName,
-                    (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
-                    taskExecutionStatus.SourceReceivedRecordCount,
-                    taskExecutionStatus.DestAddRecordCount,
-                    taskExecutionStatus.DestUpdateRecordCount,
-                    taskExecutionStatus.DestDeleteRecordCount,
-                    taskExecutionStatus.DestFailureRecordCount
+                dataHtmlBuilder.Append(
+                    string.Format(
+                        Constants.ExecutionStatusReportEmailBodyTableFormat,
+                        taskExecutionStatus.TaskName,
+                        (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
+                        taskExecutionStatus.SourceReceivedRecordCount,
+                        taskExecutionStatus.DestAddRecordCount,
+                        taskExecutionStatus.DestUpdateRecordCount,
+                        taskExecutionStatus.DestDeleteRecordCount,
+                        taskExecutionStatus.DestFailureRecordCount
+                    )
                 );
             }
 
-            body = body.Replace(Constants.TemplateVariableExecutionStatusDetails, dataHtml);
+            body = body.Replace(Constants.TemplateVariableExecutionStatusDetails, dataHtmlBuilder.ToString());
 
             return body;
         }
+        #endregion
     }
 }

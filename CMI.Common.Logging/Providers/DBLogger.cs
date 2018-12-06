@@ -1,110 +1,119 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace CMI.Common.Logging
 {
-    public class DBLogger : ILogger
+    public class DbLogger : ILogger
     {
-        private LogConfig logConfig;
+        #region Private Member Variables
+        private readonly LogConfig logConfig;
+        #endregion
 
-        public DBLogger(Microsoft.Extensions.Options.IOptions<LogConfig> logConfig)
+        #region Constructor
+        public DbLogger(
+            IOptions<LogConfig> logConfig
+        )
         {
             this.logConfig = logConfig.Value;
         }
+        #endregion
 
-        public void LogDebug(LogRequest logRequest)
+        #region Public Methods
+        public async void LogDebug(LogRequest logRequest)
         {
             if(logConfig.IsEnabled && logConfig.LogLevel <= LogLevel.Debug)
             {
-                Log(LogLevel.Debug, logRequest);
+                await Log(LogLevel.Debug, logRequest);
             }
         }
 
-        public void LogInfo(LogRequest logRequest)
+        public async void LogInfo(LogRequest logRequest)
         {
             if (logConfig.IsEnabled && logConfig.LogLevel <= LogLevel.Info)
             {
-                Log(LogLevel.Info, logRequest);
+                await Log(LogLevel.Info, logRequest);
             }
         }
 
-        public void LogWarning(LogRequest logRequest)
+        public async void LogWarning(LogRequest logRequest)
         {
             if (logConfig.LogLevel <= LogLevel.Warning)
             {
-                Log(LogLevel.Warning, logRequest);
+                await Log(LogLevel.Warning, logRequest);
             }
         }
 
-        public void LogError(LogRequest logRequest)
+        public async void LogError(LogRequest logRequest)
         {
             if (logConfig.IsEnabled && logConfig.LogLevel <= LogLevel.Error)
             {
-                Log(LogLevel.Error, logRequest);
+                await Log(LogLevel.Error, logRequest);
             }
         }
+        #endregion
 
-        private async void Log(LogLevel logLevel, LogRequest logRequest)
+        #region Private Helper Methods
+        private async Task Log(LogLevel logLevel, LogRequest logRequest)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(logConfig.DBConnString))
+                using (SqlConnection conn = new SqlConnection(logConfig.DatabaseConnectionString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = SQLQuery.SAVE_LOG_DETAILS;
+                        cmd.CommandText = SqlQuery.SaveLogDetails;
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Connection = conn;
 
-                        cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.LOG_LEVEL, Value = logLevel.ToString(), SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                        cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.LogLevel, Value = logLevel.ToString(), SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
 
                         if (!string.IsNullOrEmpty(logRequest.OperationName))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.OPERATION_NAME, Value = logRequest.OperationName, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.OperationName, Value = logRequest.OperationName, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         if (!string.IsNullOrEmpty(logRequest.MethodName))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.METHOD_NAME, Value = logRequest.MethodName, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.MethodName, Value = logRequest.MethodName, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         if (logRequest.ErrorType.HasValue)
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.ERROR_TYPE, Value = logRequest.ErrorType.Value, SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.ErrorType, Value = logRequest.ErrorType.Value, SqlDbType = SqlDbType.Int, Direction = ParameterDirection.Input });
                         }
 
                         if (logRequest.Exception != null && !string.IsNullOrEmpty(logRequest.Exception.Message))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.MESSAGE, Value = logRequest.Exception.Message, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.Message, Value = logRequest.Exception.Message, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
                         else if (!string.IsNullOrEmpty(logRequest.Message))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.MESSAGE, Value = logRequest.Message, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.Message, Value = logRequest.Message, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         if (logRequest.Exception != null && !string.IsNullOrEmpty(logRequest.Exception.StackTrace))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.STACK_TRACE, Value = logRequest.Exception.StackTrace, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.StackTrace, Value = logRequest.Exception.StackTrace, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         if (!string.IsNullOrEmpty(logRequest.CustomParams))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.CUSTOM_PARAMS, Value = logRequest.CustomParams, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.CustomParams, Value = logRequest.CustomParams, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         if (!string.IsNullOrEmpty(logRequest.SourceData))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.SOURCE_DATA, Value = logRequest.SourceData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.SourceData, Value = logRequest.SourceData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         if (!string.IsNullOrEmpty(logRequest.DestData))
                         {
-                            cmd.Parameters.Add(new SqlParameter() { ParameterName = SQLParamName.DEST_DATA, Value = logRequest.DestData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.DestData, Value = logRequest.DestData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         await cmd.ExecuteNonQueryAsync();
@@ -113,9 +122,9 @@ namespace CMI.Common.Logging
             }
             catch(Exception ex)
             {
-                string exMsg = ex.Message;
-                string exStackTrc = ex.StackTrace;
+                Console.WriteLine("{0}Error occurred in database logging:{0}{1}{0}", Environment.NewLine, ex.ToString());
             }
         }
+        #endregion
     }
 }

@@ -4,47 +4,58 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Source.AutoMon
 {
     public class OffenderAddressService : IOffenderAddressService
     {
-        SourceConfig sourceConfig;
+        #region Private Member Variables
+        private readonly SourceConfig sourceConfig;
+        #endregion
 
-        public OffenderAddressService(Microsoft.Extensions.Options.IOptions<SourceConfig> sourceConfig)
+        #region Constructor
+        public OffenderAddressService(
+            IOptions<SourceConfig> sourceConfig
+        )
         {
             this.sourceConfig = sourceConfig.Value;
         }
+        #endregion
 
-        public IEnumerable<OffenderAddress> GetAllOffenderAddresses(string CMIDBConnString, DateTime? lastExecutionDateTime)
+        #region Public Methods
+        public IEnumerable<OffenderAddress> GetAllOffenderAddresses(string CmiDbConnString, DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return JsonConvert.DeserializeObject<IEnumerable<OffenderAddress>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_ADDRESS_DETAILS)));
+                string testDataJsonFileName = Path.Combine(sourceConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderAddressDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<OffenderAddress>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderAddress>();
             }
             else
             {
                 List<OffenderAddress> offenderAddresses = new List<OffenderAddress>();
 
-                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_ADDRESS_DETAILS;
+                        cmd.CommandText = StoredProc.GetAllOffenderAddressDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            ParameterName = SqlParamName.SourceDatabaseName,
                             SqlDbType = System.Data.SqlDbType.NVarChar,
-                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDbConnString).InitialCatalog
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
+                            ParameterName = SqlParamName.LastExecutionDateTime,
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
@@ -57,16 +68,16 @@ namespace CMI.DAL.Source.AutoMon
                             {
                                 offenderAddresses.Add(new OffenderAddress()
                                 {
-                                    Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                    Id = Convert.ToInt32(reader[DBColumnName.ID]),
-                                    AddressType = Convert.ToString(reader[DBColumnName.ADDRESS_TYPE]),
-                                    Line1 = Convert.ToString(reader[DBColumnName.LINE1]),
-                                    Line2 = Convert.ToString(reader[DBColumnName.LINE2]),
-                                    City = Convert.ToString(reader[DBColumnName.CITY]),
-                                    State = Convert.ToString(reader[DBColumnName.STATE]),
-                                    Zip = Convert.ToString(reader[DBColumnName.ZIP]),
-                                    Comment = Convert.ToString(reader[DBColumnName.COMMENT]),
-                                    IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    Id = Convert.ToInt32(reader[DbColumnName.Id]),
+                                    AddressType = Convert.ToString(reader[DbColumnName.AddressType]),
+                                    Line1 = Convert.ToString(reader[DbColumnName.Line1]),
+                                    Line2 = Convert.ToString(reader[DbColumnName.Line2]),
+                                    City = Convert.ToString(reader[DbColumnName.City]),
+                                    State = Convert.ToString(reader[DbColumnName.State]),
+                                    Zip = Convert.ToString(reader[DbColumnName.Zip]),
+                                    Comment = Convert.ToString(reader[DbColumnName.Comment]),
+                                    IsActive = Convert.ToBoolean(reader[DbColumnName.IsActive])
                                 });
                             }
                         }
@@ -76,5 +87,6 @@ namespace CMI.DAL.Source.AutoMon
                 return offenderAddresses;
             }
         }
+        #endregion
     }
 }

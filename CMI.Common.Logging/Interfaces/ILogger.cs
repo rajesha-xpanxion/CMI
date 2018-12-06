@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace CMI.Common.Logging
 {
     public interface ILogger
     {
-        
-
         void LogDebug(LogRequest logRequest);
 
         void LogInfo(LogRequest logRequest);

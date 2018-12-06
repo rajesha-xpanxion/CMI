@@ -4,48 +4,58 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Text;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Source.AutoMon
 {
     public class OffenderPhoneService : IOffenderPhoneService
     {
-        SourceConfig sourceConfig;
+        #region Private Member Variables
+        private readonly SourceConfig sourceConfig;
+        #endregion
 
-        public OffenderPhoneService(Microsoft.Extensions.Options.IOptions<SourceConfig> sourceConfig)
+        #region Constructor
+        public OffenderPhoneService(
+            IOptions<SourceConfig> sourceConfig
+        )
         {
             this.sourceConfig = sourceConfig.Value;
         }
+        #endregion
 
-        public IEnumerable<OffenderPhone> GetAllOffenderPhones(string CMIDBConnString, DateTime? lastExecutionDateTime)
+        #region Public Methods
+        public IEnumerable<OffenderPhone> GetAllOffenderPhones(string CmiDbConnString, DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return JsonConvert.DeserializeObject<IEnumerable<OffenderPhone>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_PHONE_CONTACT_DETAILS)));
+                string testDataJsonFileName = Path.Combine(sourceConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderPhoneContactDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<OffenderPhone>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderPhone>();
             }
             else
             {
-
                 List<OffenderPhone> offenderPhones = new List<OffenderPhone>();
 
-                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_PHONE_DETAILS;
+                        cmd.CommandText = StoredProc.GetAllOffenderPhoneDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            ParameterName = SqlParamName.SourceDatabaseName,
                             SqlDbType = System.Data.SqlDbType.NVarChar,
-                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDbConnString).InitialCatalog
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
+                            ParameterName = SqlParamName.LastExecutionDateTime,
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
@@ -58,13 +68,13 @@ namespace CMI.DAL.Source.AutoMon
                             {
                                 offenderPhones.Add(new OffenderPhone()
                                 {
-                                    Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                    Id = Convert.ToInt32(reader[DBColumnName.ID]),
-                                    PhoneNumberType = Convert.ToString(reader[DBColumnName.PHONE_NUMBER_TYPE]),
-                                    Phone = Convert.ToString(reader[DBColumnName.PHONE]),
-                                    IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY]),
-                                    Comment = Convert.ToString(reader[DBColumnName.COMMENT]),
-                                    IsActive = Convert.ToBoolean(reader[DBColumnName.IS_ACTIVE])
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    Id = Convert.ToInt32(reader[DbColumnName.Id]),
+                                    PhoneNumberType = Convert.ToString(reader[DbColumnName.PhoneNumberType]),
+                                    Phone = Convert.ToString(reader[DbColumnName.Phone]),
+                                    IsPrimary = Convert.ToBoolean(reader[DbColumnName.IsPrimary]),
+                                    Comment = Convert.ToString(reader[DbColumnName.Comment]),
+                                    IsActive = Convert.ToBoolean(reader[DbColumnName.IsActive])
                                 });
                             }
                         }
@@ -74,5 +84,6 @@ namespace CMI.DAL.Source.AutoMon
                 return offenderPhones;
             }
         }
+        #endregion
     }
 }

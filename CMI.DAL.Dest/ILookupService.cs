@@ -17,10 +17,10 @@ namespace CMI.DAL.Dest
 
         List<string> Genders { get; }
 
-        List<string> Offenses { get; }
-
         List<SupervisingOfficer> SupervisingOfficers { get; }
 
         List<string> TimeZones { get; }
+
+        List<string> OffenseCategories { get; }
     }
 }

@@ -1,36 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace CMI.Common.Logging
 {
-    public class Constants
+    public static class SqlParamName
     {
+        public static string LogLevel { get { return "@LogLevel"; } }
+
+        public static string OperationName { get { return "@OperationName"; } }
+
+        public static string MethodName { get { return "@MethodName"; } }
+
+        public static string ErrorType { get { return "@ErrorType"; } }
+
+        public static string Message { get { return "@Message"; } }
+
+        public static string StackTrace { get { return "@StackTrace"; } }
+
+        public static string CustomParams { get { return "@CustomParams"; } }
+
+        public static string SourceData { get { return "@SourceData"; } }
+
+        public static string DestData { get { return "@DestData"; } }
     }
 
-    public class SQLParamName
+    public static class SqlQuery
     {
-        public const string LOG_LEVEL = "@LogLevel";
-
-        public const string OPERATION_NAME = "@OperationName";
-
-        public const string METHOD_NAME = "@MethodName";
-
-        public const string ERROR_TYPE = "@ErrorType";
-
-        public const string MESSAGE = "@Message";
-
-        public const string STACK_TRACE = "@StackTrace";
-
-        public const string CUSTOM_PARAMS = "@CustomParams";
-
-        public const string SOURCE_DATA = "@SourceData";
-
-        public const string DEST_DATA = "@DestData";
-    }
-
-    public class SQLQuery
-    {
-        public const string SAVE_LOG_DETAILS = @"[dbo].[SaveLogDetails]";
+        public static string SaveLogDetails { get { return @"[dbo].[SaveLogDetails]"; } }
     }
 }

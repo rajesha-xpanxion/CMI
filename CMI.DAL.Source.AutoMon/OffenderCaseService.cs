@@ -4,48 +4,58 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
-using System.Text;
-//using System.Linq;
+using Microsoft.Extensions.Options;
 
 namespace CMI.DAL.Source.AutoMon
 {
     public class OffenderCaseService : IOffenderCaseService
     {
-        SourceConfig sourceConfig;
+        #region Private Member Variables
+        private readonly SourceConfig sourceConfig;
+        #endregion
 
-        public OffenderCaseService(Microsoft.Extensions.Options.IOptions<SourceConfig> sourceConfig)
+        #region Constructor
+        public OffenderCaseService(
+            IOptions<SourceConfig> sourceConfig
+        )
         {
             this.sourceConfig = sourceConfig.Value;
         }
+        #endregion
 
-        public IEnumerable<OffenderCase> GetAllOffenderCases(string CMIDBConnString, DateTime? lastExecutionDateTime)
+        #region Public Methods
+        public IEnumerable<OffenderCase> GetAllOffenderCases(string CmiDbConnString, DateTime? lastExecutionDateTime)
         {
             if (sourceConfig.IsDevMode)
             {
                 //test data
-                return JsonConvert.DeserializeObject<IEnumerable<OffenderCase>>(File.ReadAllText(Path.Combine(sourceConfig.TestDataJSONRepoPath, Constants.TEST_DATA_JSON_FILE_NAME_ALL_OFFENDER_CASE_DETAILS)));
+                string testDataJsonFileName = Path.Combine(sourceConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderCaseDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<OffenderCase>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderCase>();
             }
             else
             {
                 List<OffenderCase> offenderCases = new List<OffenderCase>();
 
-                using (SqlConnection conn = new SqlConnection(CMIDBConnString))
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
                 {
                     conn.Open();
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.GET_ALL_OFFENDER_CASE_DETAILS;
+                        cmd.CommandText = StoredProc.GetAllOffenderCaseDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.SOURCE_DATABASE_NAME,
+                            ParameterName = SqlParamName.SourceDatabaseName,
                             SqlDbType = System.Data.SqlDbType.NVarChar,
-                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDBConnString).InitialCatalog
+                            Value = new SqlConnectionStringBuilder(sourceConfig.AutoMonDbConnString).InitialCatalog
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SQLParamName.LAST_EXECUTION_DATE_TIME,
+                            ParameterName = SqlParamName.LastExecutionDateTime,
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
@@ -58,54 +68,54 @@ namespace CMI.DAL.Source.AutoMon
                             {
                                 var offenderCase = new OffenderCase()
                                 {
-                                    Pin = Convert.ToString(reader[DBColumnName.PIN]),
-                                    CaseNumber = Convert.ToString(reader[DBColumnName.CASE_NUMBER]),
-                                    CaseStatus = Convert.ToString(reader[DBColumnName.CASE_STATUS]),
-                                    ClosureReason = Convert.ToString(reader[DBColumnName.CLOSURE_REASON]),
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    CaseNumber = Convert.ToString(reader[DbColumnName.CaseNumber]),
+                                    CaseStatus = Convert.ToString(reader[DbColumnName.CaseStatus]),
+                                    ClosureReason = Convert.ToString(reader[DbColumnName.ClosureReason]),
 
-                                    OffenseLabel = Convert.ToString(reader[DBColumnName.OFFENSE_LABEL]),
-                                    OffenseStatute = Convert.ToString(reader[DBColumnName.OFFENSE_STATUTE]),
-                                    OffenseCategory = Convert.ToString(reader[DBColumnName.OFFENSE_CATEGORY]),
-                                    IsPrimary = Convert.ToBoolean(reader[DBColumnName.IS_PRIMARY])
+                                    OffenseLabel = Convert.ToString(reader[DbColumnName.OffenseLabel]),
+                                    OffenseStatute = Convert.ToString(reader[DbColumnName.OffenseStatute]),
+                                    OffenseCategory = Convert.ToString(reader[DbColumnName.OffenseCategory]),
+                                    IsPrimary = Convert.ToBoolean(reader[DbColumnName.IsPrimary])
                                 };
 
                                 //case date
-                                if (Convert.IsDBNull(reader[DBColumnName.CASE_DATE]))
+                                if (Convert.IsDBNull(reader[DbColumnName.CaseDate]))
                                 {
                                     offenderCase.CaseDate = null;
                                 }
                                 else
                                 {
-                                    offenderCase.CaseDate = (DateTime?)reader[DBColumnName.CASE_DATE];
+                                    offenderCase.CaseDate = (DateTime?)reader[DbColumnName.CaseDate];
                                 }
 
                                 //supervision start date
-                                if (Convert.IsDBNull(reader[DBColumnName.SUPERVISION_START_DATE]))
+                                if (Convert.IsDBNull(reader[DbColumnName.SupervisionStartDate]))
                                 {
                                     offenderCase.SupervisionStartDate = null;
                                 }
                                 else
                                 {
-                                    offenderCase.SupervisionStartDate = (DateTime?)reader[DBColumnName.SUPERVISION_START_DATE];
+                                    offenderCase.SupervisionStartDate = (DateTime?)reader[DbColumnName.SupervisionStartDate];
                                 }
 
                                 //supervision end date
-                                if (Convert.IsDBNull(reader[DBColumnName.SUPERVISION_END_DATE]))
+                                if (Convert.IsDBNull(reader[DbColumnName.SupervisionEndDate]))
                                 {
                                     offenderCase.SupervisionEndDate = null;
                                 }
                                 else
                                 {
-                                    offenderCase.SupervisionEndDate = (DateTime?)reader[DBColumnName.SUPERVISION_END_DATE];
+                                    offenderCase.SupervisionEndDate = (DateTime?)reader[DbColumnName.SupervisionEndDate];
                                 }
 
-                                if (Convert.IsDBNull(reader[DBColumnName.OFFENSE_DATE]))
+                                if (Convert.IsDBNull(reader[DbColumnName.OffenseDate]))
                                 {
                                     offenderCase.OffenseDate = null;
                                 }
                                 else
                                 {
-                                    offenderCase.OffenseDate = (DateTime?)reader[DBColumnName.OFFENSE_DATE];
+                                    offenderCase.OffenseDate = (DateTime?)reader[DbColumnName.OffenseDate];
                                 }
 
                                 offenderCases.Add(offenderCase);
@@ -117,5 +127,6 @@ namespace CMI.DAL.Source.AutoMon
                 return offenderCases;
             }
         }
+        #endregion
     }
 }
