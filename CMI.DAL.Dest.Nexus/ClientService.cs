@@ -44,7 +44,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
                 else
                 {
-                    throw new ApplicationException(string.Format("Error occurred while adding new client details. API Response: {0}", responseString));
+                    throw new CmiException(string.Format("Error occurred while adding new client details. API Response: {0}", responseString));
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
                 else
                 {
-                    throw new ApplicationException(string.Format("Error occurred while updating existing client details. API Response: {0}", responseString));
+                    throw new CmiException(string.Format("Error occurred while updating existing client details. API Response: {0}", responseString));
                 }
             }
         }

@@ -270,7 +270,7 @@ namespace CMI.Processor
                             }
                         }
                     }
-                    catch (ApplicationException ae)
+                    catch (CmiException ce)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
 
@@ -279,7 +279,7 @@ namespace CMI.Processor
                             OperationName = "Processor",
                             MethodName = "ProcessClientProfiles",
                             Message = "Error occurred in API while processing a Client Profile.",
-                            Exception = ae,
+                            Exception = ce,
                             SourceData = JsonConvert.SerializeObject(offenderDetails),
                             DestData = JsonConvert.SerializeObject(client)
                         });
@@ -420,7 +420,7 @@ namespace CMI.Processor
                             taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
-                    catch (ApplicationException ae)
+                    catch (CmiException ce)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
 
@@ -429,7 +429,7 @@ namespace CMI.Processor
                             OperationName = "Processor",
                             MethodName = "ProcessAddresses",
                             Message = "Error occurred in API while processing a Client Address.",
-                            Exception = ae,
+                            Exception = ce,
                             SourceData = JsonConvert.SerializeObject(offenderAddressDetails),
                             DestData = JsonConvert.SerializeObject(address)
                         });
@@ -571,7 +571,7 @@ namespace CMI.Processor
                             taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
-                    catch (ApplicationException ae)
+                    catch (CmiException ce)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
 
@@ -580,7 +580,7 @@ namespace CMI.Processor
                             OperationName = "Processor",
                             MethodName = "ProcessPhoneContacts",
                             Message = "Error occurred in API while processing a Client Phone Contact.",
-                            Exception = ae,
+                            Exception = ce,
                             SourceData = JsonConvert.SerializeObject(offenderPhoneDetails),
                             DestData = JsonConvert.SerializeObject(contact)
                         });
@@ -720,7 +720,7 @@ namespace CMI.Processor
                             taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
-                    catch (ApplicationException ae)
+                    catch (CmiException ce)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
 
@@ -729,7 +729,7 @@ namespace CMI.Processor
                             OperationName = "Processor",
                             MethodName = "ProcessEmailContacts",
                             Message = "Error occurred in API while processing a Client Email Contact.",
-                            Exception = ae,
+                            Exception = ce,
                             SourceData = JsonConvert.SerializeObject(offenderEmailDetails),
                             DestData = JsonConvert.SerializeObject(contact)
                         });
@@ -859,7 +859,7 @@ namespace CMI.Processor
                             taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
-                    catch (ApplicationException ae)
+                    catch (CmiException ce)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
 
@@ -868,7 +868,7 @@ namespace CMI.Processor
                             OperationName = "Processor",
                             MethodName = "ProcessCases",
                             Message = "Error occurred in API while processing a Client Case.",
-                            Exception = ae,
+                            Exception = ce,
                             SourceData = JsonConvert.SerializeObject(offenderCaseDetails),
                             DestData = JsonConvert.SerializeObject(@case)
                         });
@@ -987,7 +987,7 @@ namespace CMI.Processor
                             taskExecutionStatus.SourceReceivedRecordCount--;
                         }
                     }
-                    catch (ApplicationException ae)
+                    catch (CmiException ce)
                     {
                         taskExecutionStatus.DestFailureRecordCount++;
 
@@ -996,7 +996,7 @@ namespace CMI.Processor
                             OperationName = "Processor",
                             MethodName = "ProcessNotes",
                             Message = "Error occurred in API while processing a Client Note.",
-                            Exception = ae,
+                            Exception = ce,
                             SourceData = JsonConvert.SerializeObject(offenderNoteDetails),
                             DestData = JsonConvert.SerializeObject(note)
                         });

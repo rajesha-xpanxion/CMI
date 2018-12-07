@@ -70,7 +70,7 @@ namespace CMI.DAL.Dest.Nexus
                     }
                     else
                     {
-                        throw new ApplicationException(string.Format("Error occurred while validating token. API Response: {0}", responseString));
+                        throw new CmiException(string.Format("Error occurred while validating token. API Response: {0}", responseString));
                     }
                 }
             }
@@ -110,7 +110,7 @@ namespace CMI.DAL.Dest.Nexus
                 }
                 else
                 {
-                    throw new ApplicationException(string.Format("Token could not be generated!!!{0}Response: {1}", Environment.NewLine, responseString));
+                    throw new CmiException(string.Format("Token could not be generated!!!{0}Response: {1}", Environment.NewLine, responseString));
                 }
             }
 
