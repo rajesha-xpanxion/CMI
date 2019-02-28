@@ -16,8 +16,8 @@ EXEC
 		@Message = 'test error message',
 		@StackTrace = 'test error stack trace',
 		@CustomParams = 'test custom params',
-		@SourceData = 'test source data',
-		@DestData = 'test dest data'
+		@AutomonData = 'test automon data',
+		@NexusData = 'test nexus data'
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
@@ -32,8 +32,8 @@ CREATE PROCEDURE [dbo].[SaveLogDetails]
 	@Message [NVARCHAR](MAX) = NULL,
 	@StackTrace [NVARCHAR](MAX) = NULL,
 	@CustomParams [NVARCHAR](MAX) = NULL,
-	@SourceData [NVARCHAR](MAX) = NULL,
-	@DestData [NVARCHAR](MAX) = NULL
+	@AutomonData [NVARCHAR](MAX) = NULL,
+	@NexusData [NVARCHAR](MAX) = NULL
 AS
 BEGIN
 	
@@ -46,8 +46,8 @@ BEGIN
 		[Message],
 		[StackTrace],
 		[CustomParams],
-		[SourceData],
-		[DestData]
+		[AutomonData],
+		[NexusData]
 	)
 	VALUES
 	(
@@ -58,8 +58,8 @@ BEGIN
 		@Message,
 		@StackTrace,
 		@CustomParams,
-		@SourceData,
-		@DestData
+		@AutomonData,
+		@NexusData
 	)
 
 	SELECT IDENT_CURRENT('[dbo].[Log]') AS [LogId];

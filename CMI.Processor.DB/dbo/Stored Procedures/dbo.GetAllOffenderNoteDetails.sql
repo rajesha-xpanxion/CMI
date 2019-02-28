@@ -3,12 +3,12 @@
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	03-Oct-18
-Description:	To get all offender note details from given source database
+Description:	To get all offender note details from given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
 EXEC	
 	[dbo].[GetAllOffenderNoteDetails]
-		@SourceDatabaseName = 'CX',
+		@AutomonDatabaseName = 'CX',
 		@LastExecutionDateTime = NULL
 ---------------------------------------------------------------------------------
 History:-
@@ -16,7 +16,7 @@ Date			Author			Changes
 04-July-18		Rajesh Awate	Created.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderNoteDetails]
-	@SourceDatabaseName NVARCHAR(128),
+	@AutomonDatabaseName NVARCHAR(128),
 	@LastExecutionDateTime DATETIME = NULL
 AS
 BEGIN
@@ -35,13 +35,13 @@ BEGIN
 				OFCR.[Email],
 				N.[FromTime]
 			FROM
-				[$SourceDatabaseName].[dbo].[Offender] OFNDR JOIN [$SourceDatabaseName].[dbo].[Person] OFNDRPER
+				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[Person] OFNDRPER
 					ON OFNDR.[PersonId] = OFNDRPER.[Id]
-					JOIN [$SourceDatabaseName].[dbo].[AnyName] OFNDRAN
+					JOIN [$AutomonDatabaseName].[dbo].[AnyName] OFNDRAN
 						ON OFNDRPER.[NameId] = OFNDRAN.[Id]
-						JOIN [$SourceDatabaseName].[dbo].[Note] N
+						JOIN [$AutomonDatabaseName].[dbo].[Note] N
 							ON OFNDRAN.[NoteId] = N.[Id]
-							JOIN [$SourceDatabaseName].[dbo].[Officer] OFCR
+							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
 								ON N.[EnteredByPId] = OFCR.[PersonId]
 			WHERE
 				N.[FromTime] > @LastExecutionDateTime
@@ -56,13 +56,13 @@ BEGIN
 				OFCR.[Email],
 				N.[FromTime]
 			FROM
-				[$SourceDatabaseName].[dbo].[Offender] OFNDR JOIN [$SourceDatabaseName].[dbo].[PersonAddress] OFNDRPA
+				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonAddress] OFNDRPA
 					ON OFNDR.[PersonId] = OFNDRPA.[PersonId]
-					JOIN [$SourceDatabaseName].[dbo].[Address] OFNDRA
+					JOIN [$AutomonDatabaseName].[dbo].[Address] OFNDRA
 						ON OFNDRPA.[AddressId] = OFNDRA.[Id]
-						JOIN [$SourceDatabaseName].[dbo].[Note] N
+						JOIN [$AutomonDatabaseName].[dbo].[Note] N
 							ON OFNDRA.[NoteId] = N.[Id]
-							JOIN [$SourceDatabaseName].[dbo].[Officer] OFCR
+							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
 									ON N.[EnteredByPId] = OFCR.[PersonId]
 			WHERE
 				N.[FromTime] > @LastExecutionDateTime
@@ -76,13 +76,13 @@ BEGIN
 				OFCR.[Email],
 				N.[FromTime]
 			FROM
-				[$SourceDatabaseName].[dbo].[Offender] OFNDR JOIN [$SourceDatabaseName].[dbo].[PersonPhone] OFNDRPP
+				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] OFNDRPP
 					ON OFNDR.[PersonId] = OFNDRPP.[PersonId]
-					JOIN [$SourceDatabaseName].[dbo].[PhoneNumber] OFNDRPN
+					JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] OFNDRPN
 						ON OFNDRPP.[PhoneNumberId] = OFNDRPN.[Id]
-						JOIN [$SourceDatabaseName].[dbo].[Note] N
+						JOIN [$AutomonDatabaseName].[dbo].[Note] N
 							ON OFNDRPN.[NoteId] = N.[Id]
-							JOIN [$SourceDatabaseName].[dbo].[Officer] OFCR
+							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
 								ON N.[EnteredByPId] = OFCR.[PersonId]
 			WHERE
 				N.[FromTime] > @LastExecutionDateTime
@@ -129,7 +129,7 @@ BEGIN
 				L.[Id],
 				L.[PermDesc]
 			FROM
-				[$SourceDatabaseName].[dbo].[Lookup] L JOIN [$SourceDatabaseName].[dbo].[LookupType] LT
+				[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
 					ON L.[LookupTypeId] = LT.[Id]
 			WHERE
 				LT.[Description] = ''Race''
@@ -141,9 +141,9 @@ BEGIN
 				CA.[FromTime],
 				CA.[ToTime]
 			FROM
-				[$SourceDatabaseName].[dbo].[CaseAttribute] CA JOIN [$SourceDatabaseName].[dbo].[AttributeDef] AD
+				[$AutomonDatabaseName].[dbo].[CaseAttribute] CA JOIN [$AutomonDatabaseName].[dbo].[AttributeDef] AD
 					ON CA.[AttributeId] = AD.[Id]
-					JOIN [$SourceDatabaseName].[dbo].[Lookup] L
+					JOIN [$AutomonDatabaseName].[dbo].[Lookup] L
 						ON CA.[Value] = L.[Id]
 			WHERE
 				AD.[PermDesc] = ''Case_CaseStatus''
@@ -170,33 +170,33 @@ BEGIN
 				OFCNAME.[Firstname] As [OfficerFirstName],
 				OFCNAME.[LastName] As [OfficerLastName]
 			FROM
-				[$SourceDatabaseName].[dbo].[AnyName] AN JOIN [$SourceDatabaseName].[dbo].[Person] P
+				[$AutomonDatabaseName].[dbo].[AnyName] AN JOIN [$AutomonDatabaseName].[dbo].[Person] P
 					ON AN.[Id] = P.[NameId]
-					JOIN [$SourceDatabaseName].[dbo].[Offender] O
+					JOIN [$AutomonDatabaseName].[dbo].[Offender] O
 						ON P.[Id] = O.[PersonId]
 
 						LEFT JOIN RaceData RD
 							ON P.[RaceLId] = RD.[Id]
 
-							LEFT JOIN [$SourceDatabaseName].[dbo].[OffenderCaseload] OFCL
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[OffenderCaseload] OFCL
 								ON O.[Id] = OFCL.[OffenderId]
-								LEFT JOIN [$SourceDatabaseName].[dbo].[Caseload] CL
+								LEFT JOIN [$AutomonDatabaseName].[dbo].[Caseload] CL
 									ON OFCL.[CaseloadId] = CL.[Id]
 						
-									LEFT JOIN [$SourceDatabaseName].[dbo].[OfficerCaseload] OCL
+									LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerCaseload] OCL
 										ON CL.[Id] = OCL.[CaseloadId]
-										LEFT JOIN [$SourceDatabaseName].[dbo].[Officer] OFC
+										LEFT JOIN [$AutomonDatabaseName].[dbo].[Officer] OFC
 											ON OCL.[OfficerId] = OFC.[Id]
-											LEFT JOIN [$SourceDatabaseName].[dbo].[Person] OFCPER
+											LEFT JOIN [$AutomonDatabaseName].[dbo].[Person] OFCPER
 												ON OFC.[PersonId] = OFCPER.[Id]
-												LEFT JOIN [$SourceDatabaseName].[dbo].[AnyName] OFCNAME
+												LEFT JOIN [$AutomonDatabaseName].[dbo].[AnyName] OFCNAME
 													ON OFCPER.[NameId] = OFCNAME.[Id]
 
-													LEFT JOIN [$SourceDatabaseName].[dbo].[CourtCase] CC
+													LEFT JOIN [$AutomonDatabaseName].[dbo].[CourtCase] CC
 														ON O.[Id] = CC.[OffenderId]
-														LEFT JOIN [$SourceDatabaseName].[dbo].[CaseType] CT
+														LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseType] CT
 															ON CC.[CaseTypeId] = CT.[Id]
-															LEFT JOIN [$SourceDatabaseName].[dbo].[CaseCategory] CSCT
+															LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseCategory] CSCT
 																ON CT.[CaseCategoryId] = CSCT.[Id]
 
 																LEFT JOIN CaseStatusData CSD
@@ -231,13 +231,13 @@ BEGIN
 				OFCR.[Email],
 				N.[FromTime]
 			FROM
-				[$SourceDatabaseName].[dbo].[Offender] OFNDR JOIN [$SourceDatabaseName].[dbo].[Person] OFNDRPER
+				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[Person] OFNDRPER
 					ON OFNDR.[PersonId] = OFNDRPER.[Id]
-					JOIN [$SourceDatabaseName].[dbo].[AnyName] OFNDRAN
+					JOIN [$AutomonDatabaseName].[dbo].[AnyName] OFNDRAN
 						ON OFNDRPER.[NameId] = OFNDRAN.[Id]
-						JOIN [$SourceDatabaseName].[dbo].[Note] N
+						JOIN [$AutomonDatabaseName].[dbo].[Note] N
 							ON OFNDRAN.[NoteId] = N.[Id]
-							JOIN [$SourceDatabaseName].[dbo].[Officer] OFCR
+							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
 								ON N.[EnteredByPId] = OFCR.[PersonId]
 			WHERE
 				(
@@ -262,13 +262,13 @@ BEGIN
 				OFCR.[Email],
 				N.[FromTime]
 			FROM
-				[$SourceDatabaseName].[dbo].[Offender] OFNDR JOIN [$SourceDatabaseName].[dbo].[PersonAddress] OFNDRPA
+				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonAddress] OFNDRPA
 					ON OFNDR.[PersonId] = OFNDRPA.[PersonId]
-					JOIN [$SourceDatabaseName].[dbo].[Address] OFNDRA
+					JOIN [$AutomonDatabaseName].[dbo].[Address] OFNDRA
 						ON OFNDRPA.[AddressId] = OFNDRA.[Id]
-						JOIN [$SourceDatabaseName].[dbo].[Note] N
+						JOIN [$AutomonDatabaseName].[dbo].[Note] N
 							ON OFNDRA.[NoteId] = N.[Id]
-							JOIN [$SourceDatabaseName].[dbo].[Officer] OFCR
+							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
 									ON N.[EnteredByPId] = OFCR.[PersonId]
 			WHERE
 				(
@@ -293,13 +293,13 @@ BEGIN
 				OFCR.[Email],
 				N.[FromTime]
 			FROM
-				[$SourceDatabaseName].[dbo].[Offender] OFNDR JOIN [$SourceDatabaseName].[dbo].[PersonPhone] OFNDRPP
+				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] OFNDRPP
 					ON OFNDR.[PersonId] = OFNDRPP.[PersonId]
-					JOIN [$SourceDatabaseName].[dbo].[PhoneNumber] OFNDRPN
+					JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] OFNDRPN
 						ON OFNDRPP.[PhoneNumberId] = OFNDRPN.[Id]
-						JOIN [$SourceDatabaseName].[dbo].[Note] N
+						JOIN [$AutomonDatabaseName].[dbo].[Note] N
 							ON OFNDRPN.[NoteId] = N.[Id]
-							JOIN [$SourceDatabaseName].[dbo].[Officer] OFCR
+							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
 								ON N.[EnteredByPId] = OFCR.[PersonId]
 			WHERE
 				(
@@ -349,7 +349,7 @@ BEGIN
 	END
 
 
-	SET @SQLString = REPLACE(@SQLString, '$SourceDatabaseName', @SourceDatabaseName);
+	SET @SQLString = REPLACE(@SQLString, '$AutomonDatabaseName', @AutomonDatabaseName);
 
 	SET @ParmDefinition = '@LastExecutionDateTime DATETIME';
 

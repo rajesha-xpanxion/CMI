@@ -1,19 +1,20 @@
-﻿using CMI.DAL.Dest;
-using CMI.DAL.Source;
+﻿using CMI.Nexus.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CMI.DAL.Dest.Models;
+using CMI.Nexus.Model;
 using CMI.Common.Logging;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Options;
+using CMI.Automon.Interface;
+using CMI.Automon.Model;
 
 namespace CMI.Processor
 {
     public class Processor
     {
         #region Private Member Variables
-        #region Source Service Providers
+        #region Automon Service Providers
         private readonly IOffenderService offenderService;
         private readonly IOffenderAddressService offenderAddressService;
         private readonly IOffenderPhoneService offenderPhoneService;
@@ -22,7 +23,7 @@ namespace CMI.Processor
         private readonly IOffenderNoteService offenderNoteService;
         #endregion
 
-        #region Destination Service Providers
+        #region Nexusination Service Providers
         private readonly IClientService clientService;
         private readonly IAddressService addressService;
         private readonly IContactService contactService;
@@ -45,14 +46,14 @@ namespace CMI.Processor
 
         #region Constructor
         public Processor(
-            //source service providers
+            //automon service providers
             IOffenderService offenderService,
             IOffenderAddressService offenderAddressService,
             IOffenderPhoneService offenderPhoneService,
             IOffenderEmailService offenderEmailService,
             IOffenderCaseService offenderCaseService,
             IOffenderNoteService offenderNoteService,
-            //destination service providers
+            //nexus service providers
             IClientService clientService,
             IAddressService addressService,
             IContactService contactService,
@@ -67,14 +68,14 @@ namespace CMI.Processor
             IOptions<DAL.ProcessorConfig> processorConfig
         )
         {
-            //source service providers
+            //automon service providers
             this.offenderService = offenderService;
             this.offenderAddressService = offenderAddressService;
             this.offenderPhoneService = offenderPhoneService;
             this.offenderEmailService = offenderEmailService;
             this.offenderCaseService = offenderCaseService;
             this.offenderNoteService = offenderNoteService;
-            //destination service providers
+            //nexus service providers
             this.clientService = clientService;
             this.addressService = addressService;
             this.contactService = contactService;
@@ -104,7 +105,7 @@ namespace CMI.Processor
                 Message = "Processor execution initiated."
             });
 
-            //get last execution date time so that differential dataset is pulled from source
+            //get last execution date time so that differential dataset is pulled from automon
             RetrieveLastExecutionDateTime();
 
             //first loads required lookup data
@@ -216,7 +217,7 @@ namespace CMI.Processor
 
                 foreach (var offenderDetails in allOffenderDetails)
                 {
-                    taskExecutionStatus.SourceReceivedRecordCount++;
+                    taskExecutionStatus.AutomonReceivedRecordCount++;
 
                     Client client = null;
                     try
@@ -241,15 +242,15 @@ namespace CMI.Processor
                         {
                             if (clientService.AddNewClientDetails(client))
                             {
-                                taskExecutionStatus.DestAddRecordCount++;
+                                taskExecutionStatus.NexusAddRecordCount++;
 
                                 logger.LogDebug(new LogRequest
                                 {
                                     OperationName = "Processor",
                                     MethodName = "ProcessClientProfiles",
                                     Message = "New Client Profile added successfully.",
-                                    SourceData = JsonConvert.SerializeObject(offenderDetails),
-                                    DestData = JsonConvert.SerializeObject(client)
+                                    AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                                    NexusData = JsonConvert.SerializeObject(client)
                                 });
                             }
                         }
@@ -257,22 +258,22 @@ namespace CMI.Processor
                         {
                             if (clientService.UpdateClientDetails(client))
                             {
-                                taskExecutionStatus.DestUpdateRecordCount++;
+                                taskExecutionStatus.NexusUpdateRecordCount++;
 
                                 logger.LogDebug(new LogRequest
                                 {
                                     OperationName = "Processor",
                                     MethodName = "ProcessClientProfiles",
                                     Message = "Existing Client Profile updated successfully.",
-                                    SourceData = JsonConvert.SerializeObject(offenderDetails),
-                                    DestData = JsonConvert.SerializeObject(client)
+                                    AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                                    NexusData = JsonConvert.SerializeObject(client)
                                 });
                             }
                         }
                     }
                     catch (CmiException ce)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogWarning(new LogRequest
                         {
@@ -280,13 +281,13 @@ namespace CMI.Processor
                             MethodName = "ProcessClientProfiles",
                             Message = "Error occurred in API while processing a Client Profile.",
                             Exception = ce,
-                            SourceData = JsonConvert.SerializeObject(offenderDetails),
-                            DestData = JsonConvert.SerializeObject(client)
+                            AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                            NexusData = JsonConvert.SerializeObject(client)
                         });
                     }
                     catch (Exception ex)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogError(new LogRequest
                         {
@@ -294,13 +295,13 @@ namespace CMI.Processor
                             MethodName = "ProcessClientProfiles",
                             Message = "Error occurred while processing a Client Profile.",
                             Exception = ex,
-                            SourceData = JsonConvert.SerializeObject(offenderDetails),
-                            DestData = JsonConvert.SerializeObject(client)
+                            AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                            NexusData = JsonConvert.SerializeObject(client)
                         });
                     }
                 }
 
-                taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
+                taskExecutionStatus.IsSuccessful = taskExecutionStatus.NexusFailureRecordCount == 0;
             }
             catch (Exception ex)
             {
@@ -311,7 +312,7 @@ namespace CMI.Processor
                     MethodName = "ProcessClientProfiles",
                     Message = "Error occurred while processing Client Profiles.",
                     Exception = ex,
-                    SourceData = JsonConvert.SerializeObject(allOffenderDetails)
+                    AutomonData = JsonConvert.SerializeObject(allOffenderDetails)
                 });
             }
 
@@ -344,7 +345,7 @@ namespace CMI.Processor
 
                 foreach (var offenderAddressDetails in allOffenderAddresses)
                 {
-                    taskExecutionStatus.SourceReceivedRecordCount++;
+                    taskExecutionStatus.AutomonReceivedRecordCount++;
 
                     Address address = null;
                     try
@@ -366,35 +367,35 @@ namespace CMI.Processor
                             {
                                 if (address.IsActive && addressService.AddNewAddressDetails(address))
                                 {
-                                    taskExecutionStatus.DestAddRecordCount++;
+                                    taskExecutionStatus.NexusAddRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessAddresses",
                                         Message = "New Client Address details added successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderAddressDetails),
-                                        DestData = JsonConvert.SerializeObject(address)
+                                        AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                                        NexusData = JsonConvert.SerializeObject(address)
                                     });
                                 }
                                 else
                                 {
-                                    taskExecutionStatus.SourceReceivedRecordCount--;
+                                    taskExecutionStatus.AutomonReceivedRecordCount--;
                                 }
                             }
                             else if (!address.IsActive)
                             {
                                 if (addressService.DeleteAddressDetails(address.ClientId, address.AddressId))
                                 {
-                                    taskExecutionStatus.DestDeleteRecordCount++;
+                                    taskExecutionStatus.NexusDeleteRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessAddresses",
                                         Message = "Existing Client Address details deleted successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderAddressDetails),
-                                        DestData = JsonConvert.SerializeObject(address)
+                                        AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                                        NexusData = JsonConvert.SerializeObject(address)
                                     });
                                 }
                             }
@@ -402,27 +403,27 @@ namespace CMI.Processor
                             {
                                 if (addressService.UpdateAddressDetails(address))
                                 {
-                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    taskExecutionStatus.NexusUpdateRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessAddresses",
                                         Message = "Existing Client Address details updated successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderAddressDetails),
-                                        DestData = JsonConvert.SerializeObject(address)
+                                        AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                                        NexusData = JsonConvert.SerializeObject(address)
                                     });
                                 }
                             }
                         }
                         else
                         {
-                            taskExecutionStatus.SourceReceivedRecordCount--;
+                            taskExecutionStatus.AutomonReceivedRecordCount--;
                         }
                     }
                     catch (CmiException ce)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogWarning(new LogRequest
                         {
@@ -430,13 +431,13 @@ namespace CMI.Processor
                             MethodName = "ProcessAddresses",
                             Message = "Error occurred in API while processing a Client Address.",
                             Exception = ce,
-                            SourceData = JsonConvert.SerializeObject(offenderAddressDetails),
-                            DestData = JsonConvert.SerializeObject(address)
+                            AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                            NexusData = JsonConvert.SerializeObject(address)
                         });
                     }
                     catch (Exception ex)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogError(new LogRequest
                         {
@@ -444,13 +445,13 @@ namespace CMI.Processor
                             MethodName = "ProcessAddresses",
                             Message = "Error occurred while processing a Client Address.",
                             Exception = ex,
-                            SourceData = JsonConvert.SerializeObject(offenderAddressDetails),
-                            DestData = JsonConvert.SerializeObject(address)
+                            AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                            NexusData = JsonConvert.SerializeObject(address)
                         });
                     }
                 }
 
-                taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
+                taskExecutionStatus.IsSuccessful = taskExecutionStatus.NexusFailureRecordCount == 0;
             }
             catch (Exception ex)
             {
@@ -462,7 +463,7 @@ namespace CMI.Processor
                     MethodName = "ProcessAddresses",
                     Message = "Error occurred while processing Addresses.",
                     Exception = ex,
-                    SourceData = JsonConvert.SerializeObject(allOffenderAddresses)
+                    AutomonData = JsonConvert.SerializeObject(allOffenderAddresses)
                 });
             }
 
@@ -495,7 +496,7 @@ namespace CMI.Processor
 
                 foreach (var offenderPhoneDetails in allOffenderPhones)
                 {
-                    taskExecutionStatus.SourceReceivedRecordCount++;
+                    taskExecutionStatus.AutomonReceivedRecordCount++;
 
                     Contact contact = null;
                     try
@@ -517,35 +518,35 @@ namespace CMI.Processor
                             {
                                 if (contact.IsActive && contactService.AddNewContactDetails(contact))
                                 {
-                                    taskExecutionStatus.DestAddRecordCount++;
+                                    taskExecutionStatus.NexusAddRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessPhoneContacts",
                                         Message = "New Client Phone Contact details added successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                                        DestData = JsonConvert.SerializeObject(contact)
+                                        AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                        NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
                                 else
                                 {
-                                    taskExecutionStatus.SourceReceivedRecordCount--;
+                                    taskExecutionStatus.AutomonReceivedRecordCount--;
                                 }
                             }
                             else if (!contact.IsActive)
                             {
                                 if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
                                 {
-                                    taskExecutionStatus.DestDeleteRecordCount++;
+                                    taskExecutionStatus.NexusDeleteRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessPhoneContacts",
                                         Message = "Existing Client Phone Contact details deleted successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                                        DestData = JsonConvert.SerializeObject(contact)
+                                        AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                        NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
                             }
@@ -553,27 +554,27 @@ namespace CMI.Processor
                             {
                                 if (contactService.UpdateContactDetails(contact))
                                 {
-                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    taskExecutionStatus.NexusUpdateRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessPhoneContacts",
                                         Message = "Existing Client Phone Contact details updated successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                                        DestData = JsonConvert.SerializeObject(contact)
+                                        AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                        NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
                             }
                         }
                         else
                         {
-                            taskExecutionStatus.SourceReceivedRecordCount--;
+                            taskExecutionStatus.AutomonReceivedRecordCount--;
                         }
                     }
                     catch (CmiException ce)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogWarning(new LogRequest
                         {
@@ -581,13 +582,13 @@ namespace CMI.Processor
                             MethodName = "ProcessPhoneContacts",
                             Message = "Error occurred in API while processing a Client Phone Contact.",
                             Exception = ce,
-                            SourceData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                            DestData = JsonConvert.SerializeObject(contact)
+                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                            NexusData = JsonConvert.SerializeObject(contact)
                         });
                     }
                     catch (Exception ex)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogError(new LogRequest
                         {
@@ -595,12 +596,12 @@ namespace CMI.Processor
                             MethodName = "ProcessPhoneContacts",
                             Message = "Error occurred while processing a Client Phone Contact.",
                             Exception = ex,
-                            SourceData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                            DestData = JsonConvert.SerializeObject(contact)
+                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                            NexusData = JsonConvert.SerializeObject(contact)
                         });
                     }
                 }
-                taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
+                taskExecutionStatus.IsSuccessful = taskExecutionStatus.NexusFailureRecordCount == 0;
             }
             catch (Exception ex)
             {
@@ -612,7 +613,7 @@ namespace CMI.Processor
                     MethodName = "ProcessPhoneContacts",
                     Message = "Error occurred while processing Contacts.",
                     Exception = ex,
-                    SourceData = JsonConvert.SerializeObject(allOffenderPhones)
+                    AutomonData = JsonConvert.SerializeObject(allOffenderPhones)
                 });
             }
 
@@ -645,7 +646,7 @@ namespace CMI.Processor
 
                 foreach (var offenderEmailDetails in allOffenderEmails)
                 {
-                    taskExecutionStatus.SourceReceivedRecordCount++;
+                    taskExecutionStatus.AutomonReceivedRecordCount++;
 
                     Contact contact = null;
                     try
@@ -654,7 +655,7 @@ namespace CMI.Processor
                         {
                             ClientId = FormatId(offenderEmailDetails.Pin),
                             ContactId = string.Format("{0}-{1}", FormatId(offenderEmailDetails.Pin), offenderEmailDetails.Id),
-                            ContactType = DAL.Constants.ContactTypeEmailDest,
+                            ContactType = DAL.Constants.ContactTypeEmailNexus,
                             ContactValue = offenderEmailDetails.EmailAddress,
                             IsPrimary = offenderEmailDetails.IsPrimary,
                             IsActive = offenderEmailDetails.IsActive
@@ -666,35 +667,35 @@ namespace CMI.Processor
                             {
                                 if (contact.IsActive && contactService.AddNewContactDetails(contact))
                                 {
-                                    taskExecutionStatus.DestAddRecordCount++;
+                                    taskExecutionStatus.NexusAddRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessEmailContacts",
                                         Message = "New Client Email Contact details added successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderEmailDetails),
-                                        DestData = JsonConvert.SerializeObject(contact)
+                                        AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                                        NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
                                 else
                                 {
-                                    taskExecutionStatus.SourceReceivedRecordCount--;
+                                    taskExecutionStatus.AutomonReceivedRecordCount--;
                                 }
                             }
                             else if (!contact.IsActive)
                             {
                                 if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
                                 {
-                                    taskExecutionStatus.DestDeleteRecordCount++;
+                                    taskExecutionStatus.NexusDeleteRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessEmailContacts",
                                         Message = "Existing Client Email Contact details deleted successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderEmailDetails),
-                                        DestData = JsonConvert.SerializeObject(contact)
+                                        AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                                        NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
                             }
@@ -702,27 +703,27 @@ namespace CMI.Processor
                             {
                                 if (contactService.UpdateContactDetails(contact))
                                 {
-                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    taskExecutionStatus.NexusUpdateRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessEmailContacts",
                                         Message = "Existing Client Email Contact details updated successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderEmailDetails),
-                                        DestData = JsonConvert.SerializeObject(contact)
+                                        AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                                        NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
                             }
                         }
                         else
                         {
-                            taskExecutionStatus.SourceReceivedRecordCount--;
+                            taskExecutionStatus.AutomonReceivedRecordCount--;
                         }
                     }
                     catch (CmiException ce)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogWarning(new LogRequest
                         {
@@ -730,13 +731,13 @@ namespace CMI.Processor
                             MethodName = "ProcessEmailContacts",
                             Message = "Error occurred in API while processing a Client Email Contact.",
                             Exception = ce,
-                            SourceData = JsonConvert.SerializeObject(offenderEmailDetails),
-                            DestData = JsonConvert.SerializeObject(contact)
+                            AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                            NexusData = JsonConvert.SerializeObject(contact)
                         });
                     }
                     catch (Exception ex)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogError(new LogRequest
                         {
@@ -744,12 +745,12 @@ namespace CMI.Processor
                             MethodName = "ProcessEmailContacts",
                             Message = "Error occurred while processing a Client Email Contact.",
                             Exception = ex,
-                            SourceData = JsonConvert.SerializeObject(offenderEmailDetails),
-                            DestData = JsonConvert.SerializeObject(contact)
+                            AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                            NexusData = JsonConvert.SerializeObject(contact)
                         });
                     }
                 }
-                taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
+                taskExecutionStatus.IsSuccessful = taskExecutionStatus.NexusFailureRecordCount == 0;
             }
             catch (Exception ex)
             {
@@ -761,7 +762,7 @@ namespace CMI.Processor
                     MethodName = "ProcessEmailContacts",
                     Message = "Error occurred while processing Email Contacts.",
                     Exception = ex,
-                    SourceData = JsonConvert.SerializeObject(allOffenderEmails)
+                    AutomonData = JsonConvert.SerializeObject(allOffenderEmails)
                 });
             }
 
@@ -795,7 +796,7 @@ namespace CMI.Processor
 
                 foreach (var offenderCaseDetails in allOffenderCaseDetails.GroupBy(x => new { x.Pin, x.CaseNumber }).Select(y => y.First()))
                 {
-                    taskExecutionStatus.SourceReceivedRecordCount++;
+                    taskExecutionStatus.AutomonReceivedRecordCount++;
 
                     Case @case = null;
                     try
@@ -825,15 +826,15 @@ namespace CMI.Processor
                             {
                                 if (caseService.AddNewCaseDetails(@case))
                                 {
-                                    taskExecutionStatus.DestAddRecordCount++;
+                                    taskExecutionStatus.NexusAddRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessCases",
                                         Message = "New Client Case details added successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderCaseDetails),
-                                        DestData = JsonConvert.SerializeObject(@case)
+                                        AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
+                                        NexusData = JsonConvert.SerializeObject(@case)
                                     });
                                 }
                             }
@@ -841,27 +842,27 @@ namespace CMI.Processor
                             {
                                 if (caseService.UpdateCaseDetails(@case))
                                 {
-                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    taskExecutionStatus.NexusUpdateRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessCases",
                                         Message = "Existing Client Case details updated successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderCaseDetails),
-                                        DestData = JsonConvert.SerializeObject(@case)
+                                        AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
+                                        NexusData = JsonConvert.SerializeObject(@case)
                                     });
                                 }
                             }
                         }
                         else
                         {
-                            taskExecutionStatus.SourceReceivedRecordCount--;
+                            taskExecutionStatus.AutomonReceivedRecordCount--;
                         }
                     }
                     catch (CmiException ce)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogWarning(new LogRequest
                         {
@@ -869,13 +870,13 @@ namespace CMI.Processor
                             MethodName = "ProcessCases",
                             Message = "Error occurred in API while processing a Client Case.",
                             Exception = ce,
-                            SourceData = JsonConvert.SerializeObject(offenderCaseDetails),
-                            DestData = JsonConvert.SerializeObject(@case)
+                            AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
+                            NexusData = JsonConvert.SerializeObject(@case)
                         });
                     }
                     catch (Exception ex)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogError(new LogRequest
                         {
@@ -883,12 +884,12 @@ namespace CMI.Processor
                             MethodName = "ProcessCases",
                             Message = "Error occurred while processing a Client Case.",
                             Exception = ex,
-                            SourceData = JsonConvert.SerializeObject(offenderCaseDetails),
-                            DestData = JsonConvert.SerializeObject(@case)
+                            AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
+                            NexusData = JsonConvert.SerializeObject(@case)
                         });
                     }
                 }
-                taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
+                taskExecutionStatus.IsSuccessful = taskExecutionStatus.NexusFailureRecordCount == 0;
             }
             catch (Exception ex)
             {
@@ -900,7 +901,7 @@ namespace CMI.Processor
                     MethodName = "ProcessCases",
                     Message = "Error occurred while processing Cases.",
                     Exception = ex,
-                    SourceData = JsonConvert.SerializeObject(allOffenderCaseDetails)
+                    AutomonData = JsonConvert.SerializeObject(allOffenderCaseDetails)
                 });
             }
 
@@ -933,7 +934,7 @@ namespace CMI.Processor
 
                 foreach (var offenderNoteDetails in allOffenderNoteDetails)
                 {
-                    taskExecutionStatus.SourceReceivedRecordCount++;
+                    taskExecutionStatus.AutomonReceivedRecordCount++;
 
                     Note note = null;
                     try
@@ -953,15 +954,15 @@ namespace CMI.Processor
                             {
                                 if (noteService.AddNewNoteDetails(note))
                                 {
-                                    taskExecutionStatus.DestAddRecordCount++;
+                                    taskExecutionStatus.NexusAddRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessNotes",
                                         Message = "New Client Note details added successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderNoteDetails),
-                                        DestData = JsonConvert.SerializeObject(note)
+                                        AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                                        NexusData = JsonConvert.SerializeObject(note)
                                     });
                                 }
                             }
@@ -969,27 +970,27 @@ namespace CMI.Processor
                             {
                                 if (noteService.UpdateNoteDetails(note))
                                 {
-                                    taskExecutionStatus.DestUpdateRecordCount++;
+                                    taskExecutionStatus.NexusUpdateRecordCount++;
 
                                     logger.LogDebug(new LogRequest
                                     {
                                         OperationName = "Processor",
                                         MethodName = "ProcessNotes",
                                         Message = "Existing Client Note details updated successfully.",
-                                        SourceData = JsonConvert.SerializeObject(offenderNoteDetails),
-                                        DestData = JsonConvert.SerializeObject(note)
+                                        AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                                        NexusData = JsonConvert.SerializeObject(note)
                                     });
                                 }
                             }
                         }
                         else
                         {
-                            taskExecutionStatus.SourceReceivedRecordCount--;
+                            taskExecutionStatus.AutomonReceivedRecordCount--;
                         }
                     }
                     catch (CmiException ce)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogWarning(new LogRequest
                         {
@@ -997,13 +998,13 @@ namespace CMI.Processor
                             MethodName = "ProcessNotes",
                             Message = "Error occurred in API while processing a Client Note.",
                             Exception = ce,
-                            SourceData = JsonConvert.SerializeObject(offenderNoteDetails),
-                            DestData = JsonConvert.SerializeObject(note)
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                            NexusData = JsonConvert.SerializeObject(note)
                         });
                     }
                     catch (Exception ex)
                     {
-                        taskExecutionStatus.DestFailureRecordCount++;
+                        taskExecutionStatus.NexusFailureRecordCount++;
 
                         logger.LogError(new LogRequest
                         {
@@ -1011,13 +1012,13 @@ namespace CMI.Processor
                             MethodName = "ProcessNotes",
                             Message = "Error occurred while processing a Client Note.",
                             Exception = ex,
-                            SourceData = JsonConvert.SerializeObject(offenderNoteDetails),
-                            DestData = JsonConvert.SerializeObject(note)
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                            NexusData = JsonConvert.SerializeObject(note)
                         });
                     }
                 }
 
-                taskExecutionStatus.IsSuccessful = taskExecutionStatus.DestFailureRecordCount == 0;
+                taskExecutionStatus.IsSuccessful = taskExecutionStatus.NexusFailureRecordCount == 0;
             }
             catch (Exception ex)
             {
@@ -1029,7 +1030,7 @@ namespace CMI.Processor
                     MethodName = "ProcessNotes",
                     Message = "Error occurred while processing Notes.",
                     Exception = ex,
-                    SourceData = JsonConvert.SerializeObject(allOffenderNoteDetails)
+                    AutomonData = JsonConvert.SerializeObject(allOffenderNoteDetails)
                 });
             }
 
@@ -1344,13 +1345,13 @@ namespace CMI.Processor
             string newId = string.Empty;
             try
             {
-                if (oldId.Length >= CMI.DAL.Dest.Nexus.Constants.ExpectedMinLenghOfId)
+                if (oldId.Length >= CMI.Nexus.Service.Constants.ExpectedMinLenghOfId)
                 {
                     newId = oldId;
                 }
                 else
                 {
-                    string[] zeros = Enumerable.Repeat("0", (CMI.DAL.Dest.Nexus.Constants.ExpectedMinLenghOfId - oldId.Length)).ToArray();
+                    string[] zeros = Enumerable.Repeat("0", (CMI.Nexus.Service.Constants.ExpectedMinLenghOfId - oldId.Length)).ToArray();
 
                     newId = string.Format("{0}{1}", string.Join("", zeros), oldId);
                 }
@@ -1373,121 +1374,121 @@ namespace CMI.Processor
         #region Mapping Helper Methods
         private string MapFullAddress(string line1, string line2, string city, string state, string zip)
         {
-            string destFullAddress = string.Empty;
+            string fullAddress = string.Empty;
 
             if(!string.IsNullOrEmpty(line1))
             {
-                destFullAddress += line1 + ", ";
+                fullAddress += line1 + ", ";
             }
 
             if (!string.IsNullOrEmpty(line2))
             {
-                destFullAddress += line2 + ", ";
+                fullAddress += line2 + ", ";
             }
 
             if (!string.IsNullOrEmpty(city))
             {
-                destFullAddress += city + ", ";
+                fullAddress += city + ", ";
             }
 
             if (!string.IsNullOrEmpty(state))
             {
-                destFullAddress += state + ", ";
+                fullAddress += state + ", ";
             }
 
             if (!string.IsNullOrEmpty(zip))
             {
-                destFullAddress += zip + ", ";
+                fullAddress += zip + ", ";
             }
 
-            destFullAddress = destFullAddress.Trim(new char[] { ',', ' ' });
+            fullAddress = fullAddress.Trim(new char[] { ',', ' ' });
 
-            return string.IsNullOrEmpty(destFullAddress) ? destFullAddress : destFullAddress.Replace("/", "-");
+            return string.IsNullOrEmpty(fullAddress) ? fullAddress : fullAddress.Replace("/", "-");
         }
 
-        private string MapAddressType(string sourceAddressType)
+        private string MapAddressType(string automonAddressType)
         {
-            string destAddressType = string.Empty;
+            string nexusAddressType = string.Empty;
 
-            switch (sourceAddressType)
+            switch (automonAddressType)
             {
                 case "Mailing":
-                    destAddressType = "Shipping Address";
+                    nexusAddressType = "Shipping Address";
                     break;
                 case "Residential":
-                    destAddressType = "Home Address";
+                    nexusAddressType = "Home Address";
                     break;
                 case "Work/Business":
-                    destAddressType = "Work Address";
+                    nexusAddressType = "Work Address";
                     break;
                 default:
-                    destAddressType = "Other";
+                    nexusAddressType = "Other";
                     break;
             }
 
-            return destAddressType;
+            return nexusAddressType;
         }
 
-        private string MapContactType(string sourceContactType)
+        private string MapContactType(string automonContactType)
         {
-            string destContactType = string.Empty;
+            string nexusContactType = string.Empty;
 
-            switch (sourceContactType)
+            switch (automonContactType)
             {
                 case "Fax":
-                    destContactType = "Fax";
+                    nexusContactType = "Fax";
                     break;
                 case "Mobile":
                 case "Message":
-                    destContactType = "Cell Phone";
+                    nexusContactType = "Cell Phone";
                     break;
                 case "Residential":
-                    destContactType = "Home Phone";
+                    nexusContactType = "Home Phone";
                     break;
                 case "Office":
-                    destContactType = "Work Phone";
+                    nexusContactType = "Work Phone";
                     break;
                 default:
-                    destContactType = "Other";
+                    nexusContactType = "Other";
                     break;
             }
 
-            return destContactType;
+            return nexusContactType;
         }
 
-        private string MapEthnicity(string sourceEthnicity)
+        private string MapEthnicity(string automonEthnicity)
         {
             return 
-                (lookupService.Ethnicities != null && lookupService.Ethnicities.Any(e => e.Equals(sourceEthnicity, StringComparison.InvariantCultureIgnoreCase))) 
-                ? sourceEthnicity 
+                (lookupService.Ethnicities != null && lookupService.Ethnicities.Any(e => e.Equals(automonEthnicity, StringComparison.InvariantCultureIgnoreCase))) 
+                ? automonEthnicity 
                 : DAL.Constants.EthnicityUnknown;
         }
 
-        private string MapCaseload(string sourceCaseloadName)
+        private string MapCaseload(string automonCaseloadName)
         {
-            if (lookupService.CaseLoads != null && lookupService.CaseLoads.Any(c => c.Name.Equals(sourceCaseloadName, StringComparison.InvariantCultureIgnoreCase)))
+            if (lookupService.CaseLoads != null && lookupService.CaseLoads.Any(c => c.Name.Equals(automonCaseloadName, StringComparison.InvariantCultureIgnoreCase)))
             {
-                return lookupService.CaseLoads.FirstOrDefault(c => c.Name.Equals(sourceCaseloadName, StringComparison.InvariantCultureIgnoreCase)).Id.ToString();
+                return lookupService.CaseLoads.FirstOrDefault(c => c.Name.Equals(automonCaseloadName, StringComparison.InvariantCultureIgnoreCase)).Id.ToString();
             }
 
             return null;
         }
 
-        private string MapSupervisingOfficer(string sourceFirstName, string sourceLastName, string sourceEmailAddress)
+        private string MapSupervisingOfficer(string automonFirstName, string automonLastName, string automonEmailAddress)
         {
-            if (lookupService.SupervisingOfficers != null && lookupService.SupervisingOfficers.Any(s => s.FirstName.Equals(sourceFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(sourceLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(sourceEmailAddress, StringComparison.InvariantCultureIgnoreCase)))
+            if (lookupService.SupervisingOfficers != null && lookupService.SupervisingOfficers.Any(s => s.FirstName.Equals(automonFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(automonLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(automonEmailAddress, StringComparison.InvariantCultureIgnoreCase)))
             {
-                return lookupService.SupervisingOfficers.FirstOrDefault(s => s.FirstName.Equals(sourceFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(sourceLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(sourceEmailAddress, StringComparison.InvariantCultureIgnoreCase)).Email;
+                return lookupService.SupervisingOfficers.FirstOrDefault(s => s.FirstName.Equals(automonFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(automonLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(automonEmailAddress, StringComparison.InvariantCultureIgnoreCase)).Email;
             }
 
             return null;
         }
 
-        private string MapOffenseCategory(string sourceOffenseCategory)
+        private string MapOffenseCategory(string automonOffenseCategory)
         {
-            if (lookupService.OffenseCategories != null && lookupService.OffenseCategories.Any(c => c.Equals(sourceOffenseCategory, StringComparison.InvariantCultureIgnoreCase)))
+            if (lookupService.OffenseCategories != null && lookupService.OffenseCategories.Any(c => c.Equals(automonOffenseCategory, StringComparison.InvariantCultureIgnoreCase)))
             {
-                return sourceOffenseCategory;
+                return automonOffenseCategory;
             }
 
             return null;

@@ -163,11 +163,11 @@ namespace CMI.Common.Notification
                         Constants.ExecutionStatusReportEmailBodyTableFormat,
                         taskExecutionStatus.TaskName,
                         (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
-                        taskExecutionStatus.SourceReceivedRecordCount,
-                        taskExecutionStatus.DestAddRecordCount,
-                        taskExecutionStatus.DestUpdateRecordCount,
-                        taskExecutionStatus.DestDeleteRecordCount,
-                        taskExecutionStatus.DestFailureRecordCount
+                        taskExecutionStatus.AutomonReceivedRecordCount,
+                        taskExecutionStatus.NexusAddRecordCount,
+                        taskExecutionStatus.NexusUpdateRecordCount,
+                        taskExecutionStatus.NexusDeleteRecordCount,
+                        taskExecutionStatus.NexusFailureRecordCount
                     )
                 );
             }

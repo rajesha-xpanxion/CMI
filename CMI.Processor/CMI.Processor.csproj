@@ -13,10 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CMI.Automon.Service\CMI.Automon.Service.csproj" />
     <ProjectReference Include="..\CMI.Common.Logging\CMI.Common.Logging.csproj" />
     <ProjectReference Include="..\CMI.Common.Notification\CMI.Common.Notification.csproj" />
-    <ProjectReference Include="..\CMI.DAL.Dest.Nexus\CMI.DAL.Dest.Nexus.csproj" />
-    <ProjectReference Include="..\CMI.DAL.Source.AutoMon\CMI.DAL.Source.AutoMon.csproj" />
+    <ProjectReference Include="..\CMI.Nexus.Service\CMI.Nexus.Service.csproj" />
     <ProjectReference Include="..\CMI.Processor.DAL\CMI.Processor.DAL.csproj" />
   </ItemGroup>
 

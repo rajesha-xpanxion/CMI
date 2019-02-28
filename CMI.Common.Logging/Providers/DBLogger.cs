@@ -106,14 +106,14 @@ namespace CMI.Common.Logging
                             cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.CustomParams, Value = logRequest.CustomParams, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
-                        if (!string.IsNullOrEmpty(logRequest.SourceData))
+                        if (!string.IsNullOrEmpty(logRequest.AutomonData))
                         {
-                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.SourceData, Value = logRequest.SourceData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.AutomonData, Value = logRequest.AutomonData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
-                        if (!string.IsNullOrEmpty(logRequest.DestData))
+                        if (!string.IsNullOrEmpty(logRequest.NexusData))
                         {
-                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.DestData, Value = logRequest.DestData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
+                            cmd.Parameters.Add(new SqlParameter { ParameterName = SqlParamName.NexusData, Value = logRequest.NexusData, SqlDbType = SqlDbType.NVarChar, Direction = ParameterDirection.Input });
                         }
 
                         await cmd.ExecuteNonQueryAsync();

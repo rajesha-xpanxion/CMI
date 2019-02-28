@@ -16,9 +16,9 @@ namespace CMI.Common.Logging
 
         public string CustomParams { get; set; }
 
-        public string SourceData { get; set; }
+        public string AutomonData { get; set; }
 
-        public string DestData { get; set; }
+        public string NexusData { get; set; }
     }
 
     public enum LogLevel

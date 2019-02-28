@@ -3,21 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.DAL.Source", "CMI.DAL.Source\CMI.DAL.Source.csproj", "{9E199D7E-5D45-4B19-B866-3C858254616D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Automon.Interface", "CMI.Automon.Interface\CMI.Automon.Interface.csproj", "{9E199D7E-5D45-4B19-B866-3C858254616D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.DAL.Dest", "CMI.DAL.Dest\CMI.DAL.Dest.csproj", "{0F7C48B2-FB70-4308-981C-AB8F31ABA76F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Nexus.Interface", "CMI.Nexus.Interface\CMI.Nexus.Interface.csproj", "{0F7C48B2-FB70-4308-981C-AB8F31ABA76F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.DAL.Source.AutoMon", "CMI.DAL.Source.AutoMon\CMI.DAL.Source.AutoMon.csproj", "{97F17073-F071-437E-AB48-356428749E81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Automon.Service", "CMI.Automon.Service\CMI.Automon.Service.csproj", "{97F17073-F071-437E-AB48-356428749E81}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.DAL.Dest.Nexus", "CMI.DAL.Dest.Nexus\CMI.DAL.Dest.Nexus.csproj", "{B302518B-952D-4278-A013-4722EA582F89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Nexus.Service", "CMI.Nexus.Service\CMI.Nexus.Service.csproj", "{B302518B-952D-4278-A013-4722EA582F89}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.DAL.Source.Models", "CMI.DAL.Source.Models\CMI.DAL.Source.Models.csproj", "{0E8D169E-C015-4351-AC1E-2728797698E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Automon.Model", "CMI.Automon.Model\CMI.Automon.Model.csproj", "{0E8D169E-C015-4351-AC1E-2728797698E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.DAL.Dest.Models", "CMI.DAL.Dest.Models\CMI.DAL.Dest.Models.csproj", "{557F6A7E-0F47-403D-AADD-416E7259D50D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Nexus.Model", "CMI.Nexus.Model\CMI.Nexus.Model.csproj", "{557F6A7E-0F47-403D-AADD-416E7259D50D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{8FA6FAA3-6B4D-4451-9859-AF436B90F5E9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automon", "Automon", "{8FA6FAA3-6B4D-4451-9859-AF436B90F5E9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dest", "Dest", "{ED2C097A-2F56-40E9-9EF3-AEFA6DC53EA8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nexus", "Nexus", "{ED2C097A-2F56-40E9-9EF3-AEFA6DC53EA8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Processor", "CMI.Processor\CMI.Processor.csproj", "{421E552B-9979-4C84-89D1-7884C505AF8F}"
 EndProject

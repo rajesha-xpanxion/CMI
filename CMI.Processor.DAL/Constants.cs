@@ -3,7 +3,7 @@ namespace CMI.Processor.DAL
 {
     public static class Constants
     {
-        public static string ContactTypeEmailDest { get { return "E-mail"; } }
+        public static string ContactTypeEmailNexus { get { return "E-mail"; } }
 
         public static string EthnicityUnknown { get { return "Unknown"; } }
     }
@@ -41,5 +41,14 @@ namespace CMI.Processor.DAL
         public static string ProcessEmailContacts { get { return "ProcessEmailContacts"; } }
         public static string ProcessCases { get { return "ProcessCases"; } }
         public static string ProcessNotes { get { return "ProcessNotes"; } }
+    }
+
+    public static class ConfigKeys
+    {
+        public static string ProcessorConfig { get { return "ProcessorConfig"; } }
+        public static string NexusConfig { get { return "NexusConfig"; } }
+        public static string AutomonConfig { get { return "AutomonConfig"; } }
+        public static string LogConfig { get { return "LogConfig"; } }
+        public static string EmailNotificationConfig { get { return "NotificationConfig:EmailNotificationConfig"; } }
     }
 }

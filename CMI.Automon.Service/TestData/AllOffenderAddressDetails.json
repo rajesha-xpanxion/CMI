@@ -1,0 +1,28 @@
+﻿[
+  {
+    "Id": 51361,
+    "AddressType": "Residential",
+    "Line1": "3668 Spruce",
+    "Line2": "10",
+    "City": "South Lake Tahoe",
+    "State": "CA",
+    "Zip": "96150",
+    "IsPrimary": false,
+    "Comment": "As of 5/12/16",
+    "IsActive": true,
+    "Pin": "5115"
+  },
+  {
+    "Id": 17410,
+    "AddressType": "Mailing",
+    "Line1": "PO Box 9906",
+    "Line2": "",
+    "City": "South Lake Tahoe",
+    "State": "CA",
+    "Zip": "96158",
+    "IsPrimary": false,
+    "Comment": "",
+    "IsActive": true,
+    "Pin": "5115"
+  }
+]

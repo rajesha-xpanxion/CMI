@@ -1,0 +1,20 @@
+﻿[
+  {
+    "Id": 92483,
+    "PhoneNumberType": "Mobile",
+    "Phone": "(530)240-5361",
+    "IsPrimary": false,
+    "Comment": "",
+    "IsActive": true,
+    "Pin": "5115"
+  },
+  {
+    "Id": 72178,
+    "PhoneNumberType": "Residential",
+    "Phone": "(530)542-3639",
+    "IsPrimary": false,
+    "Comment": "",
+    "IsActive": true,
+    "Pin": "5115"
+  }
+]

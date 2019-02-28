@@ -17,9 +17,9 @@ namespace CMI.Common.Logging
 
         public static string CustomParams { get { return "@CustomParams"; } }
 
-        public static string SourceData { get { return "@SourceData"; } }
+        public static string AutomonData { get { return "@AutomonData"; } }
 
-        public static string DestData { get { return "@DestData"; } }
+        public static string NexusData { get { return "@NexusData"; } }
     }
 
     public static class SqlQuery
