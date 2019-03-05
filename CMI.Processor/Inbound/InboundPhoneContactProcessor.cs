@@ -28,21 +28,24 @@ namespace CMI.Processor
             this.contactService = contactService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute()
+        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
         {
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessPhoneContacts",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Phone Contact processing initiated."
             });
+
+            //load required lookup data
+            LoadLookupData();
 
             IEnumerable<OffenderPhone> allOffenderPhones = null;
             Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { TaskName = "Process Phone Contacts" };
 
             try
             {
-                allOffenderPhones = offenderPhoneService.GetAllOffenderPhones(ProcessorConfig.CmiDbConnString, LastExecutionDateTime);
+                allOffenderPhones = offenderPhoneService.GetAllOffenderPhones(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
 
                 foreach (var offenderPhoneDetails in allOffenderPhones)
                 {
@@ -72,8 +75,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessPhoneContacts",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "New Client Phone Contact details added successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
@@ -92,8 +95,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessPhoneContacts",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Phone Contact details deleted successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
@@ -108,8 +111,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessPhoneContacts",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Phone Contact details updated successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
@@ -128,8 +131,8 @@ namespace CMI.Processor
 
                         Logger.LogWarning(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessPhoneContacts",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred in API while processing a Client Phone Contact.",
                             Exception = ce,
                             AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
@@ -142,8 +145,8 @@ namespace CMI.Processor
 
                         Logger.LogError(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessPhoneContacts",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred while processing a Client Phone Contact.",
                             Exception = ex,
                             AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
@@ -159,8 +162,8 @@ namespace CMI.Processor
 
                 Logger.LogError(new LogRequest
                 {
-                    OperationName = "Processor",
-                    MethodName = "ProcessPhoneContacts",
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
                     Message = "Error occurred while processing Contacts.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(allOffenderPhones)
@@ -169,13 +172,41 @@ namespace CMI.Processor
 
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessPhoneContacts",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Phone Contact processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 
             return taskExecutionStatus;
+        }
+
+        protected override void LoadLookupData()
+        {
+            //load ContactTypes lookup data
+            try
+            {
+                if (LookupService.ContactTypes != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved ContactTypes from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.ContactTypes)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading ContactTypes lookup data",
+                    Exception = ex
+                });
+            }
         }
 
         private string MapContactType(string automonContactType)

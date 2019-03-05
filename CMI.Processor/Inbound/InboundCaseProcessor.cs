@@ -29,14 +29,17 @@ namespace CMI.Processor
             this.caseService = caseService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute()
+        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
         {
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessCases",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Case processing intiated."
             });
+
+            //load required lookup data
+            LoadLookupData();
 
             IEnumerable<OffenderCase> allOffenderCaseDetails = null;
             Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { TaskName = "Process Cases" };
@@ -44,7 +47,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderCaseDetails = offenderCaseService.GetAllOffenderCases(ProcessorConfig.CmiDbConnString, LastExecutionDateTime);
+                allOffenderCaseDetails = offenderCaseService.GetAllOffenderCases(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
 
                 foreach (var offenderCaseDetails in allOffenderCaseDetails.GroupBy(x => new { x.Pin, x.CaseNumber }).Select(y => y.First()))
                 {
@@ -82,8 +85,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessCases",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "New Client Case details added successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
                                         NexusData = JsonConvert.SerializeObject(@case)
@@ -98,8 +101,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessCases",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Case details updated successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
                                         NexusData = JsonConvert.SerializeObject(@case)
@@ -118,8 +121,8 @@ namespace CMI.Processor
 
                         Logger.LogWarning(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessCases",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred in API while processing a Client Case.",
                             Exception = ce,
                             AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
@@ -132,8 +135,8 @@ namespace CMI.Processor
 
                         Logger.LogError(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessCases",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred while processing a Client Case.",
                             Exception = ex,
                             AutomonData = JsonConvert.SerializeObject(offenderCaseDetails),
@@ -149,8 +152,8 @@ namespace CMI.Processor
 
                 Logger.LogError(new LogRequest
                 {
-                    OperationName = "Processor",
-                    MethodName = "ProcessCases",
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
                     Message = "Error occurred while processing Cases.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(allOffenderCaseDetails)
@@ -159,13 +162,41 @@ namespace CMI.Processor
 
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessCases",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Case processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 
             return taskExecutionStatus;
+        }
+
+        protected override void LoadLookupData()
+        {
+            //load OffenseCategory lookup data
+            try
+            {
+                if (LookupService.OffenseCategories != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved OffenseCategories from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.OffenseCategories)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading OffenseCategories lookup data",
+                    Exception = ex
+                });
+            }
         }
 
         private string MapOffenseCategory(string automonOffenseCategory)

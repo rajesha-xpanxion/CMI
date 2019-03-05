@@ -10,6 +10,8 @@ namespace CMI.Processor.DAL
 
     public static class SqlParamName
     {
+        public static string ProcessorTypeId { get { return "@ProcessorTypeId"; } }
+
         public static string ExecutedOn { get { return "@ExecutedOn"; } }
 
         public static string IsSuccessful { get { return "@IsSuccessful"; } }
@@ -33,14 +35,14 @@ namespace CMI.Processor.DAL
         public static string SaveExecutionStatus { get { return @"[dbo].[SaveExecutionStatus]"; } }
     }
 
-    public static class ProcessorStage
+    public static class InboundProcessorStage
     {
-        public static string ProcessClientProfiles { get { return "ProcessClientProfiles"; } }
-        public static string ProcessAddresses { get { return "ProcessAddresses"; } }
-        public static string ProcessPhoneContacts { get { return "ProcessPhoneContacts"; } }
-        public static string ProcessEmailContacts { get { return "ProcessEmailContacts"; } }
-        public static string ProcessCases { get { return "ProcessCases"; } }
-        public static string ProcessNotes { get { return "ProcessNotes"; } }
+        public static string ClientProfiles { get { return "ClientProfiles"; } }
+        public static string Addresses { get { return "Addresses"; } }
+        public static string PhoneContacts { get { return "PhoneContacts"; } }
+        public static string EmailContacts { get { return "EmailContacts"; } }
+        public static string Cases { get { return "Cases"; } }
+        public static string Notes { get { return "Notes"; } }
     }
 
     public static class ConfigKeys

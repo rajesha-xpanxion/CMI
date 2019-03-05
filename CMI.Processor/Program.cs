@@ -15,14 +15,14 @@ namespace CMI.Processor
         #region Entry Point
         static void Main(string[] args)
         {
-            ProcessorTypeToExecute processorTypeToExecute = ReadProcessorTypeToExecute(args);
+            ProcessorType processorTypeToExecute = ReadProcessorTypeToExecute(args);
 
             Console.WriteLine(
                 (
-                    processorTypeToExecute == ProcessorTypeToExecute.Both 
+                    processorTypeToExecute == ProcessorType.Both 
                     ? "Starting execution of Both processors...{0}" 
                     : (
-                        processorTypeToExecute == ProcessorTypeToExecute.Inbound 
+                        processorTypeToExecute == ProcessorType.Inbound 
                         ? "Starting execution of Inbound Processor ...{0}" 
                         : "Starting execution of Outbound Processor ...{0}"
                     )
@@ -39,16 +39,25 @@ namespace CMI.Processor
             // create service provider
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
-            // entry to run scheduler
-            serviceProvider.GetService<Processor>().Execute();
+            //check for processor type to execute
+            if (processorTypeToExecute == ProcessorType.Both || processorTypeToExecute == ProcessorType.Inbound)
+            {
+                // entry to run scheduler
+                serviceProvider.GetService<InboundProcessor>().Execute();
+            }
 
+            if (processorTypeToExecute == ProcessorType.Both || processorTypeToExecute == ProcessorType.Outbound)
+            {
+                // entry to run scheduler
+                serviceProvider.GetService<OutboundProcessor>().Execute();
+            }
 
             Console.WriteLine(
                 (
-                    processorTypeToExecute == ProcessorTypeToExecute.Both
+                    processorTypeToExecute == ProcessorType.Both
                     ? "{0}Execution of Both processors completed successfully..."
                     : (
-                        processorTypeToExecute == ProcessorTypeToExecute.Inbound 
+                        processorTypeToExecute == ProcessorType.Inbound 
                         ? "{0}Execution of Inbound processor completed successfully..." 
                         : "{0}Execution of Outbound processor completed successfully..."
                     )
@@ -84,13 +93,27 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<Common.Notification.IEmailNotificationProvider, Common.Notification.EmailNotificationProvider>();
 
             // add processor as service
-            serviceCollection.AddTransient<Processor>();
+            serviceCollection.AddSingleton<InboundProcessor>();
+            serviceCollection.AddSingleton<InboundClientProfileProcessor>();
+            serviceCollection.AddSingleton<InboundAddressProcessor>();
+            serviceCollection.AddSingleton<InboundPhoneContactProcessor>();
+            serviceCollection.AddSingleton<InboundEmailContactProcessor>();
+            serviceCollection.AddSingleton<InboundCaseProcessor>();
+            serviceCollection.AddSingleton<InboundNoteProcessor>();
+            serviceCollection.AddSingleton<OutboundProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileProcessor>();
+            serviceCollection.AddSingleton<OutboundNoteProcessor>();
+            serviceCollection.AddSingleton<OutboundOfficeVisitProcessor>();
+            serviceCollection.AddSingleton<OutboundDrugTestProcessor>();
+            serviceCollection.AddSingleton<OutboundFieldVisitProcessor>();
 
             //read configuration from appsettings.json
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("AppSettings.json", false)
                 .Build();
+
+            serviceCollection.AddSingleton<IConfiguration>(configuration);
 
             //configure required configurations in service
             serviceCollection.Configure<Nexus.Model.NexusConfig>(configuration.GetSection(ConfigKeys.NexusConfig));
@@ -101,23 +124,23 @@ namespace CMI.Processor
             serviceCollection.AddOptions();
         }
 
-        private static ProcessorTypeToExecute ReadProcessorTypeToExecute(string[] args)
+        private static ProcessorType ReadProcessorTypeToExecute(string[] args)
         {
-            ProcessorTypeToExecute processorTypeToExecute = ProcessorTypeToExecute.Both; 
+            ProcessorType processorTypeToExecute = ProcessorType.Both; 
 
             if (args.Length > 0)
             {
                 if(args[0].Equals("inbound", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    processorTypeToExecute = ProcessorTypeToExecute.Inbound;
+                    processorTypeToExecute = ProcessorType.Inbound;
                 }
                 else if (args[0].Equals("outbound", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    processorTypeToExecute = ProcessorTypeToExecute.Outbound;
+                    processorTypeToExecute = ProcessorType.Outbound;
                 }
                 else
                 {
-                    processorTypeToExecute = ProcessorTypeToExecute.Both;
+                    processorTypeToExecute = ProcessorType.Both;
                 }
             }
 

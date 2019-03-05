@@ -27,21 +27,24 @@ namespace CMI.Processor
             this.contactService = contactService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute()
+        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
         {
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessEmailContacts",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Email Contact processing initiated."
             });
+
+            //load required lookup data
+            LoadLookupData();
 
             IEnumerable<OffenderEmail> allOffenderEmails = null;
             Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { TaskName = "Process Email Contacts" };
 
             try
             {
-                allOffenderEmails = offenderEmailService.GetAllOffenderEmails(ProcessorConfig.CmiDbConnString, LastExecutionDateTime);
+                allOffenderEmails = offenderEmailService.GetAllOffenderEmails(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
 
                 foreach (var offenderEmailDetails in allOffenderEmails)
                 {
@@ -70,8 +73,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessEmailContacts",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "New Client Email Contact details added successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
@@ -90,8 +93,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessEmailContacts",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Email Contact details deleted successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
@@ -106,8 +109,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessEmailContacts",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Email Contact details updated successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
@@ -126,8 +129,8 @@ namespace CMI.Processor
 
                         Logger.LogWarning(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessEmailContacts",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred in API while processing a Client Email Contact.",
                             Exception = ce,
                             AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
@@ -140,8 +143,8 @@ namespace CMI.Processor
 
                         Logger.LogError(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessEmailContacts",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred while processing a Client Email Contact.",
                             Exception = ex,
                             AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
@@ -157,8 +160,8 @@ namespace CMI.Processor
 
                 Logger.LogError(new LogRequest
                 {
-                    OperationName = "Processor",
-                    MethodName = "ProcessEmailContacts",
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
                     Message = "Error occurred while processing Email Contacts.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(allOffenderEmails)
@@ -167,13 +170,41 @@ namespace CMI.Processor
 
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessEmailContacts",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Email Contact processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 
             return taskExecutionStatus;
+        }
+
+        protected override void LoadLookupData()
+        {
+            //load ContactTypes lookup data
+            try
+            {
+                if (LookupService.ContactTypes != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved ContactTypes from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.ContactTypes)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading ContactTypes lookup data",
+                    Exception = ex
+                });
+            }
         }
     }
 }

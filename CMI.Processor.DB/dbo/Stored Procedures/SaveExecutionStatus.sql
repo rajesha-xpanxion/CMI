@@ -11,6 +11,7 @@ Test execution:-
 DECLARE @CurrentDate DATETIME = GETDATE();
 EXEC	
 	[dbo].[SaveExecutionStatus]
+		@ProcessorTypeId = 1,
 		@ExecutedOn = @CurrentDate,
 		@IsSuccessful = 1,
 		@NumTaskProcessed = 0,
@@ -22,8 +23,10 @@ EXEC
 History:-
 Date			Author			Changes
 04-July-18		Rajesh Awate	Created.
+05-Mar-19		Rajesh Awate	Changes to accomodate Processor Type
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveExecutionStatus]
+	@ProcessorTypeId INT,
 	@ExecutedOn DATETIME,
 	@IsSuccessful BIT,
 	@NumTaskProcessed INT,
@@ -36,6 +39,7 @@ BEGIN
 	
 	INSERT INTO [dbo].[ProcessorExecutionHistory]
 	(
+		[ProcessorTypeId],
 		[ExecutedOn],
 		[IsSuccessful],
 		[NumTaskProcessed],
@@ -46,6 +50,7 @@ BEGIN
 	)
 	VALUES
 	(
+		@ProcessorTypeId,
 		@ExecutedOn,
 		@IsSuccessful,
 		@NumTaskProcessed,

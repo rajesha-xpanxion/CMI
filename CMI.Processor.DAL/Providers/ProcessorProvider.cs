@@ -21,7 +21,7 @@ namespace CMI.Processor.DAL
         #endregion
 
         #region Public Methods
-        public DateTime? GetLastExecutionDateTime()
+        public DateTime? GetLastExecutionDateTime(ProcessorType processorType = ProcessorType.Inbound)
         {
             DateTime? lastExecutionDateTime = null;
 
@@ -34,6 +34,14 @@ namespace CMI.Processor.DAL
                     cmd.CommandText = StoredProc.GetLastExecutionDateTime;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Connection = conn;
+
+                    cmd.Parameters.Add(new SqlParameter
+                    {
+                        ParameterName = SqlParamName.ProcessorTypeId,
+                        Value = processorType,
+                        SqlDbType = SqlDbType.Int,
+                        Direction = ParameterDirection.Input
+                    });
 
                     object objLastExecutionDateTime = cmd.ExecuteScalar();
 
@@ -61,6 +69,13 @@ namespace CMI.Processor.DAL
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Connection = conn;
 
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.ProcessorTypeId,
+                            Value = executionStatus.ProcessorType,
+                            SqlDbType = SqlDbType.Int,
+                            Direction = ParameterDirection.Input
+                        });
                         cmd.Parameters.Add(new SqlParameter
                         {
                             ParameterName = SqlParamName.ExecutedOn,

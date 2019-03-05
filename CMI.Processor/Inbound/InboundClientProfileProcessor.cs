@@ -24,21 +24,24 @@ namespace CMI.Processor
             this.offenderService = offenderService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute()
+        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
         {
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessClientProfiles",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Client Profile processing initiated."
             });
+
+            //load required lookup data
+            LoadLookupData();
 
             IEnumerable<Offender> allOffenderDetails = null;
             Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { TaskName = "Process Client Profiles" };
 
             try
             {
-                allOffenderDetails = offenderService.GetAllOffenderDetails(ProcessorConfig.CmiDbConnString, LastExecutionDateTime);
+                allOffenderDetails = offenderService.GetAllOffenderDetails(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
 
                 foreach (var offenderDetails in allOffenderDetails)
                 {
@@ -71,8 +74,8 @@ namespace CMI.Processor
 
                                 Logger.LogDebug(new LogRequest
                                 {
-                                    OperationName = "Processor",
-                                    MethodName = "ProcessClientProfiles",
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
                                     Message = "New Client Profile added successfully.",
                                     AutomonData = JsonConvert.SerializeObject(offenderDetails),
                                     NexusData = JsonConvert.SerializeObject(client)
@@ -87,8 +90,8 @@ namespace CMI.Processor
 
                                 Logger.LogDebug(new LogRequest
                                 {
-                                    OperationName = "Processor",
-                                    MethodName = "ProcessClientProfiles",
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
                                     Message = "Existing Client Profile updated successfully.",
                                     AutomonData = JsonConvert.SerializeObject(offenderDetails),
                                     NexusData = JsonConvert.SerializeObject(client)
@@ -102,8 +105,8 @@ namespace CMI.Processor
 
                         Logger.LogWarning(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessClientProfiles",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred in API while processing a Client Profile.",
                             Exception = ce,
                             AutomonData = JsonConvert.SerializeObject(offenderDetails),
@@ -116,8 +119,8 @@ namespace CMI.Processor
 
                         Logger.LogError(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessClientProfiles",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred while processing a Client Profile.",
                             Exception = ex,
                             AutomonData = JsonConvert.SerializeObject(offenderDetails),
@@ -133,8 +136,8 @@ namespace CMI.Processor
                 taskExecutionStatus.IsSuccessful = false;
                 Logger.LogError(new LogRequest
                 {
-                    OperationName = "Processor",
-                    MethodName = "ProcessClientProfiles",
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
                     Message = "Error occurred while processing Client Profiles.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(allOffenderDetails)
@@ -143,13 +146,166 @@ namespace CMI.Processor
 
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessClientProfiles",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Client Profile processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 
             return taskExecutionStatus;
+        }
+
+        protected override void LoadLookupData()
+        {
+            //load Ethnicities lookup data
+            try
+            {
+                if (LookupService.Ethnicities != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved Ethnicities from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.Ethnicities)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading Ethnicities lookup data",
+                    Exception = ex
+                });
+            }
+
+            //load CaseLoads lookup data
+            try
+            {
+                if (LookupService.CaseLoads != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved Caseloads from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.CaseLoads)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading CaseLoads lookup data",
+                    Exception = ex
+                });
+            }
+
+            //load SupervisingOfficers lookup data
+            try
+            {
+                if (LookupService.SupervisingOfficers != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved SupervisingOfficers from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.SupervisingOfficers)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading SupervisingOfficers lookup data",
+                    Exception = ex
+                });
+            }
+
+            //load Genders lookup data
+            try
+            {
+                if (LookupService.Genders != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved Genders from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.Genders)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading Genders lookup data",
+                    Exception = ex
+                });
+            }
+
+            //load TimeZones lookup data
+            try
+            {
+                if (LookupService.TimeZones != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved TimeZones from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.TimeZones)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading TimeZones lookup data",
+                    Exception = ex
+                });
+            }
+
+            //load ClientTypes lookup data
+            try
+            {
+                if (LookupService.ClientTypes != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved ClientTypes from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.ClientTypes)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading ClientTypes lookup data",
+                    Exception = ex
+                });
+            }
         }
 
         private string MapEthnicity(string automonEthnicity)

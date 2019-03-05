@@ -28,12 +28,12 @@ namespace CMI.Processor
             this.noteService = noteService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute()
+        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
         {
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessNotes",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Note processing intiated."
             });
 
@@ -42,7 +42,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(ProcessorConfig.CmiDbConnString, LastExecutionDateTime);
+                allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
 
                 foreach (var offenderNoteDetails in allOffenderNoteDetails)
                 {
@@ -70,8 +70,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessNotes",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "New Client Note details added successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
                                         NexusData = JsonConvert.SerializeObject(note)
@@ -86,8 +86,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessNotes",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Note details updated successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
                                         NexusData = JsonConvert.SerializeObject(note)
@@ -106,8 +106,8 @@ namespace CMI.Processor
 
                         Logger.LogWarning(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessNotes",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred in API while processing a Client Note.",
                             Exception = ce,
                             AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
@@ -120,8 +120,8 @@ namespace CMI.Processor
 
                         Logger.LogError(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessNotes",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred while processing a Client Note.",
                             Exception = ex,
                             AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
@@ -138,8 +138,8 @@ namespace CMI.Processor
 
                 Logger.LogError(new LogRequest
                 {
-                    OperationName = "Processor",
-                    MethodName = "ProcessNotes",
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
                     Message = "Error occurred while processing Notes.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(allOffenderNoteDetails)
@@ -148,13 +148,18 @@ namespace CMI.Processor
 
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessNotes",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Notes processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 
             return taskExecutionStatus;
+        }
+
+        protected override void LoadLookupData()
+        {
+            throw new NotImplementedException();
         }
     }
 }

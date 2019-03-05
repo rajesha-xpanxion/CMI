@@ -27,21 +27,24 @@ namespace CMI.Processor
             this.addressService = addressService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute()
+        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
         {
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessAddresses",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Address processing initiated."
             });
+
+            //load required lookup data
+            LoadLookupData();
 
             IEnumerable<OffenderAddress> allOffenderAddresses = null;
             Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { TaskName = "Process Addresses" };
 
             try
             {
-                allOffenderAddresses = offenderAddressService.GetAllOffenderAddresses(ProcessorConfig.CmiDbConnString, LastExecutionDateTime);
+                allOffenderAddresses = offenderAddressService.GetAllOffenderAddresses(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
 
                 foreach (var offenderAddressDetails in allOffenderAddresses)
                 {
@@ -71,8 +74,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessAddresses",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "New Client Address details added successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
                                         NexusData = JsonConvert.SerializeObject(address)
@@ -91,8 +94,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessAddresses",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Address details deleted successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
                                         NexusData = JsonConvert.SerializeObject(address)
@@ -107,8 +110,8 @@ namespace CMI.Processor
 
                                     Logger.LogDebug(new LogRequest
                                     {
-                                        OperationName = "Processor",
-                                        MethodName = "ProcessAddresses",
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
                                         Message = "Existing Client Address details updated successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
                                         NexusData = JsonConvert.SerializeObject(address)
@@ -127,8 +130,8 @@ namespace CMI.Processor
 
                         Logger.LogWarning(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessAddresses",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred in API while processing a Client Address.",
                             Exception = ce,
                             AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
@@ -141,8 +144,8 @@ namespace CMI.Processor
 
                         Logger.LogError(new LogRequest
                         {
-                            OperationName = "Processor",
-                            MethodName = "ProcessAddresses",
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
                             Message = "Error occurred while processing a Client Address.",
                             Exception = ex,
                             AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
@@ -159,8 +162,8 @@ namespace CMI.Processor
 
                 Logger.LogError(new LogRequest
                 {
-                    OperationName = "Processor",
-                    MethodName = "ProcessAddresses",
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
                     Message = "Error occurred while processing Addresses.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(allOffenderAddresses)
@@ -169,13 +172,41 @@ namespace CMI.Processor
 
             Logger.LogInfo(new LogRequest
             {
-                OperationName = "Processor",
-                MethodName = "ProcessAddresses",
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
                 Message = "Addresses processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 
             return taskExecutionStatus;
+        }
+
+        protected override void LoadLookupData()
+        {
+            //load AddressTypes lookup data
+            try
+            {
+                if (LookupService.AddressTypes != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved AddressTypes from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.AddressTypes)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading AddressTypes lookup data",
+                    Exception = ex
+                });
+            }
         }
 
         private string MapFullAddress(string line1, string line2, string city, string state, string zip)

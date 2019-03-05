@@ -4,7 +4,7 @@ namespace CMI.Processor.DAL
     /// <summary>
     /// Processor Type
     /// </summary>
-    public enum ProcessorTypeToExecute
+    public enum ProcessorType
     {
         /// <summary>
         /// Both processor type

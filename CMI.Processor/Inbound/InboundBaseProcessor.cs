@@ -12,29 +12,12 @@ namespace CMI.Processor
     public abstract class InboundBaseProcessor
     {
         private readonly IProcessorProvider processorProvider;
-        private DateTime? _LastExecutionDateTime;
-        private bool isLastExecutionDateTimeRetrieved { get; set; }
 
         protected ILogger Logger { get; set; }
         protected ILookupService LookupService { get; set; }
         protected IClientService ClientService { get; set; }
-        protected DateTime? LastExecutionDateTime
-        {
-            get
-            {
-                if(isLastExecutionDateTimeRetrieved)
-                {
-                    return _LastExecutionDateTime;
-                }
-                else
-                {
-                    return RetrieveLastExecutionDateTime();
-                }
-            }
-        }
-        
         protected ProcessorConfig ProcessorConfig { get; set; }
-
+        
         public InboundBaseProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration
@@ -48,7 +31,9 @@ namespace CMI.Processor
             ProcessorConfig = configuration.GetSection(ConfigKeys.ProcessorConfig).Get<ProcessorConfig>();
         }
 
-        public abstract Common.Notification.TaskExecutionStatus Execute();
+        public abstract Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime);
+
+        protected abstract void LoadLookupData();
 
         protected string FormatId(string oldId)
         {
@@ -70,7 +55,7 @@ namespace CMI.Processor
             {
                 Logger.LogError(new LogRequest
                 {
-                    OperationName = "Processor",
+                    OperationName = this.GetType().Name,
                     MethodName = "FormatId",
                     Message = "Error occurred while formatting Id",
                     Exception = ex
@@ -78,37 +63,6 @@ namespace CMI.Processor
             }
 
             return newId;
-        }
-
-        private DateTime? RetrieveLastExecutionDateTime()
-        {
-            try
-            {
-                _LastExecutionDateTime = processorProvider.GetLastExecutionDateTime();
-
-                Logger.LogInfo(new LogRequest
-                {
-                    OperationName = "Processor",
-                    MethodName = "RetrieveLastExecutionDateTime",
-                    Message = "Successfully retrieved Last Execution Date Time",
-                    CustomParams = JsonConvert.SerializeObject(LastExecutionDateTime)
-                });
-                isLastExecutionDateTimeRetrieved = true;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(new LogRequest
-                {
-                    OperationName = "Processor",
-                    MethodName = "RetrieveLastExecutionDateTime",
-                    Message = "Error occurred while retriving processor last execution status.",
-                    Exception = ex
-                });
-
-                isLastExecutionDateTimeRetrieved = false;
-            }
-
-            return _LastExecutionDateTime;
         }
     }
 }
