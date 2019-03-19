@@ -107,10 +107,19 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<OutboundDrugTestProcessor>();
             serviceCollection.AddSingleton<OutboundFieldVisitProcessor>();
 
+
+            string enviornmentName = Environment.GetEnvironmentVariable("ENVIORNMENT_NAME");
+
             //read configuration from appsettings.json
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("AppSettings.json", false)
+                .AddJsonFile(
+                    string.IsNullOrEmpty(enviornmentName)
+                    ? $"AppSettings.json"
+                    : $"AppSettings.{enviornmentName}.json", 
+                    optional: false, 
+                    reloadOnChange: false
+                )
                 .Build();
 
             serviceCollection.AddSingleton<IConfiguration>(configuration);
