@@ -45,37 +45,37 @@ namespace CMI.Processor
             RetrieveLastExecutionDateTime();
 
             //process client profiles
-            if (ProcessorConfig.InboundProcessorStagesToProcess != null && ProcessorConfig.InboundProcessorStagesToProcess.Any(a => a.Equals(InboundProcessorStage.ClientProfiles, StringComparison.InvariantCultureIgnoreCase)))
+            if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.ClientProfiles, StringComparison.InvariantCultureIgnoreCase)))
             {
                 UpdateExecutionStatus(((InboundClientProfileProcessor)serviceProvider.GetService(typeof(InboundClientProfileProcessor))).Execute(lastExecutionDateTime));
             }
 
             //process client addresses
-            if (ProcessorConfig.InboundProcessorStagesToProcess != null && ProcessorConfig.InboundProcessorStagesToProcess.Any(a => a.Equals(InboundProcessorStage.Addresses, StringComparison.InvariantCultureIgnoreCase)))
+            if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.Addresses, StringComparison.InvariantCultureIgnoreCase)))
             {
                 UpdateExecutionStatus(((InboundAddressProcessor)serviceProvider.GetService(typeof(InboundAddressProcessor))).Execute(lastExecutionDateTime));
             }
 
             //process client phone contacts
-            if (ProcessorConfig.InboundProcessorStagesToProcess != null && ProcessorConfig.InboundProcessorStagesToProcess.Any(a => a.Equals(InboundProcessorStage.PhoneContacts, StringComparison.InvariantCultureIgnoreCase)))
+            if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.PhoneContacts, StringComparison.InvariantCultureIgnoreCase)))
             {
                 UpdateExecutionStatus(((InboundPhoneContactProcessor)serviceProvider.GetService(typeof(InboundPhoneContactProcessor))).Execute(lastExecutionDateTime));
             }
 
             //process client email contacts
-            if (ProcessorConfig.InboundProcessorStagesToProcess != null && ProcessorConfig.InboundProcessorStagesToProcess.Any(a => a.Equals(InboundProcessorStage.EmailContacts, StringComparison.InvariantCultureIgnoreCase)))
+            if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.EmailContacts, StringComparison.InvariantCultureIgnoreCase)))
             {
                 UpdateExecutionStatus(((InboundEmailContactProcessor)serviceProvider.GetService(typeof(InboundEmailContactProcessor))).Execute(lastExecutionDateTime));
             }
 
             //process client cases
-            if (ProcessorConfig.InboundProcessorStagesToProcess != null && ProcessorConfig.InboundProcessorStagesToProcess.Any(a => a.Equals(InboundProcessorStage.Cases, StringComparison.InvariantCultureIgnoreCase)))
+            if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.Cases, StringComparison.InvariantCultureIgnoreCase)))
             {
                 UpdateExecutionStatus(((InboundCaseProcessor)serviceProvider.GetService(typeof(InboundCaseProcessor))).Execute(lastExecutionDateTime));
             }
 
             //process client notes
-            if (ProcessorConfig.InboundProcessorStagesToProcess != null && ProcessorConfig.InboundProcessorStagesToProcess.Any(a => a.Equals(InboundProcessorStage.Notes, StringComparison.InvariantCultureIgnoreCase)))
+            if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.Notes, StringComparison.InvariantCultureIgnoreCase)))
             {
                 UpdateExecutionStatus(((InboundNoteProcessor)serviceProvider.GetService(typeof(InboundNoteProcessor))).Execute(lastExecutionDateTime));
             }

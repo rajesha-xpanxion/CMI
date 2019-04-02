@@ -31,15 +31,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.Common.Notification", "
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "CMI.Processor.DB", "CMI.Processor.DB\CMI.Processor.DB.sqlproj", "{1AC3EEFF-1F8D-4104-84C6-22CA11891E38}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MessageProcessor", "MessageProcessor", "{FD0FE486-32D6-44ED-9D77-7227FF1DA336}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MessageRetriever", "MessageRetriever", "{FD0FE486-32D6-44ED-9D77-7227FF1DA336}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMI.MessageProcessor.Model", "CMI.MessageProcessor.Model\CMI.MessageProcessor.Model.csproj", "{EAAA9B4E-A04A-479D-84D8-DFFFD83135F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.MessageRetriever.Model", "CMI.MessageRetriever.Model\CMI.MessageRetriever.Model.csproj", "{EAAA9B4E-A04A-479D-84D8-DFFFD83135F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMI.MessageProcessor.AMQP", "CMI.MessageProcessor.AMQP\CMI.MessageProcessor.AMQP.csproj", "{0E4BA0EB-C833-42E7-89CD-6F657260CC22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.MessageRetriever.AMQP", "CMI.MessageRetriever.AMQP\CMI.MessageRetriever.AMQP.csproj", "{0E4BA0EB-C833-42E7-89CD-6F657260CC22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMI.MessageProcessor.REST", "CMI.MessageProcessor.REST\CMI.MessageProcessor.REST.csproj", "{A809E9B0-03AF-4183-BCF0-D26C8F9730C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.MessageRetriever.REST", "CMI.MessageRetriever.REST\CMI.MessageRetriever.REST.csproj", "{A809E9B0-03AF-4183-BCF0-D26C8F9730C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMI.MessageProcessor", "CMI.MessageProcessor\CMI.MessageProcessor.csproj", "{37CAC87B-5C31-4666-81BB-78DA7D28A081}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.MessageRetriever.Interface", "CMI.MessageRetriever.Interface\CMI.MessageRetriever.Interface.csproj", "{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -105,10 +105,10 @@ Global
 		{A809E9B0-03AF-4183-BCF0-D26C8F9730C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A809E9B0-03AF-4183-BCF0-D26C8F9730C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A809E9B0-03AF-4183-BCF0-D26C8F9730C1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{37CAC87B-5C31-4666-81BB-78DA7D28A081}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{37CAC87B-5C31-4666-81BB-78DA7D28A081}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{37CAC87B-5C31-4666-81BB-78DA7D28A081}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{37CAC87B-5C31-4666-81BB-78DA7D28A081}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -125,7 +125,7 @@ Global
 		{EAAA9B4E-A04A-479D-84D8-DFFFD83135F9} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
 		{0E4BA0EB-C833-42E7-89CD-6F657260CC22} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
 		{A809E9B0-03AF-4183-BCF0-D26C8F9730C1} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
-		{37CAC87B-5C31-4666-81BB-78DA7D28A081} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
+		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {346C34A5-4F49-4E23-8D33-C6D985F92129}

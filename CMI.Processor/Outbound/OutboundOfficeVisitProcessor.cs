@@ -1,6 +1,12 @@
 ﻿using CMI.Automon.Interface;
+using CMI.Common.Logging;
+using CMI.Common.Notification;
+using CMI.MessageRetriever.Model;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CMI.Processor
 {
@@ -18,9 +24,40 @@ namespace CMI.Processor
             this.offenderOfficeVisitService = offenderOfficeVisitService;
         }
 
-        public override void Execute()
+        public override TaskExecutionStatus Execute(IEnumerable<MessageBodyResponse> messages)
         {
+            Logger.LogInfo(new LogRequest
+            {
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
+                Message = "Office Visit activity processing initiated."
+            });
 
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { TaskName = "Process Office Visit Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+            ////////////////////////////////////
+
+
+            Logger.LogInfo(new LogRequest
+            {
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
+                Message = "Office Visit activity processing completed.",
+                CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
+            });
+
+            return taskExecutionStatus;
         }
     }
 }

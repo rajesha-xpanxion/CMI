@@ -10,18 +10,18 @@ using System.Linq;
 
 namespace CMI.Processor
 {
-    public class OutboundClientProfileProcessor : OutboundBaseProcessor
+    public class OutboundDrugTestResultProcessor : OutboundBaseProcessor
     {
-        private readonly IOffenderService offenderService;
+        private readonly IOffenderDrugTestService offenderDrugTestService;
 
-        public OutboundClientProfileProcessor(
+        public OutboundDrugTestResultProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderService offenderService
+            IOffenderDrugTestService offenderDrugTestService
         )
             : base(serviceProvider, configuration)
         {
-            this.offenderService = offenderService;
+            this.offenderDrugTestService = offenderDrugTestService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<MessageBodyResponse> messages)
@@ -30,10 +30,10 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile activity processing initiated."
+                Message = "Drug Test Result activity processing initiated."
             });
 
-            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { TaskName = "Process Client Profile Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { TaskName = "Process Drug Test Result Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
 
             ////////////////////////////////////
             ////////////////////////////////////
@@ -53,7 +53,7 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile activity processing completed.",
+                Message = "Drug Test Result activity processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 

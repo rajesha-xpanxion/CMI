@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CMI.MessageProcessor.Model
+namespace CMI.MessageRetriever.Model
 {
     public class ClientProfilePersonalDetailsActivityResponse : ActivityResponse
     {

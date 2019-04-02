@@ -1,6 +1,9 @@
 ﻿using CMI.Common.Logging;
+using CMI.Common.Notification;
+using CMI.MessageRetriever.Model;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 
 namespace CMI.Processor
 {
@@ -16,6 +19,6 @@ namespace CMI.Processor
             Logger = (ILogger)serviceProvider.GetService(typeof(ILogger));
         }
 
-        public abstract void Execute();
+        public abstract TaskExecutionStatus Execute(IEnumerable<MessageBodyResponse> messages);
     }
 }

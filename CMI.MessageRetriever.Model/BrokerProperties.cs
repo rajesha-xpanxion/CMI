@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.ServiceModel.Channels;
 
-namespace CMI.MessageProcessor.Model
+namespace CMI.MessageRetriever.Model
 {
     [DataContract]
     public class BrokerProperties

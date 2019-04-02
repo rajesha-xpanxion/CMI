@@ -9,4 +9,9 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CMI.MessageRetriever.AMQP\CMI.MessageRetriever.AMQP.csproj" />
+    <ProjectReference Include="..\CMI.MessageRetriever.REST\CMI.MessageRetriever.REST.csproj" />
+  </ItemGroup>
+
 </Project>

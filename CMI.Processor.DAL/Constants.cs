@@ -45,12 +45,29 @@ namespace CMI.Processor.DAL
         public static string Notes { get { return "Notes"; } }
     }
 
+    public static class OutboundProcessorActivityType
+    {
+        public static string Note { get { return "Note"; } }
+        public static string OfficeVisit { get { return "OfficeVisit"; } }
+        public static string DrugTestAppointment { get { return "Drug Test Appointment"; } }
+        public static string DrugTestResult { get { return "Drug Test Result"; } }
+        public static string FieldVisit { get { return "FieldVisit"; } }
+    }
+
     public static class ConfigKeys
     {
         public static string ProcessorConfig { get { return "ProcessorConfig"; } }
         public static string NexusConfig { get { return "NexusConfig"; } }
         public static string AutomonConfig { get { return "AutomonConfig"; } }
         public static string LogConfig { get { return "LogConfig"; } }
+        public static string MessageRetrieverConfig { get { return "MessageRetrieverConfig"; } }
         public static string EmailNotificationConfig { get { return "NotificationConfig:EmailNotificationConfig"; } }
+        public static string MessageRetrieverTypeToExecute { get { return "ProcessorConfig:OutboundProcessorConfig:MessageRetrieverConfig:RetrieverTypeToExecute"; } }
+        public static string ProcessorTypesToExecute { get { return "ProcessorConfig:ProcessorTypesToExecute"; } }
+    }
+    public static class MessageRetrieverTypeToExecute
+    {
+        public static string Rest { get { return "REST"; } }
+        public static string Amqp { get { return "AMQP"; } }
     }
 }

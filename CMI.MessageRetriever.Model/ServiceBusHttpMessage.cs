@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace CMI.MessageProcessor.Model
+namespace CMI.MessageRetriever.Model
 {
     public class ServiceBusHttpMessage
     {

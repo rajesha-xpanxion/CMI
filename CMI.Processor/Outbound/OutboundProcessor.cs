@@ -1,5 +1,7 @@
 ﻿using CMI.Common.Logging;
 using CMI.Common.Notification;
+using CMI.MessageRetriever.Interface;
+using CMI.MessageRetriever.Model;
 using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -36,6 +38,65 @@ namespace CMI.Processor
                 MethodName = "Execute",
                 Message = "Outbound Processor execution initiated."
             });
+
+            //retrieve all messages from queue
+            IEnumerable<MessageBodyResponse> messages = ((IMessageRetrieverService)serviceProvider.GetService(typeof(IMessageRetrieverService))).Execute().Result;
+
+            //process each type of message based on whether it is allowed or not
+            //general notes
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null 
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.Note, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundNoteProcessor)serviceProvider.GetService(typeof(OutboundNoteProcessor))).Execute(
+                    messages.Where(a => a.Activity != null && a.Activity.Type.Equals(OutboundProcessorActivityType.Note, StringComparison.InvariantCultureIgnoreCase)))
+                );
+            }
+
+            //office visit
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.OfficeVisit, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundOfficeVisitProcessor)serviceProvider.GetService(typeof(OutboundOfficeVisitProcessor))).Execute(
+                    messages.Where(a => a.Activity != null && a.Activity.Type.Equals(OutboundProcessorActivityType.OfficeVisit, StringComparison.InvariantCultureIgnoreCase)))
+                );
+            }
+
+            //drug test appointment
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.DrugTestAppointment, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundDrugTestAppointmentProcessor)serviceProvider.GetService(typeof(OutboundDrugTestAppointmentProcessor))).Execute(
+                    messages.Where(a => a.Activity != null && a.Activity.Type.Equals(OutboundProcessorActivityType.DrugTestAppointment, StringComparison.InvariantCultureIgnoreCase)))
+                );
+            }
+
+            //drug test result
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.DrugTestResult, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundDrugTestResultProcessor)serviceProvider.GetService(typeof(OutboundDrugTestResultProcessor))).Execute(
+                    messages.Where(a => a.Activity != null && a.Activity.Type.Equals(OutboundProcessorActivityType.DrugTestResult, StringComparison.InvariantCultureIgnoreCase)))
+                );
+            }
+
+            //field visit
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.FieldVisit, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundFieldVisitProcessor)serviceProvider.GetService(typeof(OutboundFieldVisitProcessor))).Execute(
+                    messages.Where(a => a.Activity != null && a.Activity.Type.Equals(OutboundProcessorActivityType.FieldVisit, StringComparison.InvariantCultureIgnoreCase)))
+                );
+            }
 
             //derive final processor execution status and save it to database
             ProcessorExecutionStatus.ExecutionStatusMessage = ProcessorExecutionStatus.IsSuccessful

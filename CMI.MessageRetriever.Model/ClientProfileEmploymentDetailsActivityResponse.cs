@@ -1,4 +1,4 @@
-﻿namespace CMI.MessageProcessor.Model
+﻿namespace CMI.MessageRetriever.Model
 {
     public class ClientProfileEmploymentDetailsActivityResponse : ActivityResponse
     {
