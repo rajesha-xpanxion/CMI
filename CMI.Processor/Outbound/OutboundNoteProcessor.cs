@@ -33,7 +33,7 @@ namespace CMI.Processor
                 Message = "Note activity processing initiated."
             });
 
-            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { TaskName = "Process Note Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Outbound, TaskName = "Process Note Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
 
             ////////////////////////////////////
             ////////////////////////////////////

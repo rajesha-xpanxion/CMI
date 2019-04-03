@@ -47,6 +47,7 @@ namespace CMI.Processor.DAL
 
     public static class OutboundProcessorActivityType
     {
+        public static string ClientProfile { get { return "ClientProfile"; } }
         public static string Note { get { return "Note"; } }
         public static string OfficeVisit { get { return "OfficeVisit"; } }
         public static string DrugTestAppointment { get { return "Drug Test Appointment"; } }
@@ -64,6 +65,8 @@ namespace CMI.Processor.DAL
         public static string EmailNotificationConfig { get { return "NotificationConfig:EmailNotificationConfig"; } }
         public static string MessageRetrieverTypeToExecute { get { return "ProcessorConfig:OutboundProcessorConfig:MessageRetrieverConfig:RetrieverTypeToExecute"; } }
         public static string ProcessorTypesToExecute { get { return "ProcessorConfig:ProcessorTypesToExecute"; } }
+        public static string ExecutionStatusReportReceiverEmailAddresses { get { return "ProcessorConfig:ExecutionStatusReportReceiverEmailAddresses"; } }
+        public static string ExecutionStatusReportEmailSubject { get { return "ProcessorConfig:ExecutionStatusReportEmailSubject"; } }
     }
     public static class MessageRetrieverTypeToExecute
     {

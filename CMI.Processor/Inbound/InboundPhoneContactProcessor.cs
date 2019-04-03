@@ -1,6 +1,7 @@
 ﻿using CMI.Automon.Interface;
 using CMI.Automon.Model;
 using CMI.Common.Logging;
+using CMI.Common.Notification;
 using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,7 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<OffenderPhone> allOffenderPhones = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { TaskName = "Process Phone Contacts" };
+            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Phone Contacts" };
 
             try
             {

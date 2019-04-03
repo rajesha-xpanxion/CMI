@@ -10,18 +10,18 @@ using System.Linq;
 
 namespace CMI.Processor
 {
-    public class OutboundClientProfileProcessor : OutboundBaseProcessor
+    public class OutboundClientProfileAddressProcessor : OutboundBaseProcessor
     {
-        private readonly IOffenderService offenderService;
+        private readonly IOffenderAddressService offenderAddressService;
 
-        public OutboundClientProfileProcessor(
+        public OutboundClientProfileAddressProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderService offenderService
+            IOffenderAddressService offenderAddressService
         )
             : base(serviceProvider, configuration)
         {
-            this.offenderService = offenderService;
+            this.offenderAddressService = offenderAddressService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<MessageBodyResponse> messages)
@@ -30,10 +30,10 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile activity processing initiated."
+                Message = "Client Profile Address activity processing initiated."
             });
 
-            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { TaskName = "Process Client Profile Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Outbound, TaskName = "Process Client Profile - Address Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
 
             ////////////////////////////////////
             ////////////////////////////////////
@@ -53,7 +53,7 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile activity processing completed.",
+                Message = "Client Profile Address activity processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 

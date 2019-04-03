@@ -31,7 +31,7 @@ namespace CMI.Processor
             ProcessorConfig = configuration.GetSection(ConfigKeys.ProcessorConfig).Get<ProcessorConfig>();
         }
 
-        public abstract void Execute();
+        public abstract IEnumerable<TaskExecutionStatus> Execute();
 
         protected void UpdateExecutionStatus(TaskExecutionStatus taskExecutionStatus)
         {

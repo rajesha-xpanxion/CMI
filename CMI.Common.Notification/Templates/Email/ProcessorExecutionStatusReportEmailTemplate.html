@@ -6,6 +6,7 @@
     <p>Hi,</p>
     <p>Processor has completed its execution. Please see below for detailed execution status report:</p>
     <table bordercolor="#666666" cellpadding="3" cellspacing="3" style="font-family:arial,Helvetica,sans-serif;font-size:medium;width:auto" border="1">
+        <caption>Inbound Integration</caption>
         <thead>
             <tr style="background-color:silver">
                 <th>Task Name</th>
@@ -18,7 +19,25 @@
             </tr>
         </thead>
         <tbody>
-            {#execution-status-details#}
+            {#inbound-execution-status-details#}
+        </tbody>
+    </table>
+    <br />
+    <table bordercolor="#666666" cellpadding="3" cellspacing="3" style="font-family:arial,Helvetica,sans-serif;font-size:medium;width:auto" border="1">
+        <caption>Outbound Integration</caption>
+        <thead>
+            <tr style="background-color:silver">
+                <th>Activity Type</th>
+                <th>Is Successful</th>
+                <th># Message Processed</th>
+                <th># Message Added</th>
+                <th># Message Updated</th>
+                <th># Message Deleted</th>
+                <th># Message Failed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {#outbound-execution-status-details#}
         </tbody>
     </table>
     <br />

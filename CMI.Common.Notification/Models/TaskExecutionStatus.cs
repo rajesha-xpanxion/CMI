@@ -3,6 +3,7 @@ namespace CMI.Common.Notification
 {
     public class TaskExecutionStatus
     {
+        public ProcessorType ProcessorType { get; set; }
         public bool IsSuccessful { get; set; }
         public string TaskName { get; set; }
 
@@ -15,6 +16,9 @@ namespace CMI.Common.Notification
 
 
         public int NexusReceivedMessageCount { get; set; }
+        public int AutomonAddMessageCount { get; set; }
+        public int AutomonUpdateMessageCount { get; set; }
+        public int AutomonDeleteMessageCount { get; set; }
         public int AutomonFailureMessageCount { get; set; }
     }
 }

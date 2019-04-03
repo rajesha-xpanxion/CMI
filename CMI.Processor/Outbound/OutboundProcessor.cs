@@ -25,11 +25,11 @@ namespace CMI.Processor
             this.serviceProvider = serviceProvider;
             this.configuration = configuration;
 
-            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = ProcessorType.Outbound, ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
+            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = DAL.ProcessorType.Outbound, ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
             TaskExecutionStatuses = new List<TaskExecutionStatus>();
         }
 
-        public override void Execute()
+        public override IEnumerable<TaskExecutionStatus> Execute()
         {
             //log info message for start of processing
             Logger.LogInfo(new LogRequest
@@ -43,9 +43,127 @@ namespace CMI.Processor
             IEnumerable<MessageBodyResponse> messages = ((IMessageRetrieverService)serviceProvider.GetService(typeof(IMessageRetrieverService))).Execute().Result;
 
             //process each type of message based on whether it is allowed or not
-            //general notes
+            //client profile - personal details
             if (
                 ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null 
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(
+                    ((OutboundClientProfilePersonalDetailsProcessor)serviceProvider.GetService(typeof(OutboundClientProfilePersonalDetailsProcessor))).Execute(
+                        messages.Where(
+                            a => 
+                            a.Activity != null 
+                            && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
+                            && (a.Action.Reason.Equals("Personal Details Updated", StringComparison.InvariantCultureIgnoreCase))
+                        )
+                    )
+                );
+            }
+
+            //client profile - email
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(
+                    ((OutboundClientProfileEmailProcessor)serviceProvider.GetService(typeof(OutboundClientProfileEmailProcessor))).Execute(
+                        messages.Where(
+                            a =>
+                            a.Activity != null
+                            && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
+                            && (a.Action.Reason.Equals("Email Updated", StringComparison.InvariantCultureIgnoreCase))
+                        )
+                    )
+                );
+            }
+
+            //client profile - address
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(
+                    ((OutboundClientProfileAddressProcessor)serviceProvider.GetService(typeof(OutboundClientProfileAddressProcessor))).Execute(
+                        messages.Where(
+                            a =>
+                            a.Activity != null
+                            && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
+                            && (a.Action.Reason.Equals("Address Updated", StringComparison.InvariantCultureIgnoreCase))
+                        )
+                    )
+                );
+            }
+
+            //client profile - contact
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(
+                    ((OutboundClientProfileContactProcessor)serviceProvider.GetService(typeof(OutboundClientProfileContactProcessor))).Execute(
+                        messages.Where(
+                            a =>
+                            a.Activity != null
+                            && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
+                            && (a.Action.Reason.Equals("Contact Updated", StringComparison.InvariantCultureIgnoreCase))
+                        )
+                    )
+                );
+            }
+
+            //client profile - vehicle
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(
+                    ((OutboundClientProfileVehicleProcessor)serviceProvider.GetService(typeof(OutboundClientProfileVehicleProcessor))).Execute(
+                        messages.Where(
+                            a =>
+                            a.Activity != null
+                            && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
+                            &&
+                            (
+                                a.Action.Reason.Equals("Vehicle Created", StringComparison.InvariantCultureIgnoreCase)
+                                || a.Action.Reason.Equals("Vehicle Updated", StringComparison.InvariantCultureIgnoreCase)
+                                || a.Action.Reason.Equals("Vehicle Removed", StringComparison.InvariantCultureIgnoreCase)
+                            )
+                        )
+                    )
+                );
+            }
+
+            //client profile - employment
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(
+                    ((OutboundClientProfileEmploymentProcessor)serviceProvider.GetService(typeof(OutboundClientProfileEmploymentProcessor))).Execute(
+                        messages.Where(
+                            a =>
+                            a.Activity != null
+                            && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
+                            &&
+                            (
+                                a.Action.Reason.Equals("Employment Created", StringComparison.InvariantCultureIgnoreCase)
+                                || a.Action.Reason.Equals("Employment Updated", StringComparison.InvariantCultureIgnoreCase)
+                                || a.Action.Reason.Equals("Employment Removed", StringComparison.InvariantCultureIgnoreCase)
+                            )
+                        )
+                    )
+                );
+            }
+
+            //general notes
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
                 && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.Note, StringComparison.InvariantCultureIgnoreCase))
             )
             {
@@ -106,38 +224,6 @@ namespace CMI.Processor
             //save execution status details in history table
             SaveExecutionStatus(ProcessorExecutionStatus);
 
-            //send execution status report email
-            var executionStatusReportEmailRequest = new ExecutionStatusReportEmailRequest
-            {
-                ToEmailAddress = ProcessorConfig.ExecutionStatusReportReceiverEmailAddresses,
-                Subject = ProcessorConfig.ExecutionStatusReportEmailSubject,
-                TaskExecutionStatuses = TaskExecutionStatuses
-            };
-
-            var response = EmailNotificationProvider.SendExecutionStatusReportEmail(executionStatusReportEmailRequest);
-
-            if (response.IsSuccessful)
-            {
-                Logger.LogInfo(new LogRequest
-                {
-                    OperationName = this.GetType().Name,
-                    MethodName = "Execute",
-                    Message = "Execution status report email sent successfully.",
-                    CustomParams = JsonConvert.SerializeObject(executionStatusReportEmailRequest)
-                });
-            }
-            else
-            {
-                Logger.LogWarning(new LogRequest
-                {
-                    OperationName = this.GetType().Name,
-                    MethodName = "Execute",
-                    Message = "Error occurred while sending execution status report email.",
-                    Exception = response.Exception,
-                    CustomParams = JsonConvert.SerializeObject(executionStatusReportEmailRequest)
-                });
-            }
-
             //log info message for end of processing
             Logger.LogInfo(new LogRequest
             {
@@ -146,6 +232,8 @@ namespace CMI.Processor
                 Message = "Outbound Processor execution completed.",
                 CustomParams = JsonConvert.SerializeObject(ProcessorExecutionStatus)
             });
+
+            return TaskExecutionStatuses;
         }
     }
 }

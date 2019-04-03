@@ -9,6 +9,7 @@ using CMI.Automon.Service;
 using CMI.Processor.DAL;
 using CMI.MessageRetriever.Interface;
 using CMI.MessageRetriever.Model;
+using Newtonsoft.Json;
 
 namespace CMI.Processor
 {
@@ -42,19 +43,24 @@ namespace CMI.Processor
             // create service provider
             var serviceProvider = serviceCollection.BuildServiceProvider();
 
+            System.Collections.Generic.List<Common.Notification.TaskExecutionStatus> taskExecutionStatuses = new System.Collections.Generic.List<Common.Notification.TaskExecutionStatus>();
+
             //check if to execute inbound processor
             if (processorTypeToExecute == ProcessorType.Both || processorTypeToExecute == ProcessorType.Inbound)
             {
                 // entry to run inbound processor
-                serviceProvider.GetService<InboundProcessor>().Execute();
+                taskExecutionStatuses.AddRange(serviceProvider.GetService<InboundProcessor>().Execute());
             }
 
             //check if to execute outbound processor
             if (processorTypeToExecute == ProcessorType.Both || processorTypeToExecute == ProcessorType.Outbound)
             {
                 // entry to run outbound processor
-                serviceProvider.GetService<OutboundProcessor>().Execute();
+                taskExecutionStatuses.AddRange(serviceProvider.GetService<OutboundProcessor>().Execute());
             }
+
+            //send execution status report email
+            SendExecutionStatusReportEmail(serviceProvider, configuration, taskExecutionStatuses);
 
             Console.WriteLine(
                 (
@@ -119,6 +125,8 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<IOffenderAddressService, OffenderAddressService>();
             serviceCollection.AddSingleton<IOffenderPhoneService, OffenderPhoneService>();
             serviceCollection.AddSingleton<IOffenderEmailService, OffenderEmailService>();
+            serviceCollection.AddSingleton<IOffenderVehicleService, OffenderVehicleService>();
+            serviceCollection.AddSingleton<IOffenderEmploymentService, OffenderEmploymentService>();
             serviceCollection.AddSingleton<IOffenderCaseService, OffenderCaseService>();
             serviceCollection.AddSingleton<IOffenderNoteService, OffenderNoteService>();
             serviceCollection.AddSingleton<IOffenderDrugTestService, OffenderDrugTestService>();
@@ -158,12 +166,18 @@ namespace CMI.Processor
         private static void ConfigureOutboundProcessorServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<OutboundProcessor>();
-            serviceCollection.AddSingleton<OutboundClientProfileProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfilePersonalDetailsProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileEmailProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileAddressProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileContactProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileVehicleProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileEmploymentProcessor>();
             serviceCollection.AddSingleton<OutboundNoteProcessor>();
             serviceCollection.AddSingleton<OutboundOfficeVisitProcessor>();
             serviceCollection.AddSingleton<OutboundDrugTestAppointmentProcessor>();
             serviceCollection.AddSingleton<OutboundDrugTestResultProcessor>();
             serviceCollection.AddSingleton<OutboundFieldVisitProcessor>();
+            
         }
 
         private static void ConfigureMessageRetrieverService(IServiceCollection serviceCollection, IConfiguration configuration)
@@ -212,6 +226,48 @@ namespace CMI.Processor
             }
 
             return processorTypeToExecute;
+        }
+
+        private static void SendExecutionStatusReportEmail(
+            IServiceProvider serviceProvider,
+            IConfiguration configuration,
+            System.Collections.Generic.IEnumerable<Common.Notification.TaskExecutionStatus> taskExecutionStatuses
+        )
+        {
+            //retrieve required values from configuration
+            string executionStatusReportReceiverEmailAddresses = configuration.GetValue<string>(ConfigKeys.ExecutionStatusReportReceiverEmailAddresses);
+            string executionStatusReportEmailSubject = configuration.GetValue<string>(ConfigKeys.ExecutionStatusReportEmailSubject);
+            //create request object
+            var executionStatusReportEmailRequest = new Common.Notification.ExecutionStatusReportEmailRequest
+            {
+                ToEmailAddress = executionStatusReportReceiverEmailAddresses,
+                Subject = executionStatusReportEmailSubject,
+                TaskExecutionStatuses = taskExecutionStatuses
+            };
+            //send email notification
+            var response = serviceProvider.GetService<Common.Notification.IEmailNotificationProvider>().SendExecutionStatusReportEmail(executionStatusReportEmailRequest);
+
+            //save status of email notification in log
+            var logRequest = new Common.Logging.LogRequest
+            {
+                OperationName = "ExecutionStatusReportEmailNotification",
+                MethodName = "SendExecutionStatusReportEmail",
+                CustomParams = JsonConvert.SerializeObject(executionStatusReportEmailRequest)
+            };
+
+            var logger = serviceProvider.GetService<Common.Logging.ILogger>();
+
+            if (response.IsSuccessful)
+            {
+                logRequest.Message = "Execution status report email sent successfully.";
+                logger.LogInfo(logRequest);
+            }
+            else
+            {
+                logRequest.Message = "Error occurred while sending execution status report email.";
+                logRequest.Exception = response.Exception;
+                logger.LogWarning(logRequest);
+            }
         }
         #endregion
     }

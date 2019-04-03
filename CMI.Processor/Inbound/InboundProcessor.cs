@@ -27,11 +27,11 @@ namespace CMI.Processor
 
             processorProvider = (ProcessorProvider)serviceProvider.GetService(typeof(IProcessorProvider));
 
-            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = ProcessorType.Inbound, ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
+            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = DAL.ProcessorType.Inbound, ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
             TaskExecutionStatuses = new List<TaskExecutionStatus>();
         }
 
-        public override void Execute()
+        public override IEnumerable<TaskExecutionStatus> Execute()
         {
             //log info message for start of processing
             Logger.LogInfo(new LogRequest
@@ -88,38 +88,6 @@ namespace CMI.Processor
             //save execution status details in history table
             SaveExecutionStatus(ProcessorExecutionStatus);
 
-            //send execution status report email
-            var executionStatusReportEmailRequest = new ExecutionStatusReportEmailRequest
-            {
-                ToEmailAddress = ProcessorConfig.ExecutionStatusReportReceiverEmailAddresses,
-                Subject = ProcessorConfig.ExecutionStatusReportEmailSubject,
-                TaskExecutionStatuses = TaskExecutionStatuses
-            };
-
-            var response = EmailNotificationProvider.SendExecutionStatusReportEmail(executionStatusReportEmailRequest);
-
-            if (response.IsSuccessful)
-            {
-                Logger.LogInfo(new LogRequest
-                {
-                    OperationName = this.GetType().Name,
-                    MethodName = "Execute",
-                    Message = "Execution status report email sent successfully.",
-                    CustomParams = JsonConvert.SerializeObject(executionStatusReportEmailRequest)
-                });
-            }
-            else
-            {
-                Logger.LogWarning(new LogRequest
-                {
-                    OperationName = this.GetType().Name,
-                    MethodName = "Execute",
-                    Message = "Error occurred while sending execution status report email.",
-                    Exception = response.Exception,
-                    CustomParams = JsonConvert.SerializeObject(executionStatusReportEmailRequest)
-                });
-            }
-
             //log info message for end of processing
             Logger.LogInfo(new LogRequest
             {
@@ -128,13 +96,15 @@ namespace CMI.Processor
                 Message = "Inbound Processor execution completed.",
                 CustomParams = JsonConvert.SerializeObject(ProcessorExecutionStatus)
             });
+
+            return TaskExecutionStatuses;
         }
 
         private void RetrieveLastExecutionDateTime()
         {
             try
             {
-                lastExecutionDateTime = processorProvider.GetLastExecutionDateTime(ProcessorType.Inbound);
+                lastExecutionDateTime = processorProvider.GetLastExecutionDateTime(DAL.ProcessorType.Inbound);
 
                 Logger.LogInfo(new LogRequest
                 {

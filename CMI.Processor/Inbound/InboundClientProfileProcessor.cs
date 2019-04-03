@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using CMI.Common.Notification;
 
 namespace CMI.Processor
 {
@@ -37,7 +38,7 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<Offender> allOffenderDetails = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { TaskName = "Process Client Profiles" };
+            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Client Profiles" };
 
             try
             {

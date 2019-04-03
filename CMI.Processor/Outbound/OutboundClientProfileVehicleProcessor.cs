@@ -10,18 +10,18 @@ using System.Linq;
 
 namespace CMI.Processor
 {
-    public class OutboundFieldVisitProcessor: OutboundBaseProcessor
+    public class OutboundClientProfileVehicleProcessor : OutboundBaseProcessor
     {
-        private readonly IOffenderFieldVisitService offenderFieldVisitService;
+        private readonly IOffenderVehicleService offenderVehicleService;
 
-        public OutboundFieldVisitProcessor(
+        public OutboundClientProfileVehicleProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderFieldVisitService offenderFieldVisitService
+            IOffenderVehicleService offenderVehicleService
         )
             : base(serviceProvider, configuration)
         {
-            this.offenderFieldVisitService = offenderFieldVisitService;
+            this.offenderVehicleService = offenderVehicleService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<MessageBodyResponse> messages)
@@ -30,10 +30,10 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Field Visit activity processing initiated."
+                Message = "Client Profile Vehicle activity processing initiated."
             });
 
-            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Outbound, TaskName = "Process Field Visit Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Outbound, TaskName = "Process Client Profile - Vehicle Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
 
             ////////////////////////////////////
             ////////////////////////////////////
@@ -53,7 +53,7 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Field Visit activity processing completed.",
+                Message = "Client Profile Vehicle activity processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 

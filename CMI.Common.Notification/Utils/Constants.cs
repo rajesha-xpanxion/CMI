@@ -9,7 +9,8 @@ namespace CMI.Common.Notification
 
         #region Template Variable Names
         public static string TemplateVariableApplicationName { get { return "{#application-name#}"; } }
-        public static string TemplateVariableExecutionStatusDetails { get { return "{#execution-status-details#}"; } }
+        public static string TemplateVariableInboundExecutionStatusDetails { get { return "{#inbound-execution-status-details#}"; } }
+        public static string TemplateVariableOutboundExecutionStatusDetails { get { return "{#outbound-execution-status-details#}"; } }
         #endregion
 
         #region Media Types

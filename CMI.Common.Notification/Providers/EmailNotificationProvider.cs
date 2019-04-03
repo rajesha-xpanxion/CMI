@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using Microsoft.Extensions.Options;
+using System.Linq;
 
 namespace CMI.Common.Notification
 {
@@ -155,10 +156,11 @@ namespace CMI.Common.Notification
                 body = reader.ReadToEnd();
             }
 
-            StringBuilder dataHtmlBuilder = new StringBuilder();
-            foreach (var taskExecutionStatus in taskExecutionStatuses)
+            //inbound execution status data
+            StringBuilder inboundDataHtmlBuilder = new StringBuilder();
+            foreach (var taskExecutionStatus in taskExecutionStatuses.Where(x => x.ProcessorType == ProcessorType.Inbound))
             {
-                dataHtmlBuilder.Append(
+                inboundDataHtmlBuilder.Append(
                     string.Format(
                         Constants.ExecutionStatusReportEmailBodyTableFormat,
                         taskExecutionStatus.TaskName,
@@ -171,8 +173,26 @@ namespace CMI.Common.Notification
                     )
                 );
             }
+            body = body.Replace(Constants.TemplateVariableInboundExecutionStatusDetails, inboundDataHtmlBuilder.ToString());
 
-            body = body.Replace(Constants.TemplateVariableExecutionStatusDetails, dataHtmlBuilder.ToString());
+            //outbound execution status data
+            StringBuilder outboundDataHtmlBuilder = new StringBuilder();
+            foreach (var taskExecutionStatus in taskExecutionStatuses.Where(x => x.ProcessorType == ProcessorType.Outbound))
+            {
+                outboundDataHtmlBuilder.Append(
+                    string.Format(
+                        Constants.ExecutionStatusReportEmailBodyTableFormat,
+                        taskExecutionStatus.TaskName,
+                        (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
+                        taskExecutionStatus.NexusReceivedMessageCount,
+                        taskExecutionStatus.AutomonAddMessageCount,
+                        taskExecutionStatus.AutomonUpdateMessageCount,
+                        taskExecutionStatus.AutomonDeleteMessageCount,
+                        taskExecutionStatus.AutomonFailureMessageCount
+                    )
+                );
+            }
+            body = body.Replace(Constants.TemplateVariableOutboundExecutionStatusDetails, outboundDataHtmlBuilder.ToString());
 
             return body;
         }
