@@ -2,6 +2,9 @@
 using System.Data.SqlClient;
 using System.Data;
 using Microsoft.Extensions.Options;
+using System.Collections.Generic;
+using System.Linq;
+using System.Globalization;
 
 namespace CMI.Processor.DAL
 {
@@ -131,6 +134,62 @@ namespace CMI.Processor.DAL
                                 Direction = ParameterDirection.Input
                             });
                         }
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+
+        public void SaveOutboundMessages(IEnumerable<OutboundMessageDetails> outboundMessages)
+        {
+            if (outboundMessages != null && outboundMessages.Any())
+            {
+                using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = StoredProc.SaveOutboundMessages;
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Connection = conn;
+
+                        var dataTable = new DataTable(UserDefinedTableType.OutboundMessageTbl)
+                        {
+                            Locale = CultureInfo.InvariantCulture
+                        };
+
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.Id, typeof(int));
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActivityTypeName, typeof(string));
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActionReasonName, typeof(string));
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ClientIntegrationId, typeof(string));
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActivityIdentifier, typeof(string));
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActionOccurredOn, typeof(DateTime));
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActionUpdatedBy, typeof(string));
+                        dataTable.Columns.Add(UserDefinedTableTypeColumn.Details, typeof(string));
+
+                        foreach(var outboundMessageDetails in outboundMessages)
+                        {
+                            dataTable.Rows.Add(
+                                outboundMessageDetails.Id,
+                                outboundMessageDetails.ActivityTypeName,
+                                outboundMessageDetails.ActionReasonName,
+                                outboundMessageDetails.ClientIntegrationId,
+                                outboundMessageDetails.ActivityIdentifier,
+                                outboundMessageDetails.ActionOccurredOn,
+                                outboundMessageDetails.ActionUpdatedBy,
+                                outboundMessageDetails.Details
+                            );
+                        }
+
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.OutboundMessageTbl,
+                            Value = dataTable,
+                            SqlDbType = SqlDbType.Udt,
+                            Direction = ParameterDirection.Input
+                        });
 
                         cmd.ExecuteNonQuery();
                     }

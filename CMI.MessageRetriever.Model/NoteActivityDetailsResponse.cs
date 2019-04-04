@@ -2,7 +2,7 @@
 
 namespace CMI.MessageRetriever.Model
 {
-    public class NoteActivityResponse : ActivityResponse
+    public class NoteActivityDetailsResponse
     {
         public string NoteText { get; set; }
 

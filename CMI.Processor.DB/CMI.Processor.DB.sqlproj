@@ -78,6 +78,7 @@
     <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderCaseDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderAddressDetails.sql" />
     <Build Include="dbo\Tables\dbo.ProcessorType.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderNoteDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">

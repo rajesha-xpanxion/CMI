@@ -8,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CMI.Processor
 {
@@ -29,7 +28,7 @@ namespace CMI.Processor
             this.noteService = noteService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -39,7 +38,7 @@ namespace CMI.Processor
             });
 
             IEnumerable<OffenderNote> allOffenderNoteDetails = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Notes" };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Notes" };
 
             try
             {

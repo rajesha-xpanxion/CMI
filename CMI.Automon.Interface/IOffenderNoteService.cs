@@ -7,5 +7,7 @@ namespace CMI.Automon.Interface
     public interface IOffenderNoteService
     {
         IEnumerable<OffenderNote> GetAllOffenderNotes(string CmiDbConnString, DateTime? lastExecutionDateTime);
+
+        void SaveOffenderNote(string CmiDbConnString, OffenderNote offenderNote);
     }
 }

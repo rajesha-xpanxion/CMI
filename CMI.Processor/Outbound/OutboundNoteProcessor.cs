@@ -1,7 +1,9 @@
 ﻿using CMI.Automon.Interface;
+using CMI.Automon.Model;
 using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.MessageRetriever.Model;
+using CMI.Nexus.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -33,20 +35,86 @@ namespace CMI.Processor
                 Message = "Note activity processing initiated."
             });
 
-            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Outbound, TaskName = "Process Note Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus
+            {
+                ProcessorType = ProcessorType.Outbound,
+                TaskName = "Process Note Activity",
+                IsSuccessful = true,
+                NexusReceivedMessageCount = messages.Count()
+            };
 
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
-            ////////////////////////////////////
+            try
+            {
+                foreach(MessageBodyResponse message in messages)
+                {
+                    taskExecutionStatus.NexusReceivedMessageCount++;
+
+                    OffenderNote offenderNoteDetails = null;
+                    try
+                    {
+                        offenderNoteDetails = ConvertResponseToObject<NoteActivityDetailsResponse>(
+                            message.Client,
+                            RetrieveActivityDetails<NoteActivityDetailsResponse>(message.Details)
+                        );
+
+                        offenderNoteService.SaveOffenderNote(ProcessorConfig.CmiDbConnString, offenderNoteDetails);
+
+                        taskExecutionStatus.AutomonAddMessageCount++;
+
+                        Logger.LogDebug(new LogRequest
+                        {
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
+                            Message = "New Offender Note details added successfully.",
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                            NexusData = JsonConvert.SerializeObject(message)
+                        });
+                    }
+                    catch (CmiException ce)
+                    {
+                        taskExecutionStatus.AutomonFailureMessageCount++;
+
+                        Logger.LogWarning(new LogRequest
+                        {
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
+                            Message = "Error occurred while processing a Note activity.",
+                            Exception = ce,
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                            NexusData = JsonConvert.SerializeObject(message)
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        taskExecutionStatus.AutomonFailureMessageCount++;
+
+                        Logger.LogError(new LogRequest
+                        {
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
+                            Message = "Error occurred while processing a Note activity.",
+                            Exception = ex,
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                            NexusData = JsonConvert.SerializeObject(message)
+                        });
+                    }
+                }
+
+                taskExecutionStatus.IsSuccessful = taskExecutionStatus.AutomonFailureMessageCount == 0;
+            }
+            catch (Exception ex)
+            {
+                taskExecutionStatus.IsSuccessful = false;
+
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Error occurred while processing Note activity.",
+                    Exception = ex,
+                    AutomonData = JsonConvert.SerializeObject(messages)
+                });
+            }
 
 
             Logger.LogInfo(new LogRequest

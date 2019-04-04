@@ -42,6 +42,19 @@ namespace CMI.Processor
             //retrieve all messages from queue
             IEnumerable<MessageBodyResponse> messages = ((IMessageRetrieverService)serviceProvider.GetService(typeof(IMessageRetrieverService))).Execute().Result;
 
+            //save details of received messages in database
+            ProcessorProvider.SaveOutboundMessages(messages.Select(m => new OutboundMessageDetails
+            {
+                Id = 0,
+                ActivityTypeName = m.Activity.Type,
+                ActionReasonName = m.Action.Reason,
+                ClientIntegrationId = m.Client.IntegrationId,
+                ActivityIdentifier = m.Activity.Identifier,
+                ActionOccurredOn = m.Action.OccurredOn,
+                ActionUpdatedBy = m.Action.UpdatedBy,
+                Details = JsonConvert.SerializeObject(m.Details)
+            }));
+
             //process each type of message based on whether it is allowed or not
             //client profile - personal details
             if (
@@ -55,7 +68,7 @@ namespace CMI.Processor
                             a => 
                             a.Activity != null 
                             && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
-                            && (a.Action.Reason.Equals("Personal Details Updated", StringComparison.InvariantCultureIgnoreCase))
+                            && a.Action.Reason.StartsWith(OutboundProcessorClientProfileActivitySubType.PersonalDetails, StringComparison.InvariantCultureIgnoreCase)
                         )
                     )
                 );
@@ -73,7 +86,7 @@ namespace CMI.Processor
                             a =>
                             a.Activity != null
                             && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
-                            && (a.Action.Reason.Equals("Email Updated", StringComparison.InvariantCultureIgnoreCase))
+                            && a.Action.Reason.StartsWith(OutboundProcessorClientProfileActivitySubType.Email, StringComparison.InvariantCultureIgnoreCase)
                         )
                     )
                 );
@@ -91,7 +104,7 @@ namespace CMI.Processor
                             a =>
                             a.Activity != null
                             && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
-                            && (a.Action.Reason.Equals("Address Updated", StringComparison.InvariantCultureIgnoreCase))
+                            && a.Action.Reason.StartsWith(OutboundProcessorClientProfileActivitySubType.Address, StringComparison.InvariantCultureIgnoreCase)
                         )
                     )
                 );
@@ -109,7 +122,7 @@ namespace CMI.Processor
                             a =>
                             a.Activity != null
                             && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
-                            && (a.Action.Reason.Equals("Contact Updated", StringComparison.InvariantCultureIgnoreCase))
+                            && a.Action.Reason.StartsWith(OutboundProcessorClientProfileActivitySubType.Contact, StringComparison.InvariantCultureIgnoreCase)
                         )
                     )
                 );
@@ -127,12 +140,7 @@ namespace CMI.Processor
                             a =>
                             a.Activity != null
                             && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
-                            &&
-                            (
-                                a.Action.Reason.Equals("Vehicle Created", StringComparison.InvariantCultureIgnoreCase)
-                                || a.Action.Reason.Equals("Vehicle Updated", StringComparison.InvariantCultureIgnoreCase)
-                                || a.Action.Reason.Equals("Vehicle Removed", StringComparison.InvariantCultureIgnoreCase)
-                            )
+                            && a.Action.Reason.StartsWith(OutboundProcessorClientProfileActivitySubType.Vehicle, StringComparison.InvariantCultureIgnoreCase)
                         )
                     )
                 );
@@ -150,12 +158,7 @@ namespace CMI.Processor
                             a =>
                             a.Activity != null
                             && a.Activity.Type.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
-                            &&
-                            (
-                                a.Action.Reason.Equals("Employment Created", StringComparison.InvariantCultureIgnoreCase)
-                                || a.Action.Reason.Equals("Employment Updated", StringComparison.InvariantCultureIgnoreCase)
-                                || a.Action.Reason.Equals("Employment Removed", StringComparison.InvariantCultureIgnoreCase)
-                            )
+                            && a.Action.Reason.StartsWith(OutboundProcessorClientProfileActivitySubType.Employment, StringComparison.InvariantCultureIgnoreCase)
                         )
                     )
                 );

@@ -1,5 +1,4 @@
-﻿
-namespace CMI.Processor.DAL
+﻿namespace CMI.Processor.DAL
 {
     public static class Constants
     {
@@ -26,13 +25,32 @@ namespace CMI.Processor.DAL
 
         public static string ErrorDetails { get { return "@ErrorDetails"; } }
 
+        public static string OutboundMessageTbl { get { return "@OutboundMessageTbl"; } }
+
     }
 
     public static class StoredProc
     {
         public static string GetLastExecutionDateTime { get { return @"[dbo].[GetLastExecutionDateTime]"; } }
-
         public static string SaveExecutionStatus { get { return @"[dbo].[SaveExecutionStatus]"; } }
+        public static string SaveOutboundMessages { get { return @"[dbo].[SaveOutboundMessages]"; } }
+    }
+
+    public static class UserDefinedTableType
+    {
+        public static string OutboundMessageTbl { get { return "OutboundMessageTbl"; } }
+    }
+
+    public static class UserDefinedTableTypeColumn
+    {
+        public static string Id { get { return "Id"; } }
+        public static string ActivityTypeName { get { return "ActivityTypeName"; } }
+        public static string ActionReasonName { get { return "ActionReasonName"; } }
+        public static string ClientIntegrationId { get { return "ClientIntegrationId"; } }
+        public static string ActivityIdentifier { get { return "ActivityIdentifier"; } }
+        public static string ActionOccurredOn { get { return "ActionOccurredOn"; } }
+        public static string ActionUpdatedBy { get { return "ActionUpdatedBy"; } }
+        public static string Details { get { return "Details"; } }
     }
 
     public static class InboundProcessorStage
@@ -53,6 +71,16 @@ namespace CMI.Processor.DAL
         public static string DrugTestAppointment { get { return "Drug Test Appointment"; } }
         public static string DrugTestResult { get { return "Drug Test Result"; } }
         public static string FieldVisit { get { return "FieldVisit"; } }
+    }
+
+    public static class OutboundProcessorClientProfileActivitySubType
+    {
+        public static string PersonalDetails { get { return "Personal Details"; } }
+        public static string Email { get { return "Email"; } }
+        public static string Address { get { return "Address"; } }
+        public static string Contact { get { return "Contact"; } }
+        public static string Vehicle { get { return "Vehicle"; } }
+        public static string Employment { get { return "Employment"; } }
     }
 
     public static class ConfigKeys

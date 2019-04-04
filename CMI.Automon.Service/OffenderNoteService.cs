@@ -84,6 +84,71 @@ namespace CMI.Automon.Service
                 return offenderNotes;
             }
         }
+
+        public void SaveOffenderNote(string CmiDbConnString, OffenderNote offenderNoteDetails)
+        {
+            if (automonConfig.IsDevMode)
+            {
+                //test data
+                //string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderNoteDetails);
+
+                //return File.Exists(testDataJsonFileName)
+                //    ? JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(testDataJsonFileName))
+                //    : new List<OffenderNote>();
+            }
+            else
+            {
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = StoredProc.SaveOffenderNoteDetails;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.AutomonDatabaseName,
+                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            Value = new SqlConnectionStringBuilder(automonConfig.AutomonDbConnString).InitialCatalog
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Pin,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderNoteDetails.Pin,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Text,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderNoteDetails.Text,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.AuthorEmail,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderNoteDetails.AuthorEmail,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Date,
+                            SqlDbType = System.Data.SqlDbType.DateTime,
+                            Value = offenderNoteDetails.Date,
+                            IsNullable = false
+                        });
+
+                        cmd.Connection = conn;
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
         #endregion
     }
 }

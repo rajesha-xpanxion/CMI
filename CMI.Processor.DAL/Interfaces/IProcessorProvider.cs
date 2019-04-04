@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CMI.Processor.DAL
 {
@@ -7,5 +8,7 @@ namespace CMI.Processor.DAL
         DateTime? GetLastExecutionDateTime(ProcessorType processorType = ProcessorType.Inbound);
 
         void SaveExecutionStatus(ExecutionStatus executionStatus);
+
+        void SaveOutboundMessages(IEnumerable<OutboundMessageDetails> outboundMessages);
     }
 }
