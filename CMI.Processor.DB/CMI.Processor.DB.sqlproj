@@ -64,6 +64,8 @@
     <Folder Include="dbo\" />
     <Folder Include="dbo\Tables\" />
     <Folder Include="dbo\Stored Procedures\" />
+    <Folder Include="dbo\User Defined Types\" />
+    <Folder Include="dbo\Views\" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\ProcessorExecutionHistory.sql" />
@@ -79,6 +81,12 @@
     <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderAddressDetails.sql" />
     <Build Include="dbo\Tables\dbo.ProcessorType.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderNoteDetails.sql" />
+    <Build Include="dbo\Tables\dbo.OutboundMessage.sql" />
+    <Build Include="dbo\Tables\dbo.ActivityType.sql" />
+    <Build Include="dbo\Tables\dbo.ActionReason.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOutboundMessages.sql" />
+    <Build Include="dbo\User Defined Types\dbo.OutboundMessageTbl.sql" />
+    <Build Include="dbo\Views\dbo.vw_AllOutboundMessageDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">

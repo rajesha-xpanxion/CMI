@@ -187,7 +187,7 @@ namespace CMI.Processor.DAL
                         {
                             ParameterName = SqlParamName.OutboundMessageTbl,
                             Value = dataTable,
-                            SqlDbType = SqlDbType.Udt,
+                            SqlDbType = SqlDbType.Structured,
                             Direction = ParameterDirection.Input
                         });
 

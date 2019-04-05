@@ -33,7 +33,13 @@ namespace CMI.Processor
                 Message = "Field Visit activity processing initiated."
             });
 
-            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Outbound, TaskName = "Process Field Visit Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus
+            {
+                ProcessorType = ProcessorType.Outbound,
+                TaskName = "Process Field Visit Activity",
+                IsSuccessful = true,
+                NexusReceivedMessageCount = messages.Count()
+            };
 
             ////////////////////////////////////
             ////////////////////////////////////

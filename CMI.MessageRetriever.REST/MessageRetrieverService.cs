@@ -30,9 +30,6 @@ namespace CMI.MessageRetriever.REST
         }
         #endregion
 
-
-        private bool readAndDelete = true;
-
         #region Public Methods
         public async Task<IEnumerable<MessageBodyResponse>> Execute()
         {
@@ -143,7 +140,7 @@ namespace CMI.MessageRetriever.REST
                 string requestUri = $"https://{this.messageRetrieverConfig.ServiceBusNamespace}.servicebus.windows.net/{this.messageRetrieverConfig.TopicName}/Subscriptions/{this.messageRetrieverConfig.SubscriptionName}/messages/head?timeout=30";
 
                 HttpResponseMessage response = null;
-                if (readAndDelete)
+                if (this.messageRetrieverConfig.ReadAndDelete)
                 {
                     response = await httpClient.DeleteAsync(requestUri);
                 }

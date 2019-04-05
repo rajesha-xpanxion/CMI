@@ -47,8 +47,6 @@ namespace CMI.Processor
             {
                 foreach(MessageBodyResponse message in messages)
                 {
-                    taskExecutionStatus.NexusReceivedMessageCount++;
-
                     OffenderNote offenderNoteDetails = null;
                     try
                     {

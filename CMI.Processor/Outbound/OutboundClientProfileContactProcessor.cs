@@ -33,7 +33,13 @@ namespace CMI.Processor
                 Message = "Client Profile Contact activity processing initiated."
             });
 
-            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Outbound, TaskName = "Process Client Profile - Contact Activity", IsSuccessful = true, NexusReceivedMessageCount = messages.Count() };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus
+            {
+                ProcessorType = ProcessorType.Outbound,
+                TaskName = "Process Client Profile - Contact Activity",
+                IsSuccessful = true,
+                NexusReceivedMessageCount = messages.Count()
+            };
 
             ////////////////////////////////////
             ////////////////////////////////////

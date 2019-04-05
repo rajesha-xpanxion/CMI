@@ -32,7 +32,7 @@ namespace CMI.Common.Notification
             {
                 if (emailNotificationConfig.IsEmailNotificationEnabled)
                 {
-                    string emailBody = GetEmailBodyForProcessorExecutionStatusReportEmail(request.TaskExecutionStatuses);
+                    string emailBody = GetEmailBodyForProcessorExecutionStatusReportEmail(request.TaskExecutionStatuses, request.ProcessorType);
 
                     SendEmail(
                         emailNotificationConfig.SmtpServerHost,
@@ -147,7 +147,7 @@ namespace CMI.Common.Notification
             return new List<string>(emailAddresses.Split(Constants.EmailAddressSeparators, StringSplitOptions.RemoveEmptyEntries));
         }
 
-        private string GetEmailBodyForProcessorExecutionStatusReportEmail(IEnumerable<TaskExecutionStatus> taskExecutionStatuses)
+        private string GetEmailBodyForProcessorExecutionStatusReportEmail(IEnumerable<TaskExecutionStatus> taskExecutionStatuses, ProcessorType processorType)
         {
             string body = string.Empty;
 
@@ -157,42 +157,56 @@ namespace CMI.Common.Notification
             }
 
             //inbound execution status data
-            StringBuilder inboundDataHtmlBuilder = new StringBuilder();
-            foreach (var taskExecutionStatus in taskExecutionStatuses.Where(x => x.ProcessorType == ProcessorType.Inbound))
+            if (processorType == ProcessorType.Both || processorType == ProcessorType.Inbound)
             {
-                inboundDataHtmlBuilder.Append(
-                    string.Format(
-                        Constants.ExecutionStatusReportEmailBodyTableFormat,
-                        taskExecutionStatus.TaskName,
-                        (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
-                        taskExecutionStatus.AutomonReceivedRecordCount,
-                        taskExecutionStatus.NexusAddRecordCount,
-                        taskExecutionStatus.NexusUpdateRecordCount,
-                        taskExecutionStatus.NexusDeleteRecordCount,
-                        taskExecutionStatus.NexusFailureRecordCount
-                    )
-                );
+                StringBuilder inboundDataHtmlBuilder = new StringBuilder();
+                foreach (var taskExecutionStatus in taskExecutionStatuses.Where(x => x.ProcessorType == ProcessorType.Inbound))
+                {
+                    inboundDataHtmlBuilder.Append(
+                        string.Format(
+                            Constants.ExecutionStatusReportEmailBodyTableFormat,
+                            taskExecutionStatus.TaskName,
+                            (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
+                            taskExecutionStatus.AutomonReceivedRecordCount,
+                            taskExecutionStatus.NexusAddRecordCount,
+                            taskExecutionStatus.NexusUpdateRecordCount,
+                            taskExecutionStatus.NexusDeleteRecordCount,
+                            taskExecutionStatus.NexusFailureRecordCount
+                        )
+                    );
+                }
+                body = body.Replace(Constants.TemplateVariableInboundExecutionStatusDetails, inboundDataHtmlBuilder.ToString());
             }
-            body = body.Replace(Constants.TemplateVariableInboundExecutionStatusDetails, inboundDataHtmlBuilder.ToString());
+            else
+            {
+                body = body.Replace(Constants.TemplateVariableInboundExecutionStatusDetails, Constants.NoInboundExecutionHtml);
+            }
 
             //outbound execution status data
-            StringBuilder outboundDataHtmlBuilder = new StringBuilder();
-            foreach (var taskExecutionStatus in taskExecutionStatuses.Where(x => x.ProcessorType == ProcessorType.Outbound))
+            if (processorType == ProcessorType.Both || processorType == ProcessorType.Outbound)
             {
-                outboundDataHtmlBuilder.Append(
-                    string.Format(
-                        Constants.ExecutionStatusReportEmailBodyTableFormat,
-                        taskExecutionStatus.TaskName,
-                        (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
-                        taskExecutionStatus.NexusReceivedMessageCount,
-                        taskExecutionStatus.AutomonAddMessageCount,
-                        taskExecutionStatus.AutomonUpdateMessageCount,
-                        taskExecutionStatus.AutomonDeleteMessageCount,
-                        taskExecutionStatus.AutomonFailureMessageCount
-                    )
-                );
+                StringBuilder outboundDataHtmlBuilder = new StringBuilder();
+                foreach (var taskExecutionStatus in taskExecutionStatuses.Where(x => x.ProcessorType == ProcessorType.Outbound))
+                {
+                    outboundDataHtmlBuilder.Append(
+                        string.Format(
+                            Constants.ExecutionStatusReportEmailBodyTableFormat,
+                            taskExecutionStatus.TaskName,
+                            (taskExecutionStatus.IsSuccessful ? "Yes" : "No"),
+                            taskExecutionStatus.NexusReceivedMessageCount,
+                            taskExecutionStatus.AutomonAddMessageCount,
+                            taskExecutionStatus.AutomonUpdateMessageCount,
+                            taskExecutionStatus.AutomonDeleteMessageCount,
+                            taskExecutionStatus.AutomonFailureMessageCount
+                        )
+                    );
+                }
+                body = body.Replace(Constants.TemplateVariableOutboundExecutionStatusDetails, outboundDataHtmlBuilder.ToString());
             }
-            body = body.Replace(Constants.TemplateVariableOutboundExecutionStatusDetails, outboundDataHtmlBuilder.ToString());
+            else
+            {
+                body = body.Replace(Constants.TemplateVariableOutboundExecutionStatusDetails, Constants.NoOutboundExecutionHtml);
+            }
 
             return body;
         }

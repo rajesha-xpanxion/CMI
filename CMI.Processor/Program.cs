@@ -60,7 +60,7 @@ namespace CMI.Processor
             }
 
             //send execution status report email
-            SendExecutionStatusReportEmail(serviceProvider, configuration, taskExecutionStatuses);
+            SendExecutionStatusReportEmail(serviceProvider, configuration, taskExecutionStatuses, processorTypeToExecute);
 
             Console.WriteLine(
                 (
@@ -231,7 +231,8 @@ namespace CMI.Processor
         private static void SendExecutionStatusReportEmail(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            System.Collections.Generic.IEnumerable<Common.Notification.TaskExecutionStatus> taskExecutionStatuses
+            System.Collections.Generic.IEnumerable<Common.Notification.TaskExecutionStatus> taskExecutionStatuses,
+            ProcessorType processorType
         )
         {
             //retrieve required values from configuration
@@ -242,7 +243,8 @@ namespace CMI.Processor
             {
                 ToEmailAddress = executionStatusReportReceiverEmailAddresses,
                 Subject = executionStatusReportEmailSubject,
-                TaskExecutionStatuses = taskExecutionStatuses
+                TaskExecutionStatuses = taskExecutionStatuses,
+                ProcessorType = (Common.Notification.ProcessorType)processorType
             };
             //send email notification
             var response = serviceProvider.GetService<Common.Notification.IEmailNotificationProvider>().SendExecutionStatusReportEmail(executionStatusReportEmailRequest);
