@@ -16,6 +16,7 @@ namespace CMI.Automon.Service
         public static string AutomonDatabaseName { get { return "@AutomonDatabaseName"; } }
         public static string LastExecutionDateTime { get { return "@LastExecutionDateTime"; } }
         public static string Pin { get { return "@Pin"; } }
+        public static string FirstName { get { return "@FirstName"; } }
         public static string Text { get { return "@Text"; } }
         public static string AuthorEmail { get { return "@AuthorEmail"; } }
         public static string Date { get { return "@Date"; } }

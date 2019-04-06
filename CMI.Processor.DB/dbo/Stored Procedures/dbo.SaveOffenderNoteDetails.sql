@@ -1,6 +1,4 @@
 ﻿
-
-
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	03-Apr-19
@@ -12,7 +10,7 @@ EXEC
 	[dbo].[SaveOffenderNoteDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
-		@Text = 'test comment 1',
+		@Text = 'test comment 2',
 		@AuthorEmail = 'rawate@xpanxion.com',
 		@Date = @CurrentTimestamp;
 ---------------------------------------------------------------------------------
@@ -22,9 +20,9 @@ Date			Author			Changes
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderNoteDetails]
 	@AutomonDatabaseName NVARCHAR(128),
-	@Pin VARCHAR(200),
+	@Pin VARCHAR(20),
 	@Text VARCHAR(MAX),
-	@AuthorEmail VARCHAR(200),
+	@AuthorEmail VARCHAR(255),
 	@Date DATETIME
 AS
 BEGIN
@@ -32,14 +30,18 @@ BEGIN
 	
 		SET @SQLString = 
 		'
+		--declare required variables and assign it with values
 		DECLARE 
 			@EventTypeId	INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''CaseNote''),
 			@EventDateTime	DATETIME		= @Date,
-			@EnteredByPId	INT				= 0,	--(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[PersonInfo] WHERE [EmailAddress] = @AuthorEmail),
+			@EnteredByPId	INT				= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @AuthorEmail), 0),
 			@Comment		VARCHAR(MAX)	= @Text,
-			@EventId		INT				= 0,	--to retrieve based on passed identifier
+			@EventId		INT				= 0,
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin);
 
+		--SELECT @EventTypeId, @EventDateTime, @EnteredByPId, @Comment, @EventId, @OffenderId;
+
+		--add new event
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateEvent] 
 				@EventTypeId, 
@@ -48,10 +50,15 @@ BEGIN
 				@Comment, 
 				@Id = @EventId OUTPUT;
 
+		--SELECT * FROM [$AutomonDatabaseName].[dbo].[Event] WHERE [Id] = @EventId;
+
+		--associate newly added event with given offender
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
 				@OffenderId, 
 				@EventId;
+
+		--SELECT * FROM [$AutomonDatabaseName].[dbo].[OffenderEvent] WHERE [OffenderId] = @OffenderId AND [EventId] = @EventId;
 		';
 
 	SET @SQLString = REPLACE(@SQLString, '$AutomonDatabaseName', @AutomonDatabaseName);

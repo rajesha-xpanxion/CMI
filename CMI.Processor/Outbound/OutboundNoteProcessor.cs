@@ -55,7 +55,7 @@ namespace CMI.Processor
                             RetrieveActivityDetails<NoteActivityDetailsResponse>(message.Details)
                         );
 
-                        offenderNoteService.SaveOffenderNote(ProcessorConfig.CmiDbConnString, offenderNoteDetails);
+                        offenderNoteService.SaveOffenderNoteDetails(ProcessorConfig.CmiDbConnString, offenderNoteDetails);
 
                         taskExecutionStatus.AutomonAddMessageCount++;
 

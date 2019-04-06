@@ -8,6 +8,6 @@ namespace CMI.Automon.Interface
     {
         IEnumerable<OffenderNote> GetAllOffenderNotes(string CmiDbConnString, DateTime? lastExecutionDateTime);
 
-        void SaveOffenderNote(string CmiDbConnString, OffenderNote offenderNote);
+        void SaveOffenderNoteDetails(string CmiDbConnString, OffenderNote offenderNoteDetails);
     }
 }

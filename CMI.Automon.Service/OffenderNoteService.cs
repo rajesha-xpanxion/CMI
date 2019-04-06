@@ -85,7 +85,7 @@ namespace CMI.Automon.Service
             }
         }
 
-        public void SaveOffenderNote(string CmiDbConnString, OffenderNote offenderNoteDetails)
+        public void SaveOffenderNoteDetails(string CmiDbConnString, OffenderNote offenderNoteDetails)
         {
             if (automonConfig.IsDevMode)
             {
