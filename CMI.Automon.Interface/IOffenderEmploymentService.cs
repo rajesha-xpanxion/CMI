@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CMI.Automon.Model;
 
 namespace CMI.Automon.Interface
 {
     public interface IOffenderEmploymentService
     {
+        void SaveOffenderEmploymentDetails(string CmiDbConnString, OffenderEmployment offenderEmploymentDetails);
     }
 }

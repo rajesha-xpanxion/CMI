@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -34,6 +35,16 @@ namespace CMI.MessageRetriever.REST
         public async Task<IEnumerable<MessageBodyResponse>> Execute()
         {
             Console.WriteLine("{0} -> Initiating outbound message retrieving process using REST protocol...{1}", DateTime.Now, Environment.NewLine);
+
+            if (this.messageRetrieverConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(messageRetrieverConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOutboundMessages);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<MessageBodyResponse>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<MessageBodyResponse>();
+            }
 
             //get token
             if (this.messageRetrieverConfig.UseSas)

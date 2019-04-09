@@ -1,30 +1,25 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.IO;
-using Microsoft.Extensions.Options;
-using CMI.Automon.Interface;
+﻿using CMI.Automon.Interface;
 using CMI.Automon.Model;
+using Microsoft.Extensions.Options;
+using System.Data.SqlClient;
 
 namespace CMI.Automon.Service
 {
-    public class OffenderOfficeVisitService : IOffenderOfficeVisitService
+    public class OffenderDrugTestResultService : IOffenderDrugTestResultService
     {
         #region Private Member Variables
         private readonly AutomonConfig automonConfig;
         #endregion
 
         #region Constructor
-        public OffenderOfficeVisitService(
+        public OffenderDrugTestResultService(
             IOptions<AutomonConfig> automonConfig
         )
         {
             this.automonConfig = automonConfig.Value;
         }
-        #endregion
 
-        public void SaveOffenderOfficeVisitDetails(string CmiDbConnString, OffenderOfficeVisit offenderOfficeVisitDetails)
+        public void SaveOffenderDrugTestResultDetails(string CmiDbConnString, OffenderDrugTestResult offenderDrugTestResultDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -43,7 +38,7 @@ namespace CMI.Automon.Service
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.SaveOffenderOfficeVisitDetails;
+                        cmd.CommandText = StoredProc.SaveOffenderDrugTestResultDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         cmd.Parameters.Add(new SqlParameter()
@@ -56,52 +51,68 @@ namespace CMI.Automon.Service
                         {
                             ParameterName = SqlParamName.Pin,
                             SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderOfficeVisitDetails.Pin,
+                            Value = offenderDrugTestResultDetails.Pin,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.UpdatedBy,
                             SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderOfficeVisitDetails.UpdatedBy,
+                            Value = offenderDrugTestResultDetails.UpdatedBy,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.StartDate,
                             SqlDbType = System.Data.SqlDbType.DateTime,
-                            Value = offenderOfficeVisitDetails.StartDate,
+                            Value = offenderDrugTestResultDetails.StartDate,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.Comment,
                             SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderOfficeVisitDetails.Comment,
+                            Value = offenderDrugTestResultDetails.Comment,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.EndDate,
                             SqlDbType = System.Data.SqlDbType.DateTime,
-                            Value = offenderOfficeVisitDetails.EndDate,
+                            Value = offenderDrugTestResultDetails.EndDate,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.Status,
                             SqlDbType = System.Data.SqlDbType.Int,
-                            Value = offenderOfficeVisitDetails.Status,
+                            Value = offenderDrugTestResultDetails.Status,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SqlParamName.IsOffenderPresent,
-                            SqlDbType = System.Data.SqlDbType.Bit,
-                            Value = offenderOfficeVisitDetails.IsOffenderPresent,
+                            ParameterName = SqlParamName.DeviceType,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDrugTestResultDetails.DeviceType,
                             IsNullable = false
                         });
-
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.TestResult,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDrugTestResultDetails.TestResult,
+                            IsNullable = false
+                        });
+                        if (!string.IsNullOrEmpty(offenderDrugTestResultDetails.Validities))
+                        {
+                            cmd.Parameters.Add(new SqlParameter()
+                            {
+                                ParameterName = SqlParamName.Validities,
+                                SqlDbType = System.Data.SqlDbType.VarChar,
+                                Value = offenderDrugTestResultDetails.Validities,
+                                IsNullable = true
+                            });
+                        }
 
                         cmd.Connection = conn;
 
@@ -110,5 +121,6 @@ namespace CMI.Automon.Service
                 }
             }
         }
+        #endregion
     }
 }

@@ -2,12 +2,12 @@
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	06-Apr-19
-Description:	To save office visit details to given automon database
+Description:	To save offender office visit details to given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
 DECLARE @CurrentDate DATETIME = GETDATE();
 EXEC	
-	[dbo].[SaveOfficeVisitDetails]
+	[dbo].[SaveOffenderOfficeVisitDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
 		@StartDate DATETIME = @CurrentDate,
@@ -21,7 +21,7 @@ History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 ==========================================================================================*/
-CREATE PROCEDURE [dbo].[SaveOfficeVisitDetails]
+CREATE PROCEDURE [dbo].[SaveOffenderOfficeVisitDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
 	@StartDate DATETIME,
@@ -40,7 +40,7 @@ BEGIN
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin)
+			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@EventTypeId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''Sup_Contact''),
 			@EventId			INT = 0,
 			@Value				VARCHAR(255);
@@ -67,7 +67,7 @@ BEGIN
 				@EventId;
 
 		--Offender Present
-		SET @Value = CASE WHEN @IsOffenderPresent == 1 THEN ''True'' ELSE ''False'' END;
+		SET @Value = CASE WHEN @IsOffenderPresent = 1 THEN ''True'' ELSE ''False'' END;
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
 				@EventId, 
@@ -80,7 +80,19 @@ BEGIN
 				NULL;
 
 		--Contact Type
-		SET @Value = (SELECT TOP 1 CAST(L.[Id] AS VARCHAR(255)) FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[IsActive] = 1 AND LT.[Description] = ''Contact Type'' AND L.[IsActive] = 1 AND L.[PermDesc] = ''ContactType_InPersonOffice'');
+		SET @Value = 
+			(
+				SELECT TOP 1 
+					CAST(L.[Id] AS VARCHAR(255)) 
+				FROM 
+					[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT 
+						ON L.[LookupTypeId] = LT.[Id] 
+				WHERE 
+					LT.[IsActive] = 1 
+					AND LT.[Description] = ''Contact Type'' 
+					AND L.[IsActive] = 1 
+					AND L.[PermDesc] = ''ContactType_InPersonOffice''
+			);
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
 				@EventId, 

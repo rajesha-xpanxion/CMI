@@ -2,9 +2,9 @@
 
 namespace CMI.MessageRetriever.Model
 {
-    public class FieldVisitActivityResponse : ActivityResponse
+    public class ClientProfileFieldVisitDetailsActivityResponse
     {
-        public DateTime Datetime { get; set; }
+        public DateTime DateTime { get; set; }
         public string Status { get; set; }
         public string Note { get; set; }
         public string[] FoundContraband { get; set; }

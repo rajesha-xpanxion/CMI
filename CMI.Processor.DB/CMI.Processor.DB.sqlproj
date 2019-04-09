@@ -87,13 +87,15 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOutboundMessages.sql" />
     <Build Include="dbo\User Defined Types\dbo.OutboundMessageTbl.sql" />
     <Build Include="dbo\Views\dbo.vw_AllOutboundMessageDetails.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.SaveOfficeVisitDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderVehicleDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderPhoneDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderPersonalDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmploymntDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderAddressDetails.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.SaveFieldVisitDetails.sql" />
+    <Build Include="dbo\Tables\dbo.ActivitySubType.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderOfficeVisitDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderFieldVisitDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderDrugTestResultDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">

@@ -141,9 +141,12 @@ namespace CMI.Processor.DAL
             }
         }
 
-        public void SaveOutboundMessages(IEnumerable<OutboundMessageDetails> outboundMessages)
+        public IEnumerable<OutboundMessageDetails> SaveOutboundMessages(IEnumerable<OutboundMessageDetails> receivedOutboundMessages, DateTime receivedOn)
         {
-            if (outboundMessages != null && outboundMessages.Any())
+            List<OutboundMessageDetails> updatedOutboundMessages = new List<OutboundMessageDetails>();
+
+            //check if any outbound message received
+            if (receivedOutboundMessages != null && receivedOutboundMessages.Any())
             {
                 using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
                 {
@@ -160,26 +163,32 @@ namespace CMI.Processor.DAL
                             Locale = CultureInfo.InvariantCulture
                         };
 
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.Id, typeof(int));
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActivityTypeName, typeof(string));
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActionReasonName, typeof(string));
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ClientIntegrationId, typeof(string));
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActivityIdentifier, typeof(string));
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActionOccurredOn, typeof(DateTime));
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.ActionUpdatedBy, typeof(string));
-                        dataTable.Columns.Add(UserDefinedTableTypeColumn.Details, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.Id, typeof(int));
+                        dataTable.Columns.Add(TableColumnName.ActivityTypeName, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.ActivitySubTypeName, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.ActionReasonName, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.ClientIntegrationId, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.ActivityIdentifier, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.ActionOccurredOn, typeof(DateTime));
+                        dataTable.Columns.Add(TableColumnName.ActionUpdatedBy, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.Details, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.IsSuccessful, typeof(bool));
+                        dataTable.Columns.Add(TableColumnName.ErrorDetails, typeof(string));
 
-                        foreach(var outboundMessageDetails in outboundMessages)
+                        foreach (var outboundMessageDetails in receivedOutboundMessages)
                         {
                             dataTable.Rows.Add(
                                 outboundMessageDetails.Id,
                                 outboundMessageDetails.ActivityTypeName,
+                                outboundMessageDetails.ActivitySubTypeName,
                                 outboundMessageDetails.ActionReasonName,
                                 outboundMessageDetails.ClientIntegrationId,
                                 outboundMessageDetails.ActivityIdentifier,
                                 outboundMessageDetails.ActionOccurredOn,
                                 outboundMessageDetails.ActionUpdatedBy,
-                                outboundMessageDetails.Details
+                                outboundMessageDetails.Details,
+                                outboundMessageDetails.IsSuccessful,
+                                outboundMessageDetails.ErrorDetails
                             );
                         }
 
@@ -190,11 +199,39 @@ namespace CMI.Processor.DAL
                             SqlDbType = SqlDbType.Structured,
                             Direction = ParameterDirection.Input
                         });
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.ReceivedOn,
+                            Value = receivedOn,
+                            SqlDbType = SqlDbType.DateTime,
+                            Direction = ParameterDirection.Input
+                        });
 
-                        cmd.ExecuteNonQuery();
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                updatedOutboundMessages.Add(new OutboundMessageDetails
+                                {
+                                    Id = Convert.ToInt32(reader[TableColumnName.Id]),
+                                    ActivityTypeName = Convert.ToString(reader[TableColumnName.ActivityTypeName]),
+                                    ActivitySubTypeName = Convert.ToString(reader[TableColumnName.ActivitySubTypeName]),
+                                    ActionReasonName = Convert.ToString(reader[TableColumnName.ActionReasonName]),
+                                    ClientIntegrationId = Convert.ToString(reader[TableColumnName.ClientIntegrationId]),
+                                    ActivityIdentifier = Convert.ToString(reader[TableColumnName.ActivityIdentifier]),
+                                    ActionOccurredOn = Convert.ToDateTime(reader[TableColumnName.ActionOccurredOn]),
+                                    ActionUpdatedBy = Convert.ToString(reader[TableColumnName.ActionUpdatedBy]),
+                                    Details = Convert.ToString(reader[TableColumnName.Details]),
+                                    IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
+                                    ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails])
+                                });
+                            }
+                        }
                     }
                 }
             }
+
+            return updatedOutboundMessages;
         }
         #endregion
     }

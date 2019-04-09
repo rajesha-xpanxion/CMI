@@ -27,6 +27,8 @@
 
         public static string OutboundMessageTbl { get { return "@OutboundMessageTbl"; } }
 
+        public static string ReceivedOn { get { return "@ReceivedOn"; } }
+
     }
 
     public static class StoredProc
@@ -41,16 +43,22 @@
         public static string OutboundMessageTbl { get { return "OutboundMessageTbl"; } }
     }
 
-    public static class UserDefinedTableTypeColumn
+    public static class TableColumnName
     {
         public static string Id { get { return "Id"; } }
+        public static string ActivityTypeId { get { return "ActivityTypeId"; } }
         public static string ActivityTypeName { get { return "ActivityTypeName"; } }
+        public static string ActivitySubTypeId { get { return "ActivitySubTypeId"; } }
+        public static string ActivitySubTypeName { get { return "ActivitySubTypeName"; } }
+        public static string ActionReasonId { get { return "ActionReasonId"; } }
         public static string ActionReasonName { get { return "ActionReasonName"; } }
         public static string ClientIntegrationId { get { return "ClientIntegrationId"; } }
         public static string ActivityIdentifier { get { return "ActivityIdentifier"; } }
         public static string ActionOccurredOn { get { return "ActionOccurredOn"; } }
         public static string ActionUpdatedBy { get { return "ActionUpdatedBy"; } }
         public static string Details { get { return "Details"; } }
+        public static string IsSuccessful { get { return "IsSuccessful"; } }
+        public static string ErrorDetails { get { return "ErrorDetails"; } }
     }
 
     public static class InboundProcessorStage
@@ -76,11 +84,11 @@
     public static class OutboundProcessorClientProfileActivitySubType
     {
         public static string PersonalDetails { get { return "Personal Details"; } }
-        public static string Email { get { return "Email"; } }
-        public static string Address { get { return "Address"; } }
-        public static string Contact { get { return "Contact"; } }
-        public static string Vehicle { get { return "Vehicle"; } }
-        public static string Employment { get { return "Employment"; } }
+        public static string EmailDetails { get { return "Email Details"; } }
+        public static string AddressDetails { get { return "Address Details"; } }
+        public static string ContactDetails { get { return "Contact Details"; } }
+        public static string VehicleDetails { get { return "Vehicle Details"; } }
+        public static string EmploymentDetails { get { return "Employment Details"; } }
     }
 
     public static class ConfigKeys

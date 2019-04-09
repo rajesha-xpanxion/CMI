@@ -13,18 +13,18 @@ using System.Linq;
 
 namespace CMI.Processor
 {
-    public class OutboundClientProfileVehicleProcessor : OutboundBaseProcessor
+    public class OutboundClientProfileNoteProcessor: OutboundBaseProcessor
     {
-        private readonly IOffenderVehicleService offenderVehicleService;
+        private readonly IOffenderNoteService offenderNoteService;
 
-        public OutboundClientProfileVehicleProcessor(
+        public OutboundClientProfileNoteProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderVehicleService offenderVehicleService
+            IOffenderNoteService offenderNoteService
         )
             : base(serviceProvider, configuration)
         {
-            this.offenderVehicleService = offenderVehicleService;
+            this.offenderNoteService = offenderNoteService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<OutboundMessageDetails> messages, DateTime messagesReceivedOn)
@@ -33,31 +33,31 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile - Vehicle Details activity processing initiated."
+                Message = "Note activity processing initiated."
             });
 
             TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus
             {
                 ProcessorType = Common.Notification.ProcessorType.Outbound,
-                TaskName = "Client Profile - Vehicle Details",
+                TaskName = "Note",
                 IsSuccessful = true,
                 NexusReceivedMessageCount = messages.Count()
             };
 
             try
             {
-                foreach (OutboundMessageDetails message in messages)
+                foreach(OutboundMessageDetails message in messages)
                 {
-                    OffenderVehicle offenderVehicleDetails = null;
+                    OffenderNote offenderNoteDetails = null;
                     try
                     {
-                        offenderVehicleDetails = (OffenderVehicle)ConvertResponseToObject<ClientProfileVehicleDetailsActivityResponse>(
+                        offenderNoteDetails = (OffenderNote)ConvertResponseToObject<ClientProfileNoteActivityDetailsResponse>(
                             message.ClientIntegrationId,
-                            RetrieveActivityDetails<ClientProfileVehicleDetailsActivityResponse>(message.Details),
+                            RetrieveActivityDetails<ClientProfileNoteActivityDetailsResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
 
-                        offenderVehicleService.SaveOffenderVehicleDetails(ProcessorConfig.CmiDbConnString, offenderVehicleDetails);
+                        offenderNoteService.SaveOffenderNoteDetails(ProcessorConfig.CmiDbConnString, offenderNoteDetails);
 
                         taskExecutionStatus.AutomonAddMessageCount++;
 
@@ -65,8 +65,8 @@ namespace CMI.Processor
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "New Offender - Vehicle Details added successfully.",
-                            AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                            Message = "New Offender - Note details added successfully.",
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
@@ -78,9 +78,9 @@ namespace CMI.Processor
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "Error occurred while processing a Client Profile - Vehicle Details activity.",
+                            Message = "Error occurred while processing a Note activity.",
                             Exception = ce,
-                            AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
@@ -92,9 +92,9 @@ namespace CMI.Processor
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "Critical error occurred while processing a Client Profile - Vehicle Details activity.",
+                            Message = "Critical error occurred while processing a Note activity.",
                             Exception = ex,
-                            AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                            AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
@@ -110,7 +110,7 @@ namespace CMI.Processor
                 {
                     OperationName = this.GetType().Name,
                     MethodName = "Execute",
-                    Message = "Critical error occurred while processing Client Profile - Vehicle Details activities.",
+                    Message = "Critical error occurred while processing Note activities.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(messages)
                 });
@@ -121,7 +121,7 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile - Vehicle Details activity processing completed.",
+                Message = "Note activity processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 

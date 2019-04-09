@@ -1,6 +1,6 @@
 ﻿namespace CMI.MessageRetriever.Model
 {
-    public class ClientProfileEmploymentDetailsActivityResponse : ActivityResponse
+    public class ClientProfileEmploymentDetailsActivityResponse : DetailsResponse
     {
         public string Employer { get; set; }
         public string Occupation { get; set; }

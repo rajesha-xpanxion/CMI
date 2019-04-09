@@ -1,13 +1,14 @@
 ﻿
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	06-Apr-19
-Description:	To save field visit details to given automon database
+Description:	To save offender field visit details to given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
 DECLARE @CurrentDate DATETIME = GETDATE();
 EXEC	
-	[dbo].[SaveFieldVisitDetails]
+	[dbo].[SaveOffenderFieldVisitDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
 		@StartDate = @CurrentDate,
@@ -24,17 +25,17 @@ History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 ==========================================================================================*/
-CREATE PROCEDURE [dbo].[SaveFieldVisitDetails]
+CREATE PROCEDURE [dbo].[SaveOffenderFieldVisitDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
 	@StartDate DATETIME,
-	@Comment VARCHAR(MAX),
+	@Comment VARCHAR(MAX) = NULL,
 	@EndDate DATETIME,
 	@Status INT = 0, --Pending = 0, Missed = 16, Cancelled = 10, Complete = 2
 	@IsOffenderPresent BIT = 0,
 	@IsSearchConducted BIT = 0,
 	@SearchLocations VARCHAR(255),
-	@SearchResults VARCHAR(255),
+	@SearchResults VARCHAR(255) = NULL,
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -46,7 +47,7 @@ BEGIN
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin)
+			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@EventTypeId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''Sup_Contact''),
 			@EventId			INT = 0,
 			@Value				VARCHAR(255);
@@ -71,7 +72,10 @@ BEGIN
 		EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @SearchLocations, NULL, ''CaseEvent_SearchLocation'', NULL, NULL, NULL;
 
 		--Search-Results of Search
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @SearchResults, NULL, ''CaseEvent_Search-Results of Search'', NULL, NULL, NULL;
+		IF(@SearchResults IS NOT NULL)
+		BEGIN
+			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @SearchResults, NULL, ''CaseEvent_Search-Results of Search'', NULL, NULL, NULL;
+		END
 
 		';
 

@@ -2,7 +2,7 @@
 
 namespace CMI.MessageRetriever.Model
 {
-    public class OfficeVisitActivityResponse : ActivityResponse
+    public class ClientProfileOfficeVisitDetailsActivityResponse
     {
         public DateTime DateTime { get; set; }
         public string Status { get; set; }

@@ -31,5 +31,7 @@ namespace CMI.Automon.Model
         public string OfficerFirstName { get; set; }
 
         public string OfficerLastName { get; set; }
+
+        public string UpdatedBy { get; set; }
     }
 }

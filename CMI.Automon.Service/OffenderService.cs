@@ -130,8 +130,41 @@ namespace CMI.Automon.Service
                             Value = offenderDetails.Pin,
                             IsNullable = false
                         });
-                        
-                        
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.FirstName,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.FirstName,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.MiddleName,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.MiddleName,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.LastName,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.LastName,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Race,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Race,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.UpdatedBy,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.UpdatedBy,
+                            IsNullable = false
+                        });
 
                         cmd.Connection = conn;
 

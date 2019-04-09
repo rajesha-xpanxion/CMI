@@ -21,6 +21,8 @@
         /// Http response header type of "BrokerProperties"
         /// </summary>
         public static string HttpResponseHeaderTypeBrokerProperties { get { return "BrokerProperties"; } }
+
+        public static string TestDataJsonFileNameAllOutboundMessages { get { return "AllOutboundMessages.json"; } }
     }
 
     public static class ConfigKeys

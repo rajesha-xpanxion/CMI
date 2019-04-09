@@ -13,18 +13,18 @@ using System.Linq;
 
 namespace CMI.Processor
 {
-    public class OutboundClientProfileVehicleProcessor : OutboundBaseProcessor
+    public class OutboundClientProfileOfficeVisitProcessor : OutboundBaseProcessor
     {
-        private readonly IOffenderVehicleService offenderVehicleService;
+        private readonly IOffenderOfficeVisitService offenderOfficeVisitService;
 
-        public OutboundClientProfileVehicleProcessor(
+        public OutboundClientProfileOfficeVisitProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderVehicleService offenderVehicleService
+            IOffenderOfficeVisitService offenderOfficeVisitService
         )
             : base(serviceProvider, configuration)
         {
-            this.offenderVehicleService = offenderVehicleService;
+            this.offenderOfficeVisitService = offenderOfficeVisitService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<OutboundMessageDetails> messages, DateTime messagesReceivedOn)
@@ -33,13 +33,13 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile - Vehicle Details activity processing initiated."
+                Message = "Office Visit activity processing initiated."
             });
 
             TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus
             {
                 ProcessorType = Common.Notification.ProcessorType.Outbound,
-                TaskName = "Client Profile - Vehicle Details",
+                TaskName = "Office Visit",
                 IsSuccessful = true,
                 NexusReceivedMessageCount = messages.Count()
             };
@@ -48,53 +48,58 @@ namespace CMI.Processor
             {
                 foreach (OutboundMessageDetails message in messages)
                 {
-                    OffenderVehicle offenderVehicleDetails = null;
+                    OffenderOfficeVisit offenderOfficeVisitDetails = null;
                     try
                     {
-                        offenderVehicleDetails = (OffenderVehicle)ConvertResponseToObject<ClientProfileVehicleDetailsActivityResponse>(
+                        offenderOfficeVisitDetails = (OffenderOfficeVisit)ConvertResponseToObject<ClientProfileOfficeVisitDetailsActivityResponse>(
                             message.ClientIntegrationId,
-                            RetrieveActivityDetails<ClientProfileVehicleDetailsActivityResponse>(message.Details),
+                            RetrieveActivityDetails<ClientProfileOfficeVisitDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
 
-                        offenderVehicleService.SaveOffenderVehicleDetails(ProcessorConfig.CmiDbConnString, offenderVehicleDetails);
+                        offenderOfficeVisitService.SaveOffenderOfficeVisitDetails(ProcessorConfig.CmiDbConnString, offenderOfficeVisitDetails);
 
                         taskExecutionStatus.AutomonAddMessageCount++;
+                        message.IsSuccessful = true;
 
                         Logger.LogDebug(new LogRequest
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "New Offender - Vehicle Details added successfully.",
-                            AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                            Message = "New Offender - Office Visit Details added successfully.",
+                            AutomonData = JsonConvert.SerializeObject(offenderOfficeVisitDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
                     catch (CmiException ce)
                     {
                         taskExecutionStatus.AutomonFailureMessageCount++;
+                        message.IsSuccessful = false;
+                        message.ErrorDetails = ce.ToString();
 
                         Logger.LogWarning(new LogRequest
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "Error occurred while processing a Client Profile - Vehicle Details activity.",
+                            Message = "Error occurred while processing a Client Profile - Office Visit Details activity.",
                             Exception = ce,
-                            AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                            AutomonData = JsonConvert.SerializeObject(offenderOfficeVisitDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
                     catch (Exception ex)
                     {
                         taskExecutionStatus.AutomonFailureMessageCount++;
+                        message.IsSuccessful = false;
+                        message.ErrorDetails = ex.ToString();
 
                         Logger.LogError(new LogRequest
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "Critical error occurred while processing a Client Profile - Vehicle Details activity.",
+                            Message = "Critical error occurred while processing a Client Profile - Office Visit Details activity.",
                             Exception = ex,
-                            AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                            AutomonData = JsonConvert.SerializeObject(offenderOfficeVisitDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
@@ -105,23 +110,32 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
+                messages.ToList().ForEach(m => {
+                    m.IsSuccessful = false;
+                    m.ErrorDetails = ex.ToString();
+                });
 
                 Logger.LogError(new LogRequest
                 {
                     OperationName = this.GetType().Name,
                     MethodName = "Execute",
-                    Message = "Critical error occurred while processing Client Profile - Vehicle Details activities.",
+                    Message = "Critical error occurred while processing Client Profile - Office Visit Details activities.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(messages)
                 });
             }
 
+            //update message wise processing status
+            if (messages != null && messages.Any())
+            {
+                ProcessorProvider.SaveOutboundMessages(messages, messagesReceivedOn);
+            }
 
             Logger.LogInfo(new LogRequest
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile - Vehicle Details activity processing completed.",
+                Message = "Office Visit activity processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 

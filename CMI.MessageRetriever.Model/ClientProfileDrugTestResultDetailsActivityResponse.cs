@@ -2,16 +2,11 @@
 
 namespace CMI.MessageRetriever.Model
 {
-    public class DrugTestLabResultActivityResponse : ActivityResponse
+    public class ClientProfileDrugTestResultDetailsActivityResponse
     {
         public DateTime TestDateTime { get; set; }
         public string ResultStatus { get; set; }
         public string Location { get; set; }
-        public DrugTestLabResultDetails Details { get; set; }
-    }
-
-    public class DrugTestLabResultDetails
-    {
         public string DrugTestType { get; set; }
         public string DeliberateTamper { get; set; }
         public string Screened { get; set; }

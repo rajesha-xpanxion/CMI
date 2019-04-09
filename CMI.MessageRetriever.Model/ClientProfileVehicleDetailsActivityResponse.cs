@@ -1,6 +1,6 @@
 ﻿namespace CMI.MessageRetriever.Model
 {
-    public class ClientProfileVehicleDetailsActivityResponse : ActivityResponse
+    public class ClientProfileVehicleDetailsActivityResponse : DetailsResponse
     {
         public string Make { get; set; }
         public string Model { get; set; }

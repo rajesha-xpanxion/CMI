@@ -2,7 +2,7 @@
 
 namespace CMI.MessageRetriever.Model
 {
-    public class ClientProfilePersonalDetailsActivityResponse : ActivityResponse
+    public class ClientProfilePersonalDetailsActivityResponse : DetailsResponse
     {
         public string FirstName { get; set; }
         public string MiddleName { get; set; }

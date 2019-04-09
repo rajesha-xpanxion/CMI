@@ -11,7 +11,7 @@ EXEC
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
 		@Phone = '(876)673-0388',
-		@PhoneType = 'Message',
+		@PhoneNumberType = 'Message',
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -22,7 +22,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderPhoneDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
 	@Phone VARCHAR(15),
-	@PhoneType VARCHAR(100),
+	@PhoneNumberType VARCHAR(100),
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -55,7 +55,7 @@ BEGIN
 				NULL, 
 				0, 
 				@PersonPhoneId OUTPUT, 
-				@PhoneType, 
+				@PhoneNumberType, 
 				NULL, 
 				NULL;
 		';
@@ -66,7 +66,7 @@ BEGIN
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
 		@Phone VARCHAR(15),
-		@PhoneType VARCHAR(100),
+		@PhoneNumberType VARCHAR(100),
 		@UpdatedBy VARCHAR(255)';
 
 PRINT @SQLString;
@@ -76,6 +76,6 @@ PRINT @SQLString;
 				@ParmDefinition,  
 				@Pin = @Pin,
 				@Phone = @Phone,
-				@PhoneType = @PhoneType,
+				@PhoneNumberType = @PhoneNumberType,
 				@UpdatedBy = @UpdatedBy;
 END

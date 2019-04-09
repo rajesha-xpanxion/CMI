@@ -96,6 +96,8 @@ namespace CMI.Processor
             //retrieve enviornment name and load related appsettings json file
             string enviornmentName = Environment.GetEnvironmentVariable("ENVIORNMENT_NAME");
 
+            Console.WriteLine($"ENVIORNMENT_NAME: {enviornmentName}");
+
             //read configuration from appsettings.json
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -129,7 +131,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<IOffenderEmploymentService, OffenderEmploymentService>();
             serviceCollection.AddSingleton<IOffenderCaseService, OffenderCaseService>();
             serviceCollection.AddSingleton<IOffenderNoteService, OffenderNoteService>();
-            serviceCollection.AddSingleton<IOffenderDrugTestService, OffenderDrugTestService>();
+            serviceCollection.AddSingleton<IOffenderDrugTestResultService, OffenderDrugTestResultService>();
             serviceCollection.AddSingleton<IOffenderOfficeVisitService, OffenderOfficeVisitService>();
             serviceCollection.AddSingleton<IOffenderFieldVisitService, OffenderFieldVisitService>();
         }
@@ -172,11 +174,10 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<OutboundClientProfileContactProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileVehicleProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileEmploymentProcessor>();
-            serviceCollection.AddSingleton<OutboundNoteProcessor>();
-            serviceCollection.AddSingleton<OutboundOfficeVisitProcessor>();
-            serviceCollection.AddSingleton<OutboundDrugTestAppointmentProcessor>();
-            serviceCollection.AddSingleton<OutboundDrugTestResultProcessor>();
-            serviceCollection.AddSingleton<OutboundFieldVisitProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileNoteProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileOfficeVisitProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileDrugTestResultProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileFieldVisitProcessor>();
             
         }
 

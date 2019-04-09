@@ -1,0 +1,316 @@
+[{
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "72cd7797-061e-4605-94bf-b8b947cc4346",
+			"Type": "Note"
+		},
+		"Details": {
+			"SubType": null,
+			"NoteText": "9th new note for 5115 through nexusfb1 portal",
+			"CreatedDate": "2019-04-05T11:58",
+			"NoteAuthor": "edcuser@scramtest.com"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-05T11:58:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "5dffef39-788c-47fd-be68-e12508069e08",
+			"Type": "Note"
+		},
+		"Details": {
+			"SubType": null,
+			"NoteText": "10th new note for 5115 through nexusfb1 portal",
+			"CreatedDate": "2019-04-05T11:58",
+			"NoteAuthor": "edcuser@scramtest.com"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-05T11:58:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "352b2df8-66a5-401a-b469-a46fba0e5199",
+			"Type": "Note"
+		},
+		"Details": {
+			"SubType": null,
+			"NoteText": "11th new note for 5115 through nexusfb1 portal",
+			"CreatedDate": "2019-04-05T11:58",
+			"NoteAuthor": "edcuser@scramtest.com"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-05T11:58:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "5115",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Personal Details",
+			"FirstName": "Sarah 2",
+			"LastName": "Anderson 2",
+			"DateOfBirth": "1989-07-24T00:00",
+			"TimeZone": "Pacific Standard Time",
+			"Gender": "Female",
+			"Ethinicity": "Native American",
+			"StaticRiskChecking": "Unspecified",
+			"NeedsClassification": "Unspecified"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-04-05T12:12:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "5115",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Email Details",
+			"Email": "sarah.anderson_2@test.com"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-04-05T12:12:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "ed3a66d8-f3ad-4735-b0e0-5f00424ebf3b",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Address Details",
+			"Identifier": "ed3a66d8-f3ad-4735-b0e0-5f00424ebf3b",
+			"AddressType": "Other",
+			"Address": "new 2 other address"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-04-05T12:13:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "5115-72178",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Contact Details",
+			"ContactType": "HomePhone",
+			"Contact": "(530) 240-5360",
+			"Identifier": "5115-72178"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-04-05T12:14:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "5115-92483",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Contact Details",
+			"ContactType": "MobilePhone",
+			"Contact": "(530) 542-3638",
+			"Identifier": "5115-92483"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-04-05T12:14:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "0df51963-dbb4-4b33-84cb-f523b3da55c1",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Vehicle Details",
+			"Make": "make 2",
+			"Model": "model 2",
+			"Year": 2018,
+			"Color": "black",
+			"LicensePlate": ""
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-04-05T12:15:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "3f43d632-82d5-4ee8-b9f4-11b5faef96f8",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Employment Details",
+			"Employer": "Test employer 1",
+			"Occupation": "",
+			"WorkAddress": "",
+			"WorkPhone": "",
+			"Wage": null,
+			"WageUnit": null,
+			"WorkEnvironment": ""
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-05T12:15:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "694D4680-886C-4FB9-9BEE-554CDB020AD6",
+			"Type": "Drug Test Appointment"
+		},
+		"Details": {
+			"Type": "Drug Test Appointment",
+			"SubType": null,
+			"Identifier": "db08acee-ce42-4f40-a70e-5da9478ca70e",
+			"AppointmentDateTime": "4/5/2019 10:38 AM",
+			"AppointmentStatus": "Tampered",
+			"Location": "CCC"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-05T17:58:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "694D4680-886C-4FB9-9BEE-554CDB020AD6",
+			"Type": "FieldVisit"
+		},
+		"Details": {
+			"Type": "FieldVisit",
+			"Identifier": "6571ed7c-2f71-4f77-aff3-3834f6612aa4",
+			"Datetime": "4/5/2019 11:27 AM",
+			"Status": "Attended",
+			"VisitedLocations": [{
+					"Address": "1234 Jeje St. ",
+					"Type": "Home Address",
+					"ClientPresent": "Yes",
+					"SearchedAreas": "Client Areas, Common Areas"
+				}
+			],
+			"FoundContraband": [],
+			"Note": null
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-05T18:49:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Identifier": "256530BB-B3ED-430A-B948-548379FCEC76",
+			"Type": "Drug Test Appointment"
+		},
+		"Details": {
+			"Type": "Drug Test Appointment",
+			"SubType": null,
+			"Identifier": "d7419f11-fec2-4231-9789-e6c339ef7c24",
+			"AppointmentDateTime": "4/4/2019 4:00 PM",
+			"AppointmentStatus": "Completed",
+			"Location": "CCC"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-05T23:01:00",
+			"UpdatedBy": "edcuser@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Type": "Drug Test Result",
+			"Identifier": "f95d1dee-ae19-4ca9-ad0e-f99d18101b2f"
+		},
+		"Details": {
+			"TestDateTime": "2019-03-28T07:23",
+			"ResultStatus": "Failed",
+			"Location": "south Lake Tahoe Test Location 14",
+			"DrugTestType": "DevDemo1",
+			"DeliberateTamper": null,
+			"Screened": "No",
+			"SentToLab": "Yes",
+			"DrugTestId": "5555",
+			"Dilute": "No",
+			"CreatinineLevel": null
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "5115"
+		},
+		"Activity": {
+			"Type": "OfficeVisit",
+			"Identifier": "33d73dc9-ed97-4636-a721-245faa17880d"
+		},
+		"Details": {
+			"DateTime": "2019-03-28T07:23",
+			"Status": "Attended",
+			"Notes": "Test",
+			"Location": "Test 64",
+			"OnTime": "Yes"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}
+]
