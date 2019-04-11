@@ -46,7 +46,7 @@ namespace CMI.Processor
                     Text = noteActivityDetailsResponse.NoteText,
                     AuthorEmail = noteActivityDetailsResponse.NoteAuthor,
                     Date = noteActivityDetailsResponse.CreatedDate
-                    
+
                 };
             }
             else if (typeof(T) == typeof(ClientProfileOfficeVisitDetailsActivityResponse))
@@ -67,7 +67,7 @@ namespace CMI.Processor
                                 ? 16
                                 : 0,
                     IsOffenderPresent = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                    
+
                 };
             }
             else if (typeof(T) == typeof(ClientProfileDrugTestResultDetailsActivityResponse))
@@ -101,7 +101,7 @@ namespace CMI.Processor
                 bool isSearchConducted = false;
                 string searchLocations = string.Empty;
 
-                if(details.VisitedLocations != null && details.VisitedLocations.Any())
+                if (details.VisitedLocations != null && details.VisitedLocations.Any())
                 {
                     isSearchConducted = details.VisitedLocations.Any(v => !string.IsNullOrEmpty(v.SearchedAreas));
                     searchLocations = string.Join(", ", details.VisitedLocations.Select(v => v.SearchedAreas));
@@ -125,12 +125,52 @@ namespace CMI.Processor
                     IsOffenderPresent = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase),
                     IsSearchConducted = isSearchConducted,
                     SearchLocations = searchLocations,
-                    SearchResults = details.FoundContraband != null 
+                    SearchResults = details.FoundContraband != null
                         ? string.Join(", ", details.FoundContraband)
                         : string.Empty
                 };
             }
+            else if (typeof(T) == typeof(ClientProfilePersonalDetailsActivityResponse))
+            {
+                return new Offender
+                {
+                };
+            }
+            else if (typeof(T) == typeof(ClientProfileEmailDetailsActivityResponse))
+            {
+                return new OffenderEmail
+                {
 
+                };
+            }
+            else if (typeof(T) == typeof(ClientProfileAddressDetailsActivityResponse))
+            {
+                return new OffenderAddress
+                {
+
+                };
+            }
+            else if (typeof(T) == typeof(ClientProfileContactDetailsActivityResponse))
+            {
+                return new OffenderPhone
+                {
+
+                };
+            }
+            else if (typeof(T) == typeof(ClientProfileVehicleDetailsActivityResponse))
+            {
+                return new OffenderVehicle
+                {
+
+                };
+            }
+            else if (typeof(T) == typeof(ClientProfileEmploymentDetailsActivityResponse))
+            {
+                return new OffenderEmployment
+                {
+
+                };
+            }
 
             return null;
         }

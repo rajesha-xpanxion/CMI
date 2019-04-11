@@ -43,7 +43,7 @@ BEGIN
 			@BodyStyleLId		INT	= (SELECT L.[Id] FROM [dbo].[Lookup] L JOIN [dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Body Style'' AND L.[PermDesc] = @BodyStyle),
 			@ColorLId			INT	= (SELECT L.[Id] FROM [dbo].[Lookup] L JOIN [dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Color'' AND L.[PermDesc] = @Color),
 			@AssociationLId		INT	= (SELECT L.[Id] FROM [dbo].[Lookup] L JOIN [dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Association'' AND L.[PermDesc] = ''Offender''),
-			@VehicleId			INT	= 0
+			@VehicleId			INT	= 0;
 
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateVehicle] 

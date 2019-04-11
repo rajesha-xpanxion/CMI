@@ -60,6 +60,7 @@ namespace CMI.Processor
                         offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, offenderEmailDetails);
 
                         taskExecutionStatus.AutomonAddMessageCount++;
+                        message.IsSuccessful = true;
 
                         Logger.LogDebug(new LogRequest
                         {
@@ -73,6 +74,8 @@ namespace CMI.Processor
                     catch (CmiException ce)
                     {
                         taskExecutionStatus.AutomonFailureMessageCount++;
+                        message.IsSuccessful = false;
+                        message.ErrorDetails = ce.ToString();
 
                         Logger.LogWarning(new LogRequest
                         {
@@ -87,6 +90,8 @@ namespace CMI.Processor
                     catch (Exception ex)
                     {
                         taskExecutionStatus.AutomonFailureMessageCount++;
+                        message.IsSuccessful = false;
+                        message.ErrorDetails = ex.ToString();
 
                         Logger.LogError(new LogRequest
                         {
@@ -105,6 +110,11 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
+                messages.ToList().ForEach(m => {
+                    m.IsSuccessful = false;
+                    m.ErrorDetails = ex.ToString();
+                });
+
 
                 Logger.LogError(new LogRequest
                 {
@@ -116,6 +126,11 @@ namespace CMI.Processor
                 });
             }
 
+            //update message wise processing status
+            if (messages != null && messages.Any())
+            {
+                ProcessorProvider.SaveOutboundMessages(messages, messagesReceivedOn);
+            }
 
             Logger.LogInfo(new LogRequest
             {

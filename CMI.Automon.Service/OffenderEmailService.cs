@@ -119,7 +119,20 @@ namespace CMI.Automon.Service
                             Value = offenderEmailDetails.Pin,
                             IsNullable = false
                         });
-                        
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.UpdatedBy,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmailDetails.UpdatedBy,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.EmailAddress,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmailDetails.EmailAddress,
+                            IsNullable = false
+                        });
 
                         cmd.Connection = conn;
 

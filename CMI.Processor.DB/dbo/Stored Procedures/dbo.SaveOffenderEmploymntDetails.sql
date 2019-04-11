@@ -34,7 +34,7 @@ BEGIN
 			@OrganizationTypeId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OrganizationType] WHERE [Description] = ''Other'' AND [IsActive] = 1),
 			@OrganizationId				INT	= 0,
 			@PersonAssociationId		INT	= 0, 
-			@PersonAssociationRoleId	INT	= 0
+			@PersonAssociationRoleId	INT	= 0;
 
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateOrganization]
