@@ -5,7 +5,6 @@ Create date:	06-Apr-19
 Description:	To save given offender personal details to given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
-DECLARE @CurrentTimestamp DATETIME = GETDATE();
 EXEC	
 	[dbo].[SaveOffenderPersonalDetails]
 		@AutomonDatabaseName = 'CX',
@@ -13,12 +12,16 @@ EXEC
 		@FirstName = 'John',
 		@MiddleName = 'Brent',
 		@LastName = 'Aitkens',
+		@DateOfBirth = '1961-06-12',
+		@Gender = 'Male',
 		@Race = 'White',
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
+16-Apr-19		Rajesh Awate	Check if given race matches, else set it as Unknown
+16-Apr-19		Rajesh Awate	Changes to save DateOfBirth & Gender information
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderPersonalDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -26,6 +29,8 @@ CREATE PROCEDURE [dbo].[SaveOffenderPersonalDetails]
 	@FirstName VARCHAR(32) = NULL,
 	@MiddleName VARCHAR(32) = NULL,
 	@LastName VARCHAR(32),
+	@DateOfBirth DATETIME = NULL,
+	@Gender VARCHAR(255) = NULL,
 	@Race VARCHAR(150),
 	@UpdatedBy VARCHAR(255)
 AS
@@ -39,11 +44,7 @@ BEGIN
 			@EnteredByPId	INT				= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @UpdatedBy), 0),
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@AnyNameId		INT				= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[AnyName] WHERE [Firstname] = @FirstName AND [LastName] = @LastName AND [ToTime] IS NULL), 0),
-			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@Value			VARCHAR(255)	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[PermDesc] = @Race AND LT.[IsActive] = 1 AND LT.[Description] = ''Race''),
-			@PermDesc		VARCHAR(50)		= ''Race'';
-
-		--SELECT @LastName, @EnteredByPId, @FirstName, @MiddleName, NULL, NULL, 0, NULL, @AnyNameId, @OffenderId, @PersonId;
+			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin);
 
 		--update name based on given info
 		EXEC 
@@ -58,8 +59,19 @@ BEGIN
 				NULL,
 				@AnyNameId OUTPUT;
 
-		--SELECT * FROM [$AutomonDatabaseName].[dbo].[AnyName] WHERE [Id] = @AnyNameId;
+		/*******************************RACE****************************/
+		DECLARE
+			@PersonAttributeId	INT			= 0,
+			@Value			VARCHAR(255)	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[PermDesc] = @Race AND LT.[IsActive] = 1 AND LT.[Description] = ''Race''),
+			@PermDesc		VARCHAR(50)		= ''Race'';
 
+		--check if valid race matched, otherwise set it with unknown
+		IF(@Value IS NULL)
+		BEGIN
+			SET @Value = (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[PermDesc] = ''Unknown'' AND LT.[IsActive] = 1 AND LT.[Description] = ''Race'');
+		END
+		
+		--update Race attribute
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
 				@PersonId, 
@@ -72,7 +84,51 @@ BEGIN
 				NULL,
 				@PersonAttributeId OUTPUT;
 
-		--SELECT * FROM [$AutomonDatabaseName].[dbo].[PersonAttribute] WHERE [Id] = @PersonAttributeId;
+		/*******************************DOB****************************/
+		SELECT
+			@PersonAttributeId	= 0,
+			@Value				= CONVERT(VARCHAR(255), @DateOfBirth, 101),
+			@PermDesc			= ''DOB'';
+
+		--check if value is not null
+		IF(@Value IS NOT NULL)
+		BEGIN
+			--update DOB attribute
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
+					@PersonId, 
+					@Value, 
+					@EnteredByPId, 
+					0,
+					NULL,
+					@PermDesc, 
+					NULL,
+					NULL,
+					@PersonAttributeId OUTPUT;
+		END
+
+		/*******************************Gender****************************/
+		SELECT
+			@PersonAttributeId	= 0,
+			@Value				= ISNULL(@Gender, ''Unknown''),
+			@PermDesc			= ''Sex'';
+
+		--check if value is not null
+		IF(@Value IS NOT NULL)
+		BEGIN
+			--update Gender attribute
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
+					@PersonId, 
+					@Value, 
+					@EnteredByPId, 
+					0,
+					NULL,
+					@PermDesc, 
+					NULL,
+					NULL,
+					@PersonAttributeId OUTPUT;
+		END
 		';
 
 
@@ -83,6 +139,8 @@ BEGIN
 		@FirstName VARCHAR(32),
 		@MiddleName VARCHAR(32),
 		@LastName VARCHAR(32),
+		@DateOfBirth DATETIME,
+		@Gender VARCHAR(255),
 		@Race VARCHAR(150),
 		@UpdatedBy VARCHAR(255)';
 
@@ -95,6 +153,8 @@ PRINT @SQLString;
 				@FirstName = @FirstName,
 				@MiddleName = @MiddleName,
 				@LastName = @LastName,
+				@DateOfBirth = @DateOfBirth,
+				@Gender = @Gender,
 				@Race = @Race,
 				@UpdatedBy = @UpdatedBy;
 END

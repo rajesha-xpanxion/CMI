@@ -95,8 +95,10 @@ namespace CMI.Automon.Service
             }
         }
 
-        public void SaveOffenderPersonalDetails(string CmiDbConnString, Offender offenderDetails)
+        public string SaveOffenderDetails(string CmiDbConnString, OffenderDetails offenderDetails)
         {
+            string pin = string.Empty;
+
             if (automonConfig.IsDevMode)
             {
                 //test data
@@ -114,7 +116,7 @@ namespace CMI.Automon.Service
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.SaveOffenderPersonalDetails;
+                        cmd.CommandText = StoredProc.SaveOffenderAllDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         cmd.Parameters.Add(new SqlParameter()
@@ -158,6 +160,83 @@ namespace CMI.Automon.Service
                             Value = offenderDetails.Race,
                             IsNullable = false
                         });
+
+
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.DateOfBirth,
+                            SqlDbType = System.Data.SqlDbType.DateTime,
+                            Value = offenderDetails.DateOfBirth,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.TimeZone,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.TimeZone,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.ClientType,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.ClientType,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Gender,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Gender,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.EmailAddress,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.EmailAddress,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Line1,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Line1,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Line2,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Line2,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.AddressType,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.AddressType,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Phone,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Phone,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.PhoneNumberType,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.PhoneNumberType,
+                            IsNullable = false
+                        });
+
+
+
+
+
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.UpdatedBy,
@@ -168,10 +247,12 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        cmd.ExecuteNonQuery();
+                        pin = Convert.ToString(cmd.ExecuteScalar());
                     }
                 }
             }
+
+            return pin;
         }
         #endregion
 

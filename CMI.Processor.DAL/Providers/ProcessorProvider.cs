@@ -174,6 +174,7 @@ namespace CMI.Processor.DAL
                         dataTable.Columns.Add(TableColumnName.Details, typeof(string));
                         dataTable.Columns.Add(TableColumnName.IsSuccessful, typeof(bool));
                         dataTable.Columns.Add(TableColumnName.ErrorDetails, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.RawData, typeof(string));
 
                         foreach (var outboundMessageDetails in receivedOutboundMessages)
                         {
@@ -188,7 +189,8 @@ namespace CMI.Processor.DAL
                                 outboundMessageDetails.ActionUpdatedBy,
                                 outboundMessageDetails.Details,
                                 outboundMessageDetails.IsSuccessful,
-                                outboundMessageDetails.ErrorDetails
+                                outboundMessageDetails.ErrorDetails,
+                                outboundMessageDetails.RawData
                             );
                         }
 
@@ -223,7 +225,8 @@ namespace CMI.Processor.DAL
                                     ActionUpdatedBy = Convert.ToString(reader[TableColumnName.ActionUpdatedBy]),
                                     Details = Convert.ToString(reader[TableColumnName.Details]),
                                     IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
-                                    ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails])
+                                    ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails]),
+                                    RawData = Convert.ToString(reader[TableColumnName.RawData])
                                 });
                             }
                         }

@@ -5,13 +5,12 @@ Create date:	06-Apr-19
 Description:	To save given offender phone details to given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
-DECLARE @CurrentTimestamp DATETIME = GETDATE();
 EXEC	
 	[dbo].[SaveOffenderPhoneDetails]
 		@AutomonDatabaseName = 'CX',
-		@Pin = '5824',
-		@Phone = '(876)673-0388',
-		@PhoneNumberType = 'Message',
+		@Pin = '10772',
+		@Phone = '(541)555-8778',
+		@PhoneNumberType = 'Residential',
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -38,26 +37,50 @@ BEGIN
 			@PhoneNumberId	INT				= 0,
 			@PersonPhoneId	INT				= 0;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
-				@EnteredByPId, 
-				@Phone, 
-				NULL, 
-				NULL, 
-				NULL, 
-				@PhoneNumberId OUTPUT;
-		
+		--check if given phone is already associated with given person. avoid duplicate records
+		IF(
+			NOT EXISTS
+			(
+				SELECT
+					1
+				FROM
+					[$AutomonDatabaseName].[dbo].[PhoneNumber] PN JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] PP
+						ON PN.[Id] = PP.[PhoneNumberId]
+						JOIN [$AutomonDatabaseName].[dbo].[Lookup] L 
+							ON PP.[PhoneTypeLId] = L.[Id]
+							JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
+								ON L.[LookupTypeId] = LT.[Id]
+				WHERE
+					PP.[PersonId] = @PersonId
+					AND PN.[Phone] = @Phone
+					AND PN.[ToTime] IS NULL
+					AND LT.[Description] = ''PhoneNumberTypes''
+					AND L.[PermDesc] = @PhoneNumberType
+					AND LT.[IsActive] = 1
+					AND L.[IsActive] = 1
+			)
+		)
+		BEGIN
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
+					@EnteredByPId, 
+					@Phone, 
+					NULL, 
+					NULL, 
+					NULL, 
+					@PhoneNumberId OUTPUT;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePersonPhone] 
-				@PersonId, 
-				@PhoneNumberId, 
-				NULL, 
-				0, 
-				@PersonPhoneId OUTPUT, 
-				@PhoneNumberType, 
-				NULL, 
-				NULL;
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonPhone] 
+					@PersonId, 
+					@PhoneNumberId, 
+					NULL, 
+					0, 
+					@PersonPhoneId OUTPUT, 
+					@PhoneNumberType, 
+					NULL, 
+					NULL;
+		END
 		';
 
 

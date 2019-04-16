@@ -7,5 +7,6 @@ namespace CMI.Automon.Interface
     public interface IOffenderVehicleService
     {
         void SaveOffenderVehicleDetails(string CmiDbConnString, OffenderVehicle offenderVehicleDetails);
+        void DeleteOffenderVehicleDetails(string CmiDbConnString, OffenderVehicle offenderVehicleDetails);
     }
 }

@@ -15,16 +15,16 @@ namespace CMI.Processor
 {
     public class OutboundClientProfilePersonalDetailsProcessor : OutboundBaseProcessor
     {
-        private readonly IOffenderService offenderService;
+        private readonly IOffenderPersonalDetailsService offenderPersonalDetailsService;
 
         public OutboundClientProfilePersonalDetailsProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderService offenderService
+            IOffenderPersonalDetailsService offenderPersonalDetailsService
         )
             : base(serviceProvider, configuration)
         {
-            this.offenderService = offenderService;
+            this.offenderPersonalDetailsService = offenderPersonalDetailsService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<OutboundMessageDetails> messages, DateTime messagesReceivedOn)
@@ -57,7 +57,7 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
-                        offenderService.SaveOffenderPersonalDetails(ProcessorConfig.CmiDbConnString, offenderPersonalDetails);
+                        offenderPersonalDetailsService.SaveOffenderPersonalDetails(ProcessorConfig.CmiDbConnString, offenderPersonalDetails);
 
                         taskExecutionStatus.AutomonAddMessageCount++;
                         message.IsSuccessful = true;

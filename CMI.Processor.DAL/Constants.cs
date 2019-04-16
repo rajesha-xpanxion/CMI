@@ -59,6 +59,7 @@
         public static string Details { get { return "Details"; } }
         public static string IsSuccessful { get { return "IsSuccessful"; } }
         public static string ErrorDetails { get { return "ErrorDetails"; } }
+        public static string RawData { get { return "RawData"; } }
     }
 
     public static class InboundProcessorStage
@@ -73,6 +74,7 @@
 
     public static class OutboundProcessorActivityType
     {
+        public static string Client { get { return "Client"; } }
         public static string ClientProfile { get { return "ClientProfile"; } }
         public static string Note { get { return "Note"; } }
         public static string OfficeVisit { get { return "OfficeVisit"; } }
@@ -89,6 +91,13 @@
         public static string ContactDetails { get { return "Contact Details"; } }
         public static string VehicleDetails { get { return "Vehicle Details"; } }
         public static string EmploymentDetails { get { return "Employment Details"; } }
+    }
+
+    public static class OutboundProcessorActionReason
+    {
+        public static string Created { get { return "Created"; } }
+        public static string Updated { get { return "Updated"; } }
+        public static string Removed { get { return "Removed"; } }
     }
 
     public static class ConfigKeys

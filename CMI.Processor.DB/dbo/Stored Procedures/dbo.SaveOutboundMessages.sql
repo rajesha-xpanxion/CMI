@@ -1,5 +1,6 @@
 ﻿
 
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	04-Apr-19
@@ -39,7 +40,8 @@ BEGIN
 	   [Details] NVARCHAR(MAX),
 	   [ReceivedOn] DATETIME,
 	   [IsSuccessful] BIT,
-	   [ErrorDetails] NVARCHAR(MAX)
+	   [ErrorDetails] NVARCHAR(MAX),
+	   [RawData] NVARCHAR(MAX)
 	);
 
 
@@ -99,7 +101,6 @@ BEGIN
 		INSERT ([Name])
 		VALUES (Src.[ActionReasonName]);
 
-	
 	--merge outbound messages
 	MERGE [dbo].[OutboundMessage] AS Tgt
 	USING
@@ -116,7 +117,8 @@ BEGIN
 			OMT.[Details],
 			@ReceivedOn AS [ReceivedOn],
 			OMT.[IsSuccessful],
-			OMT.[ErrorDetails]
+			OMT.[ErrorDetails],
+			OMT.[RawData]
 		FROM
 			@OutboundMessageTbl OMT JOIN [dbo].[ActivityType] AT
 				ON OMT.[ActivityTypeName] = AT.[Name]
@@ -127,8 +129,8 @@ BEGIN
 	) AS Src
 	ON (Tgt.[Id] = Src.[Id])
 	WHEN NOT MATCHED THEN  
-		INSERT ([ActivityTypeId], [ActivitySubTypeId], [ActionReasonId], [ClientIntegrationId], [ActivityIdentifier], [ActionOccurredOn], [ActionUpdatedBy], [Details], [ReceivedOn])
-		VALUES (Src.[ActivityTypeId], Src.[ActivitySubTypeId], Src.[ActionReasonId], Src.[ClientIntegrationId], Src.[ActivityIdentifier], Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], @ReceivedOn)
+		INSERT ([ActivityTypeId], [ActivitySubTypeId], [ActionReasonId], [ClientIntegrationId], [ActivityIdentifier], [ActionOccurredOn], [ActionUpdatedBy], [Details], [ReceivedOn], [RawData])
+		VALUES (Src.[ActivityTypeId], Src.[ActivitySubTypeId], Src.[ActionReasonId], Src.[ClientIntegrationId], Src.[ActivityIdentifier], Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], @ReceivedOn, Src.[RawData])
 	WHEN MATCHED THEN
 		UPDATE SET
 			Tgt.[ActivityTypeId] = Src.[ActivityTypeId],
@@ -141,7 +143,8 @@ BEGIN
 			Tgt.[Details] = Src.[Details],
 			Tgt.[ReceivedOn] = Src.[ReceivedOn],
 			Tgt.[IsSuccessful] = Src.[IsSuccessful],
-			Tgt.[ErrorDetails] = Src.[ErrorDetails]
+			Tgt.[ErrorDetails] = Src.[ErrorDetails],
+			Tgt.[RawData] = Src.[RawData]
 	OUTPUT
 		$action, inserted.* INTO @OutboundMessageOutput;
 
@@ -157,7 +160,8 @@ BEGIN
 		OMP.[ActionUpdatedBy],
 		OMP.[Details],
 		OMP.[IsSuccessful],
-		OMP.[ErrorDetails]
+		OMP.[ErrorDetails],
+		OMP.[RawData]
 	FROM
 		@OutboundMessageOutput OMP JOIN [dbo].[ActivityType] AT
 			ON OMP.[ActivityTypeId] = AT.[Id]

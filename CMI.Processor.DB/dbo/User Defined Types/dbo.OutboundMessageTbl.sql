@@ -9,7 +9,10 @@
     [ActionUpdatedBy]     NVARCHAR (200) NOT NULL,
     [Details]             NVARCHAR (MAX) NULL,
     [IsSuccessful]        BIT            NULL,
-    [ErrorDetails]        NVARCHAR (MAX) NULL);
+    [ErrorDetails]        NVARCHAR (MAX) NULL,
+    [RawData]             NVARCHAR (MAX) NULL);
+
+
 
 
 

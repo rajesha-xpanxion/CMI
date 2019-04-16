@@ -21,6 +21,10 @@ namespace CMI.Automon.Service
         public static string MiddleName { get { return "@MiddleName"; } }
         public static string LastName { get { return "@LastName"; } }
         public static string Race { get { return "@Race"; } }
+        public static string DateOfBirth { get { return "@DateOfBirth"; } }
+        public static string TimeZone { get { return "@TimeZone"; } }
+        public static string ClientType { get { return "@ClientType"; } }
+        public static string Gender { get { return "@Gender"; } }
         public static string EmailAddress { get { return "@EmailAddress"; } }
         public static string Line1 { get { return "@Line1"; } }
         public static string Line2 { get { return "@Line2"; } }

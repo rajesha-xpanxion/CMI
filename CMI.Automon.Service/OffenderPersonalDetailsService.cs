@@ -1,18 +1,21 @@
-﻿using System.Data.SqlClient;
-using Microsoft.Extensions.Options;
-using CMI.Automon.Interface;
+﻿using CMI.Automon.Interface;
 using CMI.Automon.Model;
+using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Text;
 
 namespace CMI.Automon.Service
 {
-    public class OffenderEmploymentService : IOffenderEmploymentService
+    public class OffenderPersonalDetailsService : IOffenderPersonalDetailsService
     {
         #region Private Member Variables
         private readonly AutomonConfig automonConfig;
         #endregion
 
         #region Constructor
-        public OffenderEmploymentService(
+        public OffenderPersonalDetailsService(
             IOptions<AutomonConfig> automonConfig
         )
         {
@@ -20,7 +23,8 @@ namespace CMI.Automon.Service
         }
         #endregion
 
-        public void SaveOffenderEmploymentDetails(string CmiDbConnString, OffenderEmployment offenderEmploymentDetails)
+        #region Public Methods
+        public void SaveOffenderPersonalDetails(string CmiDbConnString, Offender offenderDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -39,7 +43,7 @@ namespace CMI.Automon.Service
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.SaveOffenderEmploymentDetails;
+                        cmd.CommandText = StoredProc.SaveOffenderPersonalDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         cmd.Parameters.Add(new SqlParameter()
@@ -52,21 +56,56 @@ namespace CMI.Automon.Service
                         {
                             ParameterName = SqlParamName.Pin,
                             SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.Pin,
+                            Value = offenderDetails.Pin,
                             IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.FirstName,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.FirstName,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.MiddleName,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.MiddleName,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.LastName,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.LastName,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Race,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Race,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.DateOfBirth,
+                            SqlDbType = System.Data.SqlDbType.DateTime,
+                            Value = offenderDetails.DateOfBirth,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Gender,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Gender,
+                            IsNullable = true
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.UpdatedBy,
                             SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.UpdatedBy,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.OrganizationName,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.OrganizationName,
+                            Value = offenderDetails.UpdatedBy,
                             IsNullable = false
                         });
 
@@ -77,63 +116,6 @@ namespace CMI.Automon.Service
                 }
             }
         }
-
-        public void DeleteOffenderEmploymentDetails(string CmiDbConnString, OffenderEmployment offenderEmploymentDetails)
-        {
-            if (automonConfig.IsDevMode)
-            {
-                //test data
-                //string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderNoteDetails);
-
-                //return File.Exists(testDataJsonFileName)
-                //    ? JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(testDataJsonFileName))
-                //    : new List<OffenderNote>();
-            }
-            else
-            {
-                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
-                {
-                    conn.Open();
-
-                    using (SqlCommand cmd = new SqlCommand())
-                    {
-                        cmd.CommandText = StoredProc.DeleteOffenderEmploymentDetails;
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.AutomonDatabaseName,
-                            SqlDbType = System.Data.SqlDbType.NVarChar,
-                            Value = new SqlConnectionStringBuilder(automonConfig.AutomonDbConnString).InitialCatalog
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.Pin,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.Pin,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.UpdatedBy,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.UpdatedBy,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.OrganizationName,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.OrganizationName,
-                            IsNullable = false
-                        });
-
-                        cmd.Connection = conn;
-
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-            }
-        }
+        #endregion
     }
 }

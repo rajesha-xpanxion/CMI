@@ -57,19 +57,43 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
-                        offenderVehicleService.SaveOffenderVehicleDetails(ProcessorConfig.CmiDbConnString, offenderVehicleDetails);
-
-                        taskExecutionStatus.AutomonAddMessageCount++;
-                        message.IsSuccessful = true;
-
-                        Logger.LogDebug(new LogRequest
+                        if (
+                            message.ActionReasonName.Equals(OutboundProcessorActionReason.Created, StringComparison.InvariantCultureIgnoreCase)
+                            || message.ActionReasonName.Equals(OutboundProcessorActionReason.Updated, StringComparison.InvariantCultureIgnoreCase)
+                        )
                         {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "New Offender - Vehicle Details added successfully.",
-                            AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
-                            NexusData = JsonConvert.SerializeObject(message)
-                        });
+                            offenderVehicleService.SaveOffenderVehicleDetails(ProcessorConfig.CmiDbConnString, offenderVehicleDetails);
+                            taskExecutionStatus.AutomonAddMessageCount++;
+
+                            Logger.LogDebug(new LogRequest
+                            {
+                                OperationName = this.GetType().Name,
+                                MethodName = "Execute",
+                                Message = "New Offender - Vehicle Details added successfully.",
+                                AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                                NexusData = JsonConvert.SerializeObject(message)
+                            });
+                        }
+                        else if(message.ActionReasonName.Equals(OutboundProcessorActionReason.Removed, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            offenderVehicleService.DeleteOffenderVehicleDetails(ProcessorConfig.CmiDbConnString, offenderVehicleDetails);
+                            taskExecutionStatus.AutomonDeleteMessageCount++;
+
+                            Logger.LogDebug(new LogRequest
+                            {
+                                OperationName = this.GetType().Name,
+                                MethodName = "Execute",
+                                Message = "Offender - Vehicle Details removed successfully.",
+                                AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                                NexusData = JsonConvert.SerializeObject(message)
+                            });
+                        }
+                        else
+                        {
+                            throw new CmiException("Invalid action reason found.");
+                        }
+                        
+                        message.IsSuccessful = true;
                     }
                     catch (CmiException ce)
                     {

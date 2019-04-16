@@ -8,10 +8,10 @@ Test execution:-
 EXEC	
 	[dbo].[SaveOffenderAddressDetails]
 		@AutomonDatabaseName = 'CX',
-		@Pin = '5824',
-		@Line1 = 'test address line 1',
-		@Line2 = 'test address line 1',
-		@AddressType = 'Other',
+		@Pin = '10772',
+		@Line1 = '12357 Old Follows Lane, St. Helens, Oregon 97409',
+		@Line2 = NULL,
+		@AddressType = 'Residential',
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -22,7 +22,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderAddressDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
 	@Line1 VARCHAR(75),
-	@Line2 VARCHAR(75),
+	@Line2 VARCHAR(75) = NULL,
 	@AddressType VARCHAR(100),
 	@UpdatedBy VARCHAR(255)
 AS
@@ -33,11 +33,10 @@ BEGIN
 		'
 		--declare required variables and assign it with values
 		DECLARE 
-			@EnteredByPId	INT	= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @UpdatedBy), 0),
-			@PersonId		INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@AddressId      INT = 0;
-
-		--SELECT @Line1, @Line2, @EnteredByPId, @AddressType, @PersonId;
+			@EnteredByPId		INT	= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @UpdatedBy), 0),
+			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
+			@AddressId			INT = 0,
+			@PersonAddressId	INT = 0;
 
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateAddress] 
@@ -50,9 +49,6 @@ BEGIN
 				NULL, 
 				@EnteredByPId = @EnteredByPId, 
 				@Id = @AddressId OUTPUT;
-		
-
-		--SELECT * FROM [$AutomonDatabaseName].[dbo].[Address] WHERE [Id] = @AddressId;
 
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdatePersonAddress] 
@@ -62,8 +58,6 @@ BEGIN
 				0, 
 				@PersonAddressId OUTPUT, 
 				@AddressType;
-
-		--SELECT * FROM [$AutomonDatabaseName].[dbo].[PersonAddress] WHERE [Id] = @PersonAddressId;
 		';
 
 

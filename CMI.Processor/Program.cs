@@ -168,6 +168,7 @@ namespace CMI.Processor
         private static void ConfigureOutboundProcessorServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<OutboundProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfilePersonalDetailsProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileEmailProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileAddressProcessor>();

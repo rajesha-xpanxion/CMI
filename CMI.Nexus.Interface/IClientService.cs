@@ -10,5 +10,7 @@ namespace CMI.Nexus.Interface
         Client GetClientDetails(string clientId);
 
         bool UpdateClientDetails(Client client);
+
+        bool UpdateClientId(string oldClientId, string newClientId);
     }
 }

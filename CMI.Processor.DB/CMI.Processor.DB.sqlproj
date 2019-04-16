@@ -97,6 +97,7 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderFieldVisitDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderDrugTestResultDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmailDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderAllDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">

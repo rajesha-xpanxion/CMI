@@ -64,7 +64,8 @@ namespace CMI.Processor
                     ActionOccurredOn = m.Action.OccurredOn,
                     ActionUpdatedBy = m.Action.UpdatedBy,
                     Details = JsonConvert.SerializeObject(m.Details),
-                    IsSuccessful = true
+                    IsSuccessful = true,
+                    RawData = JsonConvert.SerializeObject(m)
                 }),
                 messagesReceivedOn
             );
@@ -83,6 +84,16 @@ namespace CMI.Processor
                         a.ActivityTypeName.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
                         && !string.IsNullOrEmpty(JsonConvert.SerializeObject(a.Details))
                         && JsonConvert.DeserializeObject<DetailsResponse>(JsonConvert.SerializeObject(a.Details)) != null
+                );
+
+                //details
+                UpdateExecutionStatus(
+                    ((OutboundClientProfileProcessor)serviceProvider.GetService(typeof(OutboundClientProfileProcessor))).Execute(
+                        clientProfileMessages.Where(
+                            a => string.IsNullOrEmpty(a.ActivitySubTypeName)
+                        ),
+                        messagesReceivedOn
+                    )
                 );
 
                 //personal details

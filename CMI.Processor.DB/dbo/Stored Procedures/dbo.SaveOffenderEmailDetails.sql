@@ -10,7 +10,7 @@ EXEC
 	[dbo].[SaveOffenderEmailDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
-		@EmailAddress = 'test@edc.com',
+		@EmailAddress = 'test1@edcgov.us',
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -34,13 +34,17 @@ BEGIN
 			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@EmailAddressId	INT				= 0;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEmail] 
-				@EmailAddress, 
-				@PersonId,
-				@EnteredByPId,
-				NULL,
-				NULL;
+		--check if given email address already set for person
+		IF(NOT EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[Email] WHERE [PersonId] = @PersonId AND [ToTime] IS NULL AND [EmailAddress] = @EmailAddress))
+		BEGIN
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateEmail] 
+					@EmailAddress, 
+					@PersonId,
+					@EnteredByPId,
+					0,
+					NULL;
+		END
 		';
 
 

@@ -132,43 +132,112 @@ namespace CMI.Processor
             }
             else if (typeof(T) == typeof(ClientProfilePersonalDetailsActivityResponse))
             {
+                ClientProfilePersonalDetailsActivityResponse details = (ClientProfilePersonalDetailsActivityResponse)(object)activityDetails;
+
                 return new Offender
                 {
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    FirstName = details.FirstName,
+                    MiddleName = details.MiddleName,
+                    LastName = details.LastName,
+                    Race = details.Ethinicity,
+                    DateOfBirth = details.DateOfBirth,
+                    Gender = details.Gender
                 };
             }
             else if (typeof(T) == typeof(ClientProfileEmailDetailsActivityResponse))
             {
+                ClientProfileEmailDetailsActivityResponse details = (ClientProfileEmailDetailsActivityResponse)(object)activityDetails;
+
                 return new OffenderEmail
                 {
-
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    EmailAddress = details.Email
                 };
             }
             else if (typeof(T) == typeof(ClientProfileAddressDetailsActivityResponse))
             {
+                ClientProfileAddressDetailsActivityResponse details = (ClientProfileAddressDetailsActivityResponse)(object)activityDetails;
+
                 return new OffenderAddress
                 {
-
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    Line1 = details.Address,
+                    //Line2 = details.Address,
+                    AddressType =
+                        details.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase)
+                        ? "Residential"
+                        : "Unknown"
                 };
             }
             else if (typeof(T) == typeof(ClientProfileContactDetailsActivityResponse))
             {
+                ClientProfileContactDetailsActivityResponse details = (ClientProfileContactDetailsActivityResponse)(object)activityDetails;
+
                 return new OffenderPhone
                 {
-
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    Phone = details.Contact.Replace(" ", string.Empty),
+                    PhoneNumberType = 
+                        details.ContactType.Equals("HomePhone", StringComparison.InvariantCultureIgnoreCase)
+                        ? "Residential"
+                        : 
+                        (
+                            details.ContactType.Equals("MobilePhone", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Mobile"
+                            : "Message"
+                        )
                 };
             }
             else if (typeof(T) == typeof(ClientProfileVehicleDetailsActivityResponse))
             {
+                ClientProfileVehicleDetailsActivityResponse details = (ClientProfileVehicleDetailsActivityResponse)(object)activityDetails;
+
                 return new OffenderVehicle
                 {
-
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    VehicleYear = details.Year,
+                    Make = details.Make,
+                    BodyStyle = details.Model,
+                    Color = details.Color,
+                    LicensePlate = details.LicensePlate
                 };
             }
             else if (typeof(T) == typeof(ClientProfileEmploymentDetailsActivityResponse))
             {
+                ClientProfileEmploymentDetailsActivityResponse details = (ClientProfileEmploymentDetailsActivityResponse)(object)activityDetails;
+
                 return new OffenderEmployment
                 {
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    OrganizationName = details.Employer
+                };
+            }
+            else if (typeof(T) == typeof(ClientProfileDetailsActivityResponse))
+            {
+                ClientProfileDetailsActivityResponse details = (ClientProfileDetailsActivityResponse)(object)activityDetails;
 
+                return new OffenderDetails
+                {
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    FirstName = details.FirstName,
+                    MiddleName = details.MiddleName,
+                    LastName = details.LastName,
+                    Race = details.Ethinicity,
+                    ClientType = details.ClientType,
+                    EmailAddress = details.Email,
+                    Line1 = details.Address,
+                    //Line2 = details.Address,
+                    AddressType = details.AddressType,
+                    Phone = details.Contact,
+                    PhoneNumberType = details.ContactType
                 };
             }
 
