@@ -1,12 +1,12 @@
 ﻿
 /*==========================================================================================
 Author:			Rajesh Awate
-Create date:	06-Apr-19
-Description:	To save given offender vehicle details to given automon database
+Create date:	18-Apr-19
+Description:	To delete given offender vehicle details to given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
 EXEC	
-	[dbo].[SaveOffenderVehicleDetails]
+	[dbo].[DeleteOffenderVehicleDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
 		@VehicleYear = 2012,
@@ -18,9 +18,9 @@ EXEC
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
-06-Apr-19		Rajesh Awate	Created.
+18-Apr-19		Rajesh Awate	Created.
 ==========================================================================================*/
-CREATE PROCEDURE [dbo].[SaveOffenderVehicleDetails]
+CREATE PROCEDURE [dbo].[DeleteOffenderVehicleDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
 	@VehicleYear INT = NULL,
@@ -45,44 +45,9 @@ BEGIN
 			@AssociationLId		INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Association'' AND L.[PermDesc] = ''Offender''),
 			@VehicleId			INT	= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[VehicleInfo] WHERE [ToTime] IS NULL AND [LicensePlate] = @LicensePlate AND [Vyear] = @VehicleYear AND [Make] = @Make AND [BodyStyle] = @BodyStyle AND [Color] = @Color ORDER BY [FromTime] DESC), 0);
 
-		IF(
-			NOT EXISTS
-			(
-				SELECT 
-					1 
-				FROM 
-					[$AutomonDatabaseName].[dbo].[VehicleInfo] 
-				WHERE 
-					[ToTime] IS NULL 
-					AND [LicensePlate] = @LicensePlate 
-					AND [Vyear] = @VehicleYear 
-					AND [Make] = @Make 
-					AND [BodyStyle] = @BodyStyle 
-					AND [Color] = @Color
-			)
-		)
-		BEGIN
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdateVehicle] 
-					@PersonId, 
-					@VehicleYear, 
-					@MakeLId, 
-					@BodyStyleLId, 
-					@ColorLId, 
-					@LicensePlate, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					@AssociationLId, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					@EnteredByPId, 
-					@VehicleId OUTPUT;
-		END
+		EXEC 
+			[$AutomonDatabaseName].[dbo].[DeleteVehicle]
+				@VehicleId;
 		';
 
 
