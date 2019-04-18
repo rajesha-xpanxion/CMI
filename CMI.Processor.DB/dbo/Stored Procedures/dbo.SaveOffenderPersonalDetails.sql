@@ -8,14 +8,14 @@ Test execution:-
 EXEC	
 	[dbo].[SaveOffenderPersonalDetails]
 		@AutomonDatabaseName = 'CX',
-		@Pin = '5824',
-		@FirstName = 'John',
-		@MiddleName = 'Brent',
-		@LastName = 'Aitkens',
-		@DateOfBirth = '1961-06-12',
-		@Gender = 'Male',
-		@Race = 'White',
-		@UpdatedBy = 'rawate@xpanxion.com';
+		@Pin = '5115',
+		@FirstName = 'Sarah',
+		@MiddleName = NULL,
+		@LastName = 'Anderson',
+		@DateOfBirth = '1989-07-24',
+		@Gender = 'Female',
+		@Race = 'Native American',
+		@UpdatedBy = 'edcuser@scramtest.com';
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
@@ -43,7 +43,7 @@ BEGIN
 		DECLARE 
 			@EnteredByPId	INT				= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @UpdatedBy), 0),
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@AnyNameId		INT				= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[AnyName] WHERE [Firstname] = @FirstName AND [LastName] = @LastName AND [ToTime] IS NULL), 0),
+			@AnyNameId		INT				= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[AnyName] WHERE [Firstname] = @FirstName AND [LastName] = @LastName AND [ToTime] IS NULL ORDER BY [FromTime]), 0),
 			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin);
 
 		--update name based on given info
@@ -58,6 +58,14 @@ BEGIN
 				0,
 				NULL,
 				@AnyNameId OUTPUT;
+
+
+		EXEC 
+			[$AutomonDatabaseName].[dbo].[UpdatePerson]
+				@EnteredByPId,
+				@AnyNameId,
+				1,
+				@PersonId;
 
 		/*******************************RACE****************************/
 		DECLARE

@@ -82,19 +82,19 @@ namespace CMI.Processor
                 .Where(
                     a =>
                         a.ActivityTypeName.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
-                        && !string.IsNullOrEmpty(JsonConvert.SerializeObject(a.Details))
-                        && JsonConvert.DeserializeObject<DetailsResponse>(JsonConvert.SerializeObject(a.Details)) != null
+                        && !string.IsNullOrEmpty(a.Details)
+                        && JsonConvert.DeserializeObject<DetailsResponse>(a.Details) != null
                 );
 
                 //details
-                UpdateExecutionStatus(
-                    ((OutboundClientProfileProcessor)serviceProvider.GetService(typeof(OutboundClientProfileProcessor))).Execute(
-                        clientProfileMessages.Where(
-                            a => string.IsNullOrEmpty(a.ActivitySubTypeName)
-                        ),
-                        messagesReceivedOn
-                    )
-                );
+                //UpdateExecutionStatus(
+                //    ((OutboundClientProfileProcessor)serviceProvider.GetService(typeof(OutboundClientProfileProcessor))).Execute(
+                //        clientProfileMessages.Where(
+                //            a => string.IsNullOrEmpty(a.ActivitySubTypeName)
+                //        ),
+                //        messagesReceivedOn
+                //    )
+                //);
 
                 //personal details
                 UpdateExecutionStatus(

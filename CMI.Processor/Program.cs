@@ -124,6 +124,7 @@ namespace CMI.Processor
         private static void ConfigureAutomonServices(IServiceCollection serviceCollection)
         {
             serviceCollection.AddSingleton<IOffenderService, OffenderService>();
+            serviceCollection.AddSingleton<IOffenderPersonalDetailsService, OffenderPersonalDetailsService>();
             serviceCollection.AddSingleton<IOffenderAddressService, OffenderAddressService>();
             serviceCollection.AddSingleton<IOffenderPhoneService, OffenderPhoneService>();
             serviceCollection.AddSingleton<IOffenderEmailService, OffenderEmailService>();
