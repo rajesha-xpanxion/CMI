@@ -103,8 +103,8 @@ namespace CMI.Processor
 
                 if (details.VisitedLocations != null && details.VisitedLocations.Any())
                 {
-                    isSearchConducted = details.VisitedLocations.Any(v => !string.IsNullOrEmpty(v.SearchedAreas));
-                    searchLocations = string.Join(", ", details.VisitedLocations.Select(v => v.SearchedAreas));
+                    isSearchConducted = details.VisitedLocations.Any(v => v.SearchedAreas != null && v.SearchedAreas.Any(sa => !string.IsNullOrEmpty(sa)));
+                    searchLocations = string.Join(", ", details.VisitedLocations.Select(v => string.Join(", ", v.SearchedAreas)));
                 }
 
                 List<VisitedLocationDetails> visitedLocations = new List<VisitedLocationDetails>(details.VisitedLocations);
@@ -212,11 +212,34 @@ namespace CMI.Processor
             {
                 ClientProfileEmploymentDetailsActivityResponse details = (ClientProfileEmploymentDetailsActivityResponse)(object)activityDetails;
 
+                string payFrequency = string.Empty;
+                if(!string.IsNullOrEmpty(details.WageUnit))
+                {
+                    payFrequency =
+                        details.WageUnit.Equals("per Hour", StringComparison.InvariantCultureIgnoreCase)
+                        ? "Hourly"
+                        : details.WageUnit.Equals("per Week", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Weekly"
+                            : details.WageUnit.Equals("per Month", StringComparison.InvariantCultureIgnoreCase)
+                                ? "Monthly"
+                                : "Annually";
+                }
+                else
+                {
+                    payFrequency = null;
+                }
+
                 return new OffenderEmployment
                 {
                     Pin = clientIntegrationId,
                     UpdatedBy = updatedBy,
-                    OrganizationName = details.Employer
+                    OrganizationName = details.Employer,
+                    OrganizationAddress = details.WorkAddress,
+                    OrganizationPhone = details.WorkPhone,
+                    PayFrequency = payFrequency,
+                    PayRate = details.Wage,
+                    WorkType = details.WorkEnvironment,
+                    JobTitle = details.Occupation
                 };
             }
             else if (typeof(T) == typeof(ClientProfileDetailsActivityResponse))

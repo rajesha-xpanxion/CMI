@@ -60,6 +60,7 @@ BEGIN
 			@OutboundMessageTbl
 		WHERE
 			[ActivityTypeName] IS NOT NULL
+			AND [ActivityTypeName] <> ''
 
 	) AS Src
 	ON (Tgt.[Name] = Src.[ActivityTypeName])
@@ -77,6 +78,7 @@ BEGIN
 			@OutboundMessageTbl
 		WHERE
 			[ActivitySubTypeName] IS NOT NULL
+			AND [ActivitySubTypeName] <> ''
 
 	) AS Src
 	ON (Tgt.[Name] = Src.[ActivitySubTypeName])

@@ -37,6 +37,12 @@ namespace CMI.Automon.Service
         public static string Color { get { return "@Color"; } }
         public static string LicensePlate { get { return "@LicensePlate"; } }
         public static string OrganizationName { get { return "@OrganizationName"; } }
+        public static string OrganizationAddress { get { return "@OrganizationAddress"; } }
+        public static string OrganizationPhone { get { return "@OrganizationPhone"; } }
+        public static string PayFrequency { get { return "@PayFrequency"; } }
+        public static string PayRate { get { return "@PayRate"; } }
+        public static string WorkType { get { return "@WorkType"; } }
+        public static string JobTitle { get { return "@JobTitle"; } }
         public static string Text { get { return "@Text"; } }
         public static string AuthorEmail { get { return "@AuthorEmail"; } }
         public static string Date { get { return "@Date"; } }

@@ -1,4 +1,5 @@
 ﻿
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	03-Apr-19
@@ -34,7 +35,7 @@ BEGIN
 		DECLARE 
 			@EventTypeId	INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''CaseNote''),
 			@EventDateTime	DATETIME		= @Date,
-			@EnteredByPId	INT				= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[Officer] WHERE [Email] = @AuthorEmail), 0),
+			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @AuthorEmail), 0),
 			@Comment		VARCHAR(MAX)	= @Text,
 			@EventId		INT				= 0,
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin);
@@ -48,15 +49,26 @@ BEGIN
 				@EventDateTime, 
 				@EnteredByPId, 
 				@Comment, 
+				0,
+				NULL,
+				NULL,
+				0,
+				NULL,
+				NULL,
+				2, --status as Complete
+				NULL,
 				@Id = @EventId OUTPUT;
 
 		--SELECT * FROM [$AutomonDatabaseName].[dbo].[Event] WHERE [Id] = @EventId;
 
 		--associate newly added event with given offender
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
-				@OffenderId, 
-				@EventId;
+		IF(@EventId IS NOT NULL)
+		BEGIN
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
+					@OffenderId, 
+					@EventId;
+		END
 
 		--SELECT * FROM [$AutomonDatabaseName].[dbo].[OffenderEvent] WHERE [OffenderId] = @OffenderId AND [EventId] = @EventId;
 		';

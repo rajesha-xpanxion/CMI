@@ -69,6 +69,48 @@ namespace CMI.Automon.Service
                             Value = offenderEmploymentDetails.OrganizationName,
                             IsNullable = false
                         });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.OrganizationAddress,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.OrganizationAddress,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.OrganizationPhone,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.OrganizationPhone,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.PayFrequency,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.PayFrequency,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.PayRate,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.PayRate,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.WorkType,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.WorkType,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.JobTitle,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.JobTitle,
+                            IsNullable = true
+                        });
 
                         cmd.Connection = conn;
 
@@ -125,6 +167,20 @@ namespace CMI.Automon.Service
                             ParameterName = SqlParamName.OrganizationName,
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderEmploymentDetails.OrganizationName,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.OrganizationAddress,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.OrganizationAddress,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.OrganizationPhone,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderEmploymentDetails.OrganizationPhone,
                             IsNullable = false
                         });
 

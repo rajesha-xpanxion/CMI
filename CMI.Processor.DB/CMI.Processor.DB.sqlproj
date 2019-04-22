@@ -90,7 +90,6 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderVehicleDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderPhoneDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderPersonalDetails.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmploymntDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderAddressDetails.sql" />
     <Build Include="dbo\Tables\dbo.ActivitySubType.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderOfficeVisitDetails.sql" />
@@ -99,6 +98,8 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmailDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderAllDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderVehicleDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmploymentDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderEmploymentDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">

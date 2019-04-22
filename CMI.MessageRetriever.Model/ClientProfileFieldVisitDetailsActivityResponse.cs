@@ -16,6 +16,6 @@ namespace CMI.MessageRetriever.Model
         public string Address { get; set; }
         public string Type { get; set; }
         public string ClientPresent { get; set; }
-        public string SearchedAreas { get; set; }
+        public string[] SearchedAreas { get; set; }
     }
 }
