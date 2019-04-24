@@ -49,6 +49,7 @@ namespace CMI.Processor
                 foreach (OutboundMessageDetails message in messages)
                 {
                     OffenderEmployment offenderEmploymentDetails = null;
+                    message.IsProcessed = true;
                     try
                     {
                         offenderEmploymentDetails = (OffenderEmployment)ConvertResponseToObject<ClientProfileEmploymentDetailsActivityResponse>(
@@ -129,6 +130,7 @@ namespace CMI.Processor
             {
                 taskExecutionStatus.IsSuccessful = false;
                 messages.ToList().ForEach(m => {
+                    m.IsProcessed = true;
                     m.IsSuccessful = false;
                     m.ErrorDetails = ex.ToString();
                 });

@@ -1,275 +1,62 @@
 [{
 		"Client": {
-			"IntegrationId": "5115"
+			"IntegrationId": "apitest9842"
 		},
 		"Activity": {
-			"Identifier": "72cd7797-061e-4605-94bf-b8b947cc4346",
-			"Type": "Note"
+			"Type": "Note",
+			"Identifier": "5c861b90-15e2-45a7-ac4e-1dd1ba02ca5b"
 		},
 		"Details": {
-			"SubType": null,
-			"NoteText": "9th new note for 5115 through nexusfb1 portal",
-			"CreatedDate": "2019-04-05T11:58",
-			"NoteAuthor": "edcuser@scramtest.com"
+			"NoteText": "Test",
+			"CreatedDate": "2019-03-28T07:23:53.0272547Z",
+			"NoteAuthor": "compliance@scramtest.com"
 		},
 		"Action": {
 			"Reason": "Created",
-			"OccurredOn": "2019-04-05T11:58:00",
-			"UpdatedBy": "edcuser@scramtest.com"
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
 		}
 	}, {
 		"Client": {
-			"IntegrationId": "5115"
+			"IntegrationId": "3c69090d-2f0c-437f-9cf2-e72357505c3c"
 		},
 		"Activity": {
-			"Identifier": "5dffef39-788c-47fd-be68-e12508069e08",
-			"Type": "Note"
+			"Type": "Office Visit",
+			"Identifier": "33d73dc9-ed97-4636-a721-245faa17880d"
 		},
 		"Details": {
-			"SubType": null,
-			"NoteText": "10th new note for 5115 through nexusfb1 portal",
-			"CreatedDate": "2019-04-05T11:58",
-			"NoteAuthor": "edcuser@scramtest.com"
-		},
-		"Action": {
-			"Reason": "Created",
-			"OccurredOn": "2019-04-05T11:58:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "352b2df8-66a5-401a-b469-a46fba0e5199",
-			"Type": "Note"
-		},
-		"Details": {
-			"SubType": null,
-			"NoteText": "11th new note for 5115 through nexusfb1 portal",
-			"CreatedDate": "2019-04-05T11:58",
-			"NoteAuthor": "edcuser@scramtest.com"
-		},
-		"Action": {
-			"Reason": "Created",
-			"OccurredOn": "2019-04-05T11:58:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "5115",
-			"Type": "ClientProfile"
-		},
-		"Details": {
-			"SubType": "Personal Details",
-			"FirstName": "Sarah 2",
-			"LastName": "Anderson 2",
-			"DateOfBirth": "1989-07-24T00:00",
-			"TimeZone": "Pacific Standard Time",
-			"Gender": "Female",
-			"Ethinicity": "Native American",
-			"StaticRiskChecking": "Unspecified",
-			"NeedsClassification": "Unspecified"
-		},
-		"Action": {
-			"Reason": "Updated",
-			"OccurredOn": "2019-04-05T12:12:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "5115",
-			"Type": "ClientProfile"
-		},
-		"Details": {
-			"SubType": "Email Details",
-			"Email": "sarah.anderson_2@test.com"
-		},
-		"Action": {
-			"Reason": "Updated",
-			"OccurredOn": "2019-04-05T12:12:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "ed3a66d8-f3ad-4735-b0e0-5f00424ebf3b",
-			"Type": "ClientProfile"
-		},
-		"Details": {
-			"SubType": "Address Details",
-			"Identifier": "ed3a66d8-f3ad-4735-b0e0-5f00424ebf3b",
-			"AddressType": "Other",
-			"Address": "new 2 other address"
-		},
-		"Action": {
-			"Reason": "Updated",
-			"OccurredOn": "2019-04-05T12:13:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "5115-72178",
-			"Type": "ClientProfile"
-		},
-		"Details": {
-			"SubType": "Contact Details",
-			"ContactType": "HomePhone",
-			"Contact": "(530) 240-5360",
-			"Identifier": "5115-72178"
-		},
-		"Action": {
-			"Reason": "Updated",
-			"OccurredOn": "2019-04-05T12:14:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "5115-92483",
-			"Type": "ClientProfile"
-		},
-		"Details": {
-			"SubType": "Contact Details",
-			"ContactType": "MobilePhone",
-			"Contact": "(530) 542-3638",
-			"Identifier": "5115-92483"
-		},
-		"Action": {
-			"Reason": "Updated",
-			"OccurredOn": "2019-04-05T12:14:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "0df51963-dbb4-4b33-84cb-f523b3da55c1",
-			"Type": "ClientProfile"
-		},
-		"Details": {
-			"SubType": "Vehicle Details",
-			"Make": "make 2",
-			"Model": "model 2",
-			"Year": 2018,
-			"Color": "black",
-			"LicensePlate": ""
-		},
-		"Action": {
-			"Reason": "Updated",
-			"OccurredOn": "2019-04-05T12:15:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "3f43d632-82d5-4ee8-b9f4-11b5faef96f8",
-			"Type": "ClientProfile"
-		},
-		"Details": {
-			"SubType": "Employment Details",
-			"Employer": "Test employer 1",
-			"Occupation": "",
-			"WorkAddress": "",
-			"WorkPhone": "",
-			"Wage": null,
-			"WageUnit": null,
-			"WorkEnvironment": ""
-		},
-		"Action": {
-			"Reason": "Created",
-			"OccurredOn": "2019-04-05T12:15:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "694D4680-886C-4FB9-9BEE-554CDB020AD6",
-			"Type": "Drug Test Appointment"
-		},
-		"Details": {
-			"Type": "Drug Test Appointment",
-			"SubType": null,
-			"Identifier": "db08acee-ce42-4f40-a70e-5da9478ca70e",
-			"AppointmentDateTime": "4/5/2019 10:38 AM",
-			"AppointmentStatus": "Tampered",
-			"Location": "CCC"
-		},
-		"Action": {
-			"Reason": "Created",
-			"OccurredOn": "2019-04-05T17:58:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
-	}, {
-		"Client": {
-			"IntegrationId": "5115"
-		},
-		"Activity": {
-			"Identifier": "694D4680-886C-4FB9-9BEE-554CDB020AD6",
-			"Type": "FieldVisit"
-		},
-		"Details": {
-			"Type": "FieldVisit",
-			"Identifier": "6571ed7c-2f71-4f77-aff3-3834f6612aa4",
-			"Datetime": "4/5/2019 11:27 AM",
+			"DateTime": "2019-03-28T07:23",
 			"Status": "Attended",
-			"VisitedLocations": [{
-					"Address": "1234 Jeje St. ",
-					"Type": "Home Address",
-					"ClientPresent": "Yes",
-					"SearchedAreas": "Client Areas, Common Areas"
-				}
-			],
-			"FoundContraband": [],
-			"Note": null
+			"Notes": "Test",
+			"Location": "Test 64",
+			"OnTime": "Yes"
 		},
-		"Action": {
-			"Reason": "Created",
-			"OccurredOn": "2019-04-05T18:49:00",
-			"UpdatedBy": "edcuser@scramtest.com"
-		}
+    "Action": {
+      "Reason": "Updated",
+      "OccurredOn": "2019-03-28T07:23:53.0272547Z",
+      "UpdatedBy": "compliance@scramtest.com"
+    }
 	}, {
 		"Client": {
-			"IntegrationId": "5115"
+			"IntegrationId": "3c69090d-2f0c-437f-9cf2-e72357505c3c"
 		},
 		"Activity": {
-			"Identifier": "256530BB-B3ED-430A-B948-548379FCEC76",
-			"Type": "Drug Test Appointment"
+			"Type": "Drug Test Appointment",
+			"Identifier": "f95d1dee-ae19-4ca9-ad0e-f99d18101b2f"
 		},
 		"Details": {
-			"Type": "Drug Test Appointment",
-			"SubType": null,
-			"Identifier": "d7419f11-fec2-4231-9789-e6c339ef7c24",
-			"AppointmentDateTime": "4/4/2019 4:00 PM",
-			"AppointmentStatus": "Completed",
-			"Location": "CCC"
+			"AppointmentDateTime": "2019-03-28T07:23",
+			"AppointmentStatus": "Tampered",
+			"Location": "south Lake Tahoe Test Location 14"
 		},
 		"Action": {
 			"Reason": "Created",
-			"OccurredOn": "2019-04-05T23:01:00",
-			"UpdatedBy": "edcuser@scramtest.com"
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
 		}
 	}, {
 		"Client": {
-			"IntegrationId": "5115"
+			"IntegrationId": "3c69090d-2f0c-437f-9cf2-e72357505c3c"
 		},
 		"Activity": {
 			"Type": "Drug Test Result",
@@ -294,22 +81,608 @@
 		}
 	}, {
 		"Client": {
-			"IntegrationId": "5115"
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
 		},
 		"Activity": {
-			"Type": "OfficeVisit",
-			"Identifier": "33d73dc9-ed97-4636-a721-245faa17880d"
+			"Identifier": "4b5a7253-7103-4045-996e-6e46ac756675",
+			"Type": "ClientProfile"
 		},
 		"Details": {
-			"DateTime": "2019-03-28T07:23",
-			"Status": "Attended",
-			"Notes": "Test",
-			"Location": "Test 64",
-			"OnTime": "Yes"
+			"Status": "active",
+			"SubType": "Account Details",
+			"AssignedCaseload": "Default",
+			"AssignedOfficer": "tylermay@scramtest.com",
+			"ClientType": "Drug Smugglers"
 		},
 		"Action": {
 			"Reason": "Updated",
 			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Identifier": "4b5a7253-7103-4045-996e-6e46ac756675",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Personal Details",
+			"FirstName": "AutoTest-97088",
+			"LastName": "AutoTest-97088",
+			"DateOfBirth": "2019-03-28",
+			"TimeZone": "Hawaiian Standard Time",
+			"Gender": "Male",
+			"Ethinicity": "Test112225534444",
+			"StaticRiskChecking": "High - Violence",
+			"NeedsClassification": "High - Mental Health"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Identifier": "4b5a7253-7103-4045-996e-6e46ac756675",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Email Details",
+			"Email": "test1@test.com"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Identifier": "39e8ba82-ba1d-416f-bb66-6f13ae4e4e43",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Address Details",
+			"AddressType": "Other",
+			"Address": "other address"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Identifier": "961916f7-9a6f-4781-b329-6eb4c73089d1",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Contact Details",
+			"ContactType": "MobilePhone",
+			"Contact": "(888) 888-8877"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "dac33bbf-8166-4c90-b91f-5d53465608b7"
+		},
+		"Details": {
+			"SubType": "Vehicle Details",
+			"Make": "Hundai",
+			"Model": "Verna",
+			"Year": 2017,
+			"Color": "Grey",
+			"LicensePlate": "MH12Y1449"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "dac33bbf-8166-4c90-b91f-5d53465608b7"
+		},
+		"Details": {
+			"SubType": "Vehicle Details",
+			"Make": "Hundai",
+			"Model": "Verna",
+			"Year": 2017,
+			"Color": "Grey",
+			"LicensePlate": "MH12Y1449"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "dac33bbf-8166-4c90-b91f-5d53465608b7"
+		},
+		"Details": {
+			"SubType": "Vehicle Details",
+			"Make": "Hundai",
+			"Model": "Verna",
+			"Year": 2017,
+			"Color": "Grey",
+			"LicensePlate": "MH12Y1449"
+		},
+		"Action": {
+			"Reason": "Removed",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "a1af88cb-de19-4599-93c6-361569d82a20"
+		},
+		"Details": {
+			"SubType": "Employment Details",
+			"Employer": "Test1",
+			"Occupation": "Test1",
+			"WorkAddress": "Test1",
+			"WorkPhone": "(888) 855-8888",
+			"Wage": 55,
+			"WageUnit": "per Hour",
+			"WorkEnvironment": "Test1"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "a1af88cb-de19-4599-93c6-361569d82a20"
+		},
+		"Details": {
+			"SubType": "Employment Details",
+			"Employer": "Test1",
+			"Occupation": "Test1",
+			"WorkAddress": "Test1",
+			"WorkPhone": "(888) 855-8888",
+			"Wage": 55,
+			"WageUnit": "per Hour",
+			"WorkEnvironment": "Test1"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "a1af88cb-de19-4599-93c6-361569d82a20"
+		},
+		"Details": {
+			"SubType": "Employment Details",
+			"Employer": "Test1",
+			"Occupation": "Test1",
+			"WorkAddress": "Test1",
+			"WorkPhone": "(888) 855-8888",
+			"Wage": 55,
+			"WageUnit": "per Hour",
+			"WorkEnvironment": "Test1"
+		},
+		"Action": {
+			"Reason": "Removed",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "Test1"
+		},
+		"Details": {
+			"SubType": "Case Details",
+			"CaseNumber": "Test1",
+			"CaseDate": "2019-03-28",
+			"Status": "Test1",
+			"StartDate": "2019-04-02",
+			"ActualEndDate": "2019-04-25",
+			"EarlyReleaseDate": "2019-04-05",
+			"ProjectedEndDate": "2019-04-23",
+			"EndReason": "End Reason",
+			"Offenses": [{
+					"Label": "Test1",
+					"Date": "2019-03-28",
+					"Statute": "Test1",
+					"Category": "driving without Influence",
+					"IsPrimary": true
+				}
+			]
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "Test1"
+		},
+		"Details": {
+			"SubType": "Case Details",
+			"CaseNumber": "Test1",
+			"CaseDate": "2019-03-28",
+			"Status": "Test1",
+			"StartDate": "2019-04-02",
+			"ActualEndDate": "2019-04-25",
+			"EarlyReleaseDate": "2019-04-05",
+			"ProjectedEndDate": "2019-04-23",
+			"EndReason": "End Reason",
+			"Offenses": [{
+					"Label": "Test1",
+					"Date": "2019-03-28",
+					"Statute": "Test1",
+					"Category": "driving without Influence",
+					"IsPrimary": true
+				}
+			]
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "Test1"
+		},
+		"Details": {
+			"SubType": "Case Details",
+			"CaseNumber": "Test1",
+			"CaseDate": "2019-03-28",
+			"Status": "Test1",
+			"StartDate": "2019-04-02",
+			"ActualEndDate": "2019-04-25",
+			"EarlyReleaseDate": "2019-04-05",
+			"ProjectedEndDate": "2019-04-23",
+			"EndReason": "End Reason",
+			"Offenses": [{
+					"Label": "Test1",
+					"Date": "2019-03-28",
+					"Statute": "Test1",
+					"Category": "driving without Influence",
+					"IsPrimary": true
+				}
+			]
+		},
+		"Action": {
+			"Reason": "Removed",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "Test1"
+		},
+		"Details": {
+			"SubType": "Case Details",
+			"CaseNumber": "Test1",
+			"CaseDate": "2019-03-28",
+			"Status": "Test1",
+			"StartDate": "2019-04-02",
+			"ActualEndDate": "2019-04-25",
+			"EarlyReleaseDate": "2019-04-05",
+			"ProjectedEndDate": "2019-04-23",
+			"EndReason": "End Reason",
+			"Offenses": []
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Identifier": "Test",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Protective Order Details",
+			"OrderType": 1,
+			"OrderTypeName": "Emergency",
+			"EffectiveDate": "2019-03-28",
+			"ExpirationDate": "2019-03-28",
+			"ProtectedPersons": "Test",
+			"PeacefulContact": true,
+			"NoContact": true,
+			"StayAwayPersons": "Test",
+			"StayAwayLocations": "Test",
+			"StayAwayVehicles": "Test",
+			"MoveOutAddress": "Test",
+			"ChildCustody": "Test"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Identifier": "Test",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Protective Order Details",
+			"OrderType": 1,
+			"OrderTypeName": "Emergency",
+			"EffectiveDate": "2019-03-28",
+			"ExpirationDate": "2019-03-28",
+			"ProtectedPersons": "Test",
+			"PeacefulContact": true,
+			"NoContact": true,
+			"StayAwayPersons": "Test",
+			"StayAwayLocations": "Test",
+			"StayAwayVehicles": "Test",
+			"MoveOutAddress": "Test",
+			"ChildCustody": "Test"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "4b5a7253-7103-4045-996e-6e46ac756675"
+		},
+		"Activity": {
+			"Identifier": "Test",
+			"Type": "ClientProfile"
+		},
+		"Details": {
+			"SubType": "Protective Order Details",
+			"OrderType": 1,
+			"OrderTypeName": "Emergency",
+			"EffectiveDate": "2019-03-28",
+			"ExpirationDate": "2019-03-28",
+			"ProtectedPersons": "Test",
+			"PeacefulContact": true,
+			"NoContact": true,
+			"StayAwayPersons": "Test",
+			"StayAwayLocations": "Test",
+			"StayAwayVehicles": "Test",
+			"MoveOutAddress": "Test",
+			"ChildCustody": "Test"
+		},
+		"Action": {
+			"Reason": "Removed",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "clientid3"
+		},
+		"Activity": {
+			"Type": "Sanction",
+			"Identifier": "b494defa-c78c-467f-8401-2d725119a92f"
+		},
+		"Details": {
+			"SanctionActivities": {
+				"Activity": "Drug Test",
+				"ActivityIdentifier": "748b9d05-044d-4e99-b976-3e10358d878f",
+				"ActivityDateTime": "2019-03-28T07:23",
+				"ActivityStatus": "Failed"
+			},
+			"AssignedSanction": {
+				"Magnitude": "High",
+				"Description": "VOP With Jail time recommended up to 20"
+			},
+			"Status": "Assigned",
+			"Notes": "uuu"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "115e019b-74d5-44c0-940f-3e522c671667"
+		},
+		"Activity": {
+			"Type": "Treatment Appointment",
+			"Identifier": "edd24187-0959-484f-ba27-6a9283c0ceda"
+		},
+		"Details": {
+			"TreatmentType": "Addiction Counseling - Individual",
+			"AppointmentDateTime": "2019-03-28T07:23",
+			"Status": "Attended",
+			"QuestionsAndAnswers": [{
+					"Question": "Dressed Appropriately",
+					"Answer": "Yes"
+				}, {
+					"Question": "Participated",
+					"Answer": "Yes"
+				}, {
+					"Question": "Positive Attitude",
+					"Answer": "Yes"
+				}, {
+					"Question": "Homework Completed",
+					"Answer": "Yes"
+				}, {
+					"Question": "Any Urgent or Critical Issues (Threat to Health and Safety)",
+					"Answer": "No"
+				}
+			],
+			"Notes": "H1 New Note"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "115e019b-74d5-44c0-940f-3e522c671667"
+		},
+		"Activity": {
+			"Type": "FieldVisit",
+			"Identifier": "fe634eab-a8c4-4cb8-b3ed-c6bc9d30f864"
+		},
+		"Details": {
+			"Datetime": "2019-03-28T07:23",
+			"Status": "Attended",
+			"VisitedLocations": [{
+					"Address": "Test",
+					"Type": null,
+					"ClientPresent": "No",
+					"SearchedAreas": [
+						"Client",
+						"Other Residents",
+						"Client Areas"
+					]
+				}, {
+					"Address": "New Address",
+					"Type": null,
+					"ClientPresent": "Yes",
+					"SearchedAreas": [
+						"Other Residents",
+						"Common Areas",
+						"Vehicles"
+					]
+				}, {
+					"Address": "test addrelg",
+					"Type": null,
+					"ClientPresent": "Yes",
+					"SearchedAreas": [
+						"Other Residents",
+						"Client Areas",
+						"Vehicles"
+					]
+				}
+			],
+			"FoundContraband": [{
+					"Name": "Found Gun",
+					"Type": "Weapons",
+					"Quantity": "5",
+					"Description": "Black color"
+				}, {
+					"Name": "Found drugs",
+					"Type": "Drugs",
+					"Quantity": "10",
+					"Description": "white powder"
+				}
+			],
+			"Note": "Test Note"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-03-28T07:23:53.0272547Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "client101"
+		},
+		"Details": {
+			"SubType": null,
+			"FirstName": "TestFirstName",
+			"MiddleName": "TestMiddleName",
+			"LastName": "TestLastName",
+			"DateOfBirth": "2019-03-28",
+			"TimeZone": "Hawaiian Standard Time",
+			"Email": "test1@test.com",
+			"AddressType": "Home",
+			"Address": "Home address",
+			"ContactType": "MobilePhone",
+			"Contact": "(888) 888-8877",
+			"ClientType": "Arabic",
+			"Account": "AMSLive Compliance",
+			"AssignedCaseload": "Default",
+			"AssignedOfficer": "tylermay@scramtest.com"
+		},
+		"Activity": {
+			"Type": "Client",
+			"Identifier": "client101"
+		},
+		"Action": {
+			"Reason": "Created",
+			"OccurredOn": "2019-04-15T06:42:59.8703335Z",
+			"UpdatedBy": "compliance@scramtest.com"
+		}
+	}, {
+		"Client": {
+			"IntegrationId": "0939fa21-3ac8-461a-8b5b-dc7a0ced7f44"
+		},
+		"Details": {
+			"SubType": "Client Type",
+			"Status": "active",
+			"AssignedCaseload": "Default",
+			"AssignedOfficer": "1johndoe@scramtest.com",
+			"ClientType": "Gippsland Centre Against Sexual Assault"
+		},
+		"Activity": {
+			"Type": "ClientProfile",
+			"Identifier": "0939fa21-3ac8-461a-8b5b-dc7a0ced7f44"
+		},
+		"Action": {
+			"Reason": "Updated",
+			"OccurredOn": "2019-04-16T07:28:37.6760132Z",
 			"UpdatedBy": "compliance@scramtest.com"
 		}
 	}

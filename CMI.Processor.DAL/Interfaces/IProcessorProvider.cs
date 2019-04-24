@@ -10,5 +10,7 @@ namespace CMI.Processor.DAL
         void SaveExecutionStatus(ExecutionStatus executionStatus);
 
         IEnumerable<OutboundMessageDetails> SaveOutboundMessages(IEnumerable<OutboundMessageDetails> outboundMessages, DateTime receivedOn);
+
+        IEnumerable<OutboundMessageDetails> GetFailedOutboundMessages();
     }
 }

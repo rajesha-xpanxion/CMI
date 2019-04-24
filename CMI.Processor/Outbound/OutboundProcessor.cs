@@ -45,6 +45,9 @@ namespace CMI.Processor
             //filter out valid outbound messages
             IEnumerable<MessageBodyResponse> validOutboundMessages = allOutboundMessages.Where(x => x.Client != null && x.Activity != null && x.Details != null && x.Action != null);
 
+            //retrieve failed outbound messages from database to process it again
+            IEnumerable<OutboundMessageDetails> failedOutboundMessages = ProcessorProvider.GetFailedOutboundMessages();
+
             DateTime messagesReceivedOn = DateTime.Now;
 
             //save details of received messages in database
@@ -64,11 +67,15 @@ namespace CMI.Processor
                     ActionOccurredOn = m.Action.OccurredOn,
                     ActionUpdatedBy = m.Action.UpdatedBy,
                     Details = JsonConvert.SerializeObject(m.Details),
-                    IsSuccessful = true,
-                    RawData = JsonConvert.SerializeObject(m)
+                    IsSuccessful = false,
+                    RawData = JsonConvert.SerializeObject(m),
+                    IsProcessed = false
                 }),
                 messagesReceivedOn
             );
+
+            //combine newly saved outbound messages and failed outbound messages so that both list will be processed together
+            IEnumerable<OutboundMessageDetails> toBeProcessedOutboundMessages = savedOutboundMessages.Concat(failedOutboundMessages);
 
             //process each type of message based on whether it is allowed or not
             //client profile
@@ -78,7 +85,7 @@ namespace CMI.Processor
             )
             {
                 //retrieve client profile messages
-                var clientProfileMessages = savedOutboundMessages
+                var clientProfileMessages = toBeProcessedOutboundMessages
                 .Where(
                     a =>
                         a.ActivityTypeName.Equals(OutboundProcessorActivityType.ClientProfile, StringComparison.InvariantCultureIgnoreCase)
@@ -164,7 +171,7 @@ namespace CMI.Processor
             )
             {
                 UpdateExecutionStatus(((OutboundClientProfileNoteProcessor)serviceProvider.GetService(typeof(OutboundClientProfileNoteProcessor))).Execute(
-                    savedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.Note, StringComparison.InvariantCultureIgnoreCase)),
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.Note, StringComparison.InvariantCultureIgnoreCase)),
                     messagesReceivedOn
                     )
                 );
@@ -177,7 +184,7 @@ namespace CMI.Processor
             )
             {
                 UpdateExecutionStatus(((OutboundClientProfileOfficeVisitProcessor)serviceProvider.GetService(typeof(OutboundClientProfileOfficeVisitProcessor))).Execute(
-                    savedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.OfficeVisit, StringComparison.InvariantCultureIgnoreCase)),
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.OfficeVisit, StringComparison.InvariantCultureIgnoreCase)),
                     messagesReceivedOn
                     )
                 );
@@ -190,7 +197,7 @@ namespace CMI.Processor
             )
             {
                 UpdateExecutionStatus(((OutboundClientProfileDrugTestResultProcessor)serviceProvider.GetService(typeof(OutboundClientProfileDrugTestResultProcessor))).Execute(
-                    savedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.DrugTestResult, StringComparison.InvariantCultureIgnoreCase)),
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.DrugTestResult, StringComparison.InvariantCultureIgnoreCase)),
                     messagesReceivedOn
                     )
                 );
@@ -203,7 +210,7 @@ namespace CMI.Processor
             )
             {
                 UpdateExecutionStatus(((OutboundClientProfileFieldVisitProcessor)serviceProvider.GetService(typeof(OutboundClientProfileFieldVisitProcessor))).Execute(
-                    savedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.FieldVisit, StringComparison.InvariantCultureIgnoreCase)),
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.FieldVisit, StringComparison.InvariantCultureIgnoreCase)),
                     messagesReceivedOn
                     )
                 );

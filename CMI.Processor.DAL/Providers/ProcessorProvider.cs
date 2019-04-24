@@ -175,6 +175,7 @@ namespace CMI.Processor.DAL
                         dataTable.Columns.Add(TableColumnName.IsSuccessful, typeof(bool));
                         dataTable.Columns.Add(TableColumnName.ErrorDetails, typeof(string));
                         dataTable.Columns.Add(TableColumnName.RawData, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.IsProcessed, typeof(bool));
 
                         foreach (var outboundMessageDetails in receivedOutboundMessages)
                         {
@@ -190,7 +191,8 @@ namespace CMI.Processor.DAL
                                 outboundMessageDetails.Details,
                                 outboundMessageDetails.IsSuccessful,
                                 outboundMessageDetails.ErrorDetails,
-                                outboundMessageDetails.RawData
+                                outboundMessageDetails.RawData,
+                                outboundMessageDetails.IsProcessed
                             );
                         }
 
@@ -235,6 +237,50 @@ namespace CMI.Processor.DAL
             }
 
             return updatedOutboundMessages;
+        }
+
+        public IEnumerable<OutboundMessageDetails> GetFailedOutboundMessages()
+        {
+            List<OutboundMessageDetails> failedOutboundMessages = new List<OutboundMessageDetails>();
+
+
+            using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
+            {
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand())
+                {
+                    cmd.CommandText = StoredProc.GetFailedOutboundMessages;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Connection = conn;
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            failedOutboundMessages.Add(new OutboundMessageDetails
+                            {
+                                Id = Convert.ToInt32(reader[TableColumnName.Id]),
+                                ActivityTypeName = Convert.ToString(reader[TableColumnName.ActivityTypeName]),
+                                ActivitySubTypeName = Convert.ToString(reader[TableColumnName.ActivitySubTypeName]),
+                                ActionReasonName = Convert.ToString(reader[TableColumnName.ActionReasonName]),
+                                ClientIntegrationId = Convert.ToString(reader[TableColumnName.ClientIntegrationId]),
+                                ActivityIdentifier = Convert.ToString(reader[TableColumnName.ActivityIdentifier]),
+                                ActionOccurredOn = Convert.ToDateTime(reader[TableColumnName.ActionOccurredOn]),
+                                ActionUpdatedBy = Convert.ToString(reader[TableColumnName.ActionUpdatedBy]),
+                                Details = Convert.ToString(reader[TableColumnName.Details]),
+                                IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
+                                ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails]),
+                                RawData = Convert.ToString(reader[TableColumnName.RawData]),
+                                IsProcessed = Convert.ToBoolean(reader[TableColumnName.IsProcessed])
+                            });
+                        }
+                    }
+                }
+            }
+
+
+            return failedOutboundMessages;
         }
         #endregion
     }

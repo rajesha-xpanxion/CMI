@@ -16,5 +16,6 @@ namespace CMI.Processor.DAL
         public bool IsSuccessful { get; set; }
         public string ErrorDetails { get; set; }
         public string RawData { get; set; }
+        public bool IsProcessed { get; set; }
     }
 }

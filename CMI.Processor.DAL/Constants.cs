@@ -36,6 +36,7 @@
         public static string GetLastExecutionDateTime { get { return @"[dbo].[GetLastExecutionDateTime]"; } }
         public static string SaveExecutionStatus { get { return @"[dbo].[SaveExecutionStatus]"; } }
         public static string SaveOutboundMessages { get { return @"[dbo].[SaveOutboundMessages]"; } }
+        public static string GetFailedOutboundMessages { get { return @"[dbo].[GetFailedOutboundMessages]"; } }
     }
 
     public static class UserDefinedTableType
@@ -60,6 +61,7 @@
         public static string IsSuccessful { get { return "IsSuccessful"; } }
         public static string ErrorDetails { get { return "ErrorDetails"; } }
         public static string RawData { get { return "RawData"; } }
+        public static string IsProcessed { get { return "IsProcessed"; } }
     }
 
     public static class InboundProcessorStage
@@ -77,7 +79,7 @@
         public static string Client { get { return "Client"; } }
         public static string ClientProfile { get { return "ClientProfile"; } }
         public static string Note { get { return "Note"; } }
-        public static string OfficeVisit { get { return "OfficeVisit"; } }
+        public static string OfficeVisit { get { return "Office Visit"; } }
         public static string DrugTestAppointment { get { return "Drug Test Appointment"; } }
         public static string DrugTestResult { get { return "Drug Test Result"; } }
         public static string FieldVisit { get { return "FieldVisit"; } }
