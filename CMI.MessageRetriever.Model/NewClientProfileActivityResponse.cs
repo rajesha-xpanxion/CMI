@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CMI.MessageRetriever.Model
 {
-    public class ClientProfileDetailsActivityResponse : DetailsResponse
+    public class NewClientProfileActivityResponse : DetailsResponse
     {
         public string FirstName { get; set; }
         public string MiddleName { get; set; }

@@ -78,6 +78,20 @@ namespace CMI.Processor
             IEnumerable<OutboundMessageDetails> toBeProcessedOutboundMessages = savedOutboundMessages.Concat(failedOutboundMessages);
 
             //process each type of message based on whether it is allowed or not
+
+            //new client
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.Client, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundNewClientProfileProcessor)serviceProvider.GetService(typeof(OutboundNewClientProfileProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.Client, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+            }
+
             //client profile
             if (
                 ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null

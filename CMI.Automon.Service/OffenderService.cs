@@ -178,7 +178,7 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SqlParamName.ClientType,
+                            ParameterName = SqlParamName.OffenderType,
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderDetails.ClientType,
                             IsNullable = false

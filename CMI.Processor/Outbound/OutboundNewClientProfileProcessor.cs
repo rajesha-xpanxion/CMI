@@ -15,12 +15,12 @@ using System.Text;
 
 namespace CMI.Processor
 {
-    public class OutboundClientProfileProcessor : OutboundBaseProcessor
+    public class OutboundNewClientProfileProcessor : OutboundBaseProcessor
     {
         private readonly IOffenderService offenderService;
         private readonly IClientService clientService;
 
-        public OutboundClientProfileProcessor(
+        public OutboundNewClientProfileProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
             IOffenderService offenderService,
@@ -38,13 +38,13 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile - Details activity processing initiated."
+                Message = "New Client Profile activity processing initiated."
             });
 
             TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus
             {
                 ProcessorType = Common.Notification.ProcessorType.Outbound,
-                TaskName = "Client Profile - Details",
+                TaskName = "New Client Profile",
                 IsSuccessful = true,
                 NexusReceivedMessageCount = messages.Count()
             };
@@ -57,9 +57,9 @@ namespace CMI.Processor
                     message.IsProcessed = true;
                     try
                     {
-                        offenderDetails = (OffenderDetails)ConvertResponseToObject<ClientProfileDetailsActivityResponse>(
+                        offenderDetails = (OffenderDetails)ConvertResponseToObject<NewClientProfileActivityResponse>(
                             message.ClientIntegrationId,
-                            RetrieveActivityDetails<ClientProfileDetailsActivityResponse>(message.Details),
+                            RetrieveActivityDetails<NewClientProfileActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
 
@@ -89,7 +89,7 @@ namespace CMI.Processor
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "Error occurred while processing a Client Profile - Details activity.",
+                            Message = "Error occurred while processing a New Client Profile activity.",
                             Exception = ce,
                             AutomonData = JsonConvert.SerializeObject(offenderDetails),
                             NexusData = JsonConvert.SerializeObject(message)
@@ -105,7 +105,7 @@ namespace CMI.Processor
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "Critical error occurred while processing a Client Profile - Details activity.",
+                            Message = "Critical error occurred while processing a New Client Profile activity.",
                             Exception = ex,
                             AutomonData = JsonConvert.SerializeObject(offenderDetails),
                             NexusData = JsonConvert.SerializeObject(message)
@@ -128,7 +128,7 @@ namespace CMI.Processor
                 {
                     OperationName = this.GetType().Name,
                     MethodName = "Execute",
-                    Message = "Critical error occurred while processing Client Profile - Details activities.",
+                    Message = "Critical error occurred while processing New Client Profile activities.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(messages)
                 });
@@ -144,7 +144,7 @@ namespace CMI.Processor
             {
                 OperationName = this.GetType().Name,
                 MethodName = "Execute",
-                Message = "Client Profile - Details activity processing completed.",
+                Message = "New Client Profile activity processing completed.",
                 CustomParams = JsonConvert.SerializeObject(taskExecutionStatus)
             });
 

@@ -3,6 +3,7 @@
 
 
 
+
 CREATE VIEW [dbo].[vw_AllOutboundMessageDetails]
 AS
 	SELECT
@@ -21,7 +22,8 @@ AS
 		OM.[ReceivedOn],
 		OM.[IsSuccessful],
 		OM.[ErrorDetails],
-		OM.[RawData]
+		OM.[RawData],
+		OM.[IsProcessed]
 	FROM
 		[dbo].[OutboundMessage] OM JOIN [dbo].[ActivityType] AT
 			ON OM.[ActivityTypeId] = AT.[Id]

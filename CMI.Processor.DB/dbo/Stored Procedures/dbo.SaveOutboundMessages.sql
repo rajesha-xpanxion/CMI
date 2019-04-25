@@ -1,6 +1,8 @@
 ﻿
 
 
+
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	04-Apr-19
@@ -41,7 +43,8 @@ BEGIN
 	   [ReceivedOn] DATETIME,
 	   [IsSuccessful] BIT,
 	   [ErrorDetails] NVARCHAR(MAX),
-	   [RawData] NVARCHAR(MAX)
+	   [RawData] NVARCHAR(MAX),
+	   [IsProcessed] BIT
 	);
 
 
@@ -96,6 +99,7 @@ BEGIN
 			@OutboundMessageTbl
 		WHERE
 			[ActionReasonName] IS NOT NULL
+			AND [ActionReasonName] <> ''
 
 	) AS Src
 	ON (Tgt.[Name] = Src.[ActionReasonName])
@@ -120,7 +124,8 @@ BEGIN
 			@ReceivedOn AS [ReceivedOn],
 			OMT.[IsSuccessful],
 			OMT.[ErrorDetails],
-			OMT.[RawData]
+			OMT.[RawData],
+			OMT.[IsProcessed]
 		FROM
 			@OutboundMessageTbl OMT JOIN [dbo].[ActivityType] AT
 				ON OMT.[ActivityTypeName] = AT.[Name]
@@ -131,8 +136,16 @@ BEGIN
 	) AS Src
 	ON (Tgt.[Id] = Src.[Id])
 	WHEN NOT MATCHED THEN  
-		INSERT ([ActivityTypeId], [ActivitySubTypeId], [ActionReasonId], [ClientIntegrationId], [ActivityIdentifier], [ActionOccurredOn], [ActionUpdatedBy], [Details], [ReceivedOn], [RawData])
-		VALUES (Src.[ActivityTypeId], Src.[ActivitySubTypeId], Src.[ActionReasonId], Src.[ClientIntegrationId], Src.[ActivityIdentifier], Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], @ReceivedOn, Src.[RawData])
+		INSERT 
+		(
+			[ActivityTypeId], [ActivitySubTypeId], [ActionReasonId], [ClientIntegrationId], [ActivityIdentifier], 
+			[ActionOccurredOn], [ActionUpdatedBy], [Details], [ReceivedOn], [IsSuccessful], [RawData], [IsProcessed]
+		)
+		VALUES 
+		(
+			Src.[ActivityTypeId], Src.[ActivitySubTypeId], Src.[ActionReasonId], Src.[ClientIntegrationId], Src.[ActivityIdentifier], 
+			Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], @ReceivedOn, Src.[IsSuccessful], Src.[RawData], Src.[IsProcessed]
+		)
 	WHEN MATCHED THEN
 		UPDATE SET
 			Tgt.[ActivityTypeId] = Src.[ActivityTypeId],
@@ -146,30 +159,32 @@ BEGIN
 			Tgt.[ReceivedOn] = Src.[ReceivedOn],
 			Tgt.[IsSuccessful] = Src.[IsSuccessful],
 			Tgt.[ErrorDetails] = Src.[ErrorDetails],
-			Tgt.[RawData] = Src.[RawData]
+			Tgt.[RawData] = Src.[RawData],
+			Tgt.[IsProcessed] = Src.[IsProcessed]
 	OUTPUT
 		$action, inserted.* INTO @OutboundMessageOutput;
 
 
 	SELECT DISTINCT
-		OMP.[Id],
+		OMO.[Id],
 		AT.[Name] AS [ActivityTypeName],
 		AST.[Name] AS [ActivitySubTypeName],
 		AR.[Name] AS [ActionReasonName],
-		OMP.[ClientIntegrationId],
-		OMP.[ActivityIdentifier],
-		OMP.[ActionOccurredOn],
-		OMP.[ActionUpdatedBy],
-		OMP.[Details],
-		OMP.[IsSuccessful],
-		OMP.[ErrorDetails],
-		OMP.[RawData]
+		OMO.[ClientIntegrationId],
+		OMO.[ActivityIdentifier],
+		OMO.[ActionOccurredOn],
+		OMO.[ActionUpdatedBy],
+		OMO.[Details],
+		OMO.[IsSuccessful],
+		OMO.[ErrorDetails],
+		OMO.[RawData],
+		OMO.[IsProcessed]
 	FROM
-		@OutboundMessageOutput OMP JOIN [dbo].[ActivityType] AT
-			ON OMP.[ActivityTypeId] = AT.[Id]
+		@OutboundMessageOutput OMO JOIN [dbo].[ActivityType] AT
+			ON OMO.[ActivityTypeId] = AT.[Id]
 			JOIN [dbo].[ActionReason] AR
-				ON OMP.[ActionReasonId] = AR.[Id]
+				ON OMO.[ActionReasonId] = AR.[Id]
 				LEFT JOIN [dbo].[ActivitySubType] AST
-					ON OMP.[ActivitySubTypeId] = AST.[Id]
+					ON OMO.[ActivitySubTypeId] = AST.[Id]
 	
 END

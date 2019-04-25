@@ -17,7 +17,7 @@ EXEC
 
 		@DateOfBirth = '1976-02-10',
 		@TimeZone  = 'Pacific',
-		@ClientType = 'Adult',
+		@OffenderType = 'Adult',
 		@Gender = 'Male',
 		@EmailAddress = 'test1@test.com',
 		@Line1 = 'test line 1',
@@ -42,7 +42,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderAllDetails]
 	
 	@DateOfBirth DATETIME,
 	@TimeZone VARCHAR(150),
-	@ClientType VARCHAR(150),
+	@OffenderType VARCHAR(10),
 	@Gender VARCHAR(150),
 	@EmailAddress VARCHAR(150),
 	@Line1 VARCHAR(75),
@@ -63,6 +63,7 @@ BEGIN
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@AnyNameId		INT				= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[AnyName] WHERE [Firstname] = @FirstName AND [LastName] = @LastName AND [ToTime] IS NULL), 0),
+			@PersonType		INT				= CASE WHEN @OffenderType = ''Adult'' THEN 1 WHEN @OffenderType = ''Juvenile'' THEN 16 WHEN @OffenderType = ''Officer'' THEN 4 WHEN @OffenderType = ''Associate'' THEN 2 ELSE 0 END,
 			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@Value			VARCHAR(255)	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[PermDesc] = @Race AND LT.[IsActive] = 1 AND LT.[Description] = ''Race''),
 			@PermDesc		VARCHAR(50)		= ''Race'';
@@ -84,21 +85,34 @@ BEGIN
 		EXEC
 			[$AutomonDatabaseName].[dbo].[UpdatePerson]
 				@EnteredByPId,
-				@AnyNameId, 
+				@AnyNameId,
+				@PersonType, --PersonType: 1 = Adult, 16 = Juvenile, 4 = Officer, 2 = Associate
+				@PersonId OUTPUT;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
+		EXEC
+			[$AutomonDatabaseName].[dbo].[UpdateOffender] 
 				@PersonId, 
-				@Value, 
-				@EnteredByPId, 
-				0,
-				NULL,
-				@PermDesc, 
-				NULL,
-				NULL,
-				@PersonAttributeId OUTPUT;
+				@OffenderType, 
+				0, 
+				@Pin OUTPUT, 
+				@OffenderId OUTPUT;
 
-		--SELECT * FROM [$AutomonDatabaseName].[dbo].[PersonAttribute] WHERE [Id] = @PersonAttributeId;
+		
+		IF(@Race IS NOT NULL)
+		BEGIN
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
+					@PersonId, 
+					@Value, 
+					@EnteredByPId, 
+					0,
+					NULL,
+					@PermDesc, 
+					NULL,
+					NULL,
+					0;
+		END
+
 		';
 
 
@@ -114,13 +128,13 @@ BEGIN
 
 PRINT @SQLString;
 
-	EXECUTE sp_executesql 
-				@SQLString, 
-				@ParmDefinition,  
-				@Pin = @Pin,
-				@FirstName = @FirstName,
-				@MiddleName = @MiddleName,
-				@LastName = @LastName,
-				@Race = @Race,
-				@UpdatedBy = @UpdatedBy;
+	--EXECUTE sp_executesql 
+	--			@SQLString, 
+	--			@ParmDefinition,  
+	--			@Pin = @Pin,
+	--			@FirstName = @FirstName,
+	--			@MiddleName = @MiddleName,
+	--			@LastName = @LastName,
+	--			@Race = @Race,
+	--			@UpdatedBy = @UpdatedBy;
 END

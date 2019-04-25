@@ -100,6 +100,7 @@
     <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderVehicleDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmploymentDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderEmploymentDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetFailedOutboundMessages.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">

@@ -100,11 +100,17 @@ namespace CMI.Processor
 
                 bool isSearchConducted = false;
                 string searchLocations = string.Empty;
+                string searchResults = string.Empty;
 
                 if (details.VisitedLocations != null && details.VisitedLocations.Any())
                 {
                     isSearchConducted = details.VisitedLocations.Any(v => v.SearchedAreas != null && v.SearchedAreas.Any(sa => !string.IsNullOrEmpty(sa)));
-                    searchLocations = string.Join(", ", details.VisitedLocations.Select(v => string.Join(", ", v.SearchedAreas)));
+                    searchLocations = isSearchConducted ? string.Join(", ", details.VisitedLocations.Select(v => string.Join(", ", v.SearchedAreas))) : string.Empty;
+                }
+
+                if(details.FoundContraband != null && details.FoundContraband.Any())
+                {
+                    searchResults = string.Join(", ", details.FoundContraband.Select(fc => fc.Type));
                 }
 
                 List<VisitedLocationDetails> visitedLocations = new List<VisitedLocationDetails>(details.VisitedLocations);
@@ -125,9 +131,7 @@ namespace CMI.Processor
                     IsOffenderPresent = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase),
                     IsSearchConducted = isSearchConducted,
                     SearchLocations = searchLocations,
-                    SearchResults = details.FoundContraband != null
-                        ? string.Join(", ", details.FoundContraband)
-                        : string.Empty
+                    SearchResults = searchResults
                 };
             }
             else if (typeof(T) == typeof(ClientProfilePersonalDetailsActivityResponse))
@@ -170,7 +174,7 @@ namespace CMI.Processor
                     AddressType =
                         details.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase)
                         ? "Residential"
-                        : "Unknown"
+                        : "Mailing"
                 };
             }
             else if (typeof(T) == typeof(ClientProfileContactDetailsActivityResponse))
@@ -242,13 +246,13 @@ namespace CMI.Processor
                     JobTitle = details.Occupation
                 };
             }
-            else if (typeof(T) == typeof(ClientProfileDetailsActivityResponse))
+            else if (typeof(T) == typeof(NewClientProfileActivityResponse))
             {
-                ClientProfileDetailsActivityResponse details = (ClientProfileDetailsActivityResponse)(object)activityDetails;
+                NewClientProfileActivityResponse details = (NewClientProfileActivityResponse)(object)activityDetails;
 
                 return new OffenderDetails
                 {
-                    Pin = clientIntegrationId,
+                    Pin = null,
                     UpdatedBy = updatedBy,
                     FirstName = details.FirstName,
                     MiddleName = details.MiddleName,
