@@ -36,6 +36,7 @@ namespace CMI.Processor
 
         protected Offender ConvertResponseToObject<T>(String clientIntegrationId, T activityDetails, string updatedBy)
         {
+            //Note
             if (typeof(T) == typeof(ClientProfileNoteActivityDetailsResponse))
             {
                 ClientProfileNoteActivityDetailsResponse noteActivityDetailsResponse = (ClientProfileNoteActivityDetailsResponse)(object)activityDetails;
@@ -49,6 +50,7 @@ namespace CMI.Processor
 
                 };
             }
+            //Office Visit
             else if (typeof(T) == typeof(ClientProfileOfficeVisitDetailsActivityResponse))
             {
                 ClientProfileOfficeVisitDetailsActivityResponse details = (ClientProfileOfficeVisitDetailsActivityResponse)(object)activityDetails;
@@ -70,6 +72,7 @@ namespace CMI.Processor
 
                 };
             }
+            //Drug Test Result
             else if (typeof(T) == typeof(ClientProfileDrugTestResultDetailsActivityResponse))
             {
                 ClientProfileDrugTestResultDetailsActivityResponse details = (ClientProfileDrugTestResultDetailsActivityResponse)(object)activityDetails;
@@ -94,6 +97,7 @@ namespace CMI.Processor
                         : string.Empty
                 };
             }
+            //Field Visit
             else if (typeof(T) == typeof(ClientProfileFieldVisitDetailsActivityResponse))
             {
                 ClientProfileFieldVisitDetailsActivityResponse details = (ClientProfileFieldVisitDetailsActivityResponse)(object)activityDetails;
@@ -134,6 +138,7 @@ namespace CMI.Processor
                     SearchResults = searchResults
                 };
             }
+            //Client Profile - Personal Details
             else if (typeof(T) == typeof(ClientProfilePersonalDetailsActivityResponse))
             {
                 ClientProfilePersonalDetailsActivityResponse details = (ClientProfilePersonalDetailsActivityResponse)(object)activityDetails;
@@ -150,6 +155,7 @@ namespace CMI.Processor
                     Gender = details.Gender
                 };
             }
+            //Client Profile - Email Details
             else if (typeof(T) == typeof(ClientProfileEmailDetailsActivityResponse))
             {
                 ClientProfileEmailDetailsActivityResponse details = (ClientProfileEmailDetailsActivityResponse)(object)activityDetails;
@@ -161,6 +167,7 @@ namespace CMI.Processor
                     EmailAddress = details.Email
                 };
             }
+            //Client Profile - Address Details
             else if (typeof(T) == typeof(ClientProfileAddressDetailsActivityResponse))
             {
                 ClientProfileAddressDetailsActivityResponse details = (ClientProfileAddressDetailsActivityResponse)(object)activityDetails;
@@ -177,6 +184,7 @@ namespace CMI.Processor
                         : "Mailing"
                 };
             }
+            //Client Profile - Contact Details
             else if (typeof(T) == typeof(ClientProfileContactDetailsActivityResponse))
             {
                 ClientProfileContactDetailsActivityResponse details = (ClientProfileContactDetailsActivityResponse)(object)activityDetails;
@@ -197,6 +205,7 @@ namespace CMI.Processor
                         )
                 };
             }
+            //Client Profile - Vehicle Details
             else if (typeof(T) == typeof(ClientProfileVehicleDetailsActivityResponse))
             {
                 ClientProfileVehicleDetailsActivityResponse details = (ClientProfileVehicleDetailsActivityResponse)(object)activityDetails;
@@ -212,6 +221,7 @@ namespace CMI.Processor
                     LicensePlate = details.LicensePlate
                 };
             }
+            //Client Profile - Employment Details
             else if (typeof(T) == typeof(ClientProfileEmploymentDetailsActivityResponse))
             {
                 ClientProfileEmploymentDetailsActivityResponse details = (ClientProfileEmploymentDetailsActivityResponse)(object)activityDetails;
@@ -246,6 +256,7 @@ namespace CMI.Processor
                     JobTitle = details.Occupation
                 };
             }
+            //New Client Profile
             else if (typeof(T) == typeof(NewClientProfileActivityResponse))
             {
                 NewClientProfileActivityResponse details = (NewClientProfileActivityResponse)(object)activityDetails;
@@ -257,14 +268,33 @@ namespace CMI.Processor
                     FirstName = details.FirstName,
                     MiddleName = details.MiddleName,
                     LastName = details.LastName,
+                    ClientType = 
+                        details.ClientType.Equals("Adult.Interstate", StringComparison.InvariantCultureIgnoreCase) 
+                            ? "Adult" 
+                            : details.ClientType.Equals("Probation", StringComparison.InvariantCultureIgnoreCase)
+                                ? "Juvenile"
+                                : null,
                     Race = details.Ethinicity,
-                    ClientType = details.ClientType,
+                    DateOfBirth = details.DateOfBirth,
+                    Gender = details.Gender,
                     EmailAddress = details.Email,
                     Line1 = details.Address,
                     //Line2 = details.Address,
-                    AddressType = details.AddressType,
-                    Phone = details.Contact,
-                    PhoneNumberType = details.ContactType
+                    AddressType =
+                        details.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase)
+                        ? "Residential"
+                        : "Mailing",
+                    Phone = details.Contact.Replace(" ", string.Empty),
+                    PhoneNumberType =
+                        details.ContactType.Equals("HomePhone", StringComparison.InvariantCultureIgnoreCase)
+                        ? "Residential"
+                        :
+                        (
+                            details.ContactType.Equals("MobilePhone", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Mobile"
+                            : "Message"
+                        )
+
                 };
             }
 

@@ -11,24 +11,36 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace CMI.Processor
 {
     public class OutboundNewClientProfileProcessor : OutboundBaseProcessor
     {
         private readonly IOffenderService offenderService;
+        private readonly IOffenderPersonalDetailsService offenderPersonalDetailsService;
+        private readonly IOffenderEmailService offenderEmailService;
+        private readonly IOffenderAddressService offenderAddressService;
+        private readonly IOffenderPhoneService offenderPhoneService;
         private readonly IClientService clientService;
 
         public OutboundNewClientProfileProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
             IOffenderService offenderService,
+            IOffenderPersonalDetailsService offenderPersonalDetailsService,
+            IOffenderEmailService offenderEmailService,
+            IOffenderAddressService offenderAddressService,
+            IOffenderPhoneService offenderPhoneService,
             IClientService clientService
         )
             : base(serviceProvider, configuration)
         {
             this.offenderService = offenderService;
+            this.offenderPersonalDetailsService = offenderPersonalDetailsService;
+            this.offenderEmailService = offenderEmailService;
+            this.offenderAddressService = offenderAddressService;
+            this.offenderPhoneService = offenderPhoneService;
+
             this.clientService = clientService;
         }
 
@@ -63,9 +75,41 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
+                        //add new offender with basic details
                         offenderDetails.Pin = offenderService.SaveOffenderDetails(ProcessorConfig.CmiDbConnString, offenderDetails);
 
+                        //update back client id in Nexus
                         clientService.UpdateClientId(message.ClientIntegrationId, offenderDetails.Pin);
+
+                        //save personal details of newly created offender
+                        offenderPersonalDetailsService.SaveOffenderPersonalDetails(ProcessorConfig.CmiDbConnString, offenderDetails);
+
+                        //save email details of newly created offender
+                        offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, new OffenderEmail
+                        {
+                            Pin = offenderDetails.Pin,
+                            UpdatedBy = offenderDetails.UpdatedBy,
+                            EmailAddress = offenderDetails.EmailAddress
+                        });
+
+                        //save address details of newly created offender
+                        offenderAddressService.SaveOffenderAddressDetails(ProcessorConfig.CmiDbConnString, new OffenderAddress
+                        {
+                            Pin = offenderDetails.Pin,
+                            UpdatedBy = offenderDetails.UpdatedBy,
+                            Line1 = offenderDetails.Line1,
+                            Line2 = offenderDetails.Line2,
+                            AddressType = offenderDetails.AddressType
+                        });
+
+                        //save phone details of newly created offender
+                        offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, new OffenderPhone
+                        {
+                            Pin = offenderDetails.Pin,
+                            UpdatedBy = offenderDetails.UpdatedBy,
+                            Phone = offenderDetails.Phone,
+                            PhoneNumberType = offenderDetails.PhoneNumberType
+                        });
 
                         taskExecutionStatus.AutomonAddMessageCount++;
                         message.IsSuccessful = true;
@@ -118,7 +162,8 @@ namespace CMI.Processor
             catch (Exception ex)
             {
                 taskExecutionStatus.IsSuccessful = false;
-                messages.ToList().ForEach(m => {
+                messages.ToList().ForEach(m =>
+                {
                     m.IsProcessed = true;
                     m.IsSuccessful = false;
                     m.ErrorDetails = ex.ToString();
