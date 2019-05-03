@@ -96,7 +96,6 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderFieldVisitDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderDrugTestResultDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmailDetails.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderAllDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderVehicleDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmploymentDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderEmploymentDetails.sql" />

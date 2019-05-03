@@ -31,7 +31,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderPersonalDetails]
 	@LastName VARCHAR(32),
 	@DateOfBirth DATETIME = NULL,
 	@Gender VARCHAR(255) = NULL,
-	@Race VARCHAR(150),
+	@Race VARCHAR(150) = NULL,
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -70,13 +70,13 @@ BEGIN
 		/*******************************RACE****************************/
 		DECLARE
 			@PersonAttributeId	INT			= 0,
-			@Value			VARCHAR(255)	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[PermDesc] = @Race AND LT.[IsActive] = 1 AND LT.[Description] = ''Race''),
+			@Value			VARCHAR(255)	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[Description] = @Race AND LT.[IsActive] = 1 AND LT.[Description] = ''Race''),
 			@PermDesc		VARCHAR(50)		= ''Race'';
 
 		--check if valid race matched, otherwise set it with unknown
 		IF(@Value IS NULL)
 		BEGIN
-			SET @Value = (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[PermDesc] = ''Unknown'' AND LT.[IsActive] = 1 AND LT.[Description] = ''Race'');
+			SET @Value = (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE L.[IsActive] = 1 AND L.[Description] = ''Unknown'' AND LT.[IsActive] = 1 AND LT.[Description] = ''Race'');
 		END
 		
 		--update Race attribute
