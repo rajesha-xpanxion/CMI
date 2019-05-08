@@ -108,64 +108,100 @@ namespace CMI.Processor
                 );
 
                 //personal details
-                UpdateExecutionStatus(
-                    ((OutboundClientProfilePersonalDetailsProcessor)serviceProvider.GetService(typeof(OutboundClientProfilePersonalDetailsProcessor))).Execute(
-                        clientProfileMessages.Where(
-                            a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.PersonalDetails, StringComparison.InvariantCultureIgnoreCase)
-                        ),
-                        messagesReceivedOn
-                    )
-                );
+                if (
+                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.PersonalDetails, StringComparison.InvariantCultureIgnoreCase))
+                )
+                {
+                    UpdateExecutionStatus(
+                        ((OutboundClientProfilePersonalDetailsProcessor)serviceProvider.GetService(typeof(OutboundClientProfilePersonalDetailsProcessor))).Execute(
+                            clientProfileMessages.Where(
+                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.PersonalDetails, StringComparison.InvariantCultureIgnoreCase)
+                            ),
+                            messagesReceivedOn
+                        )
+                    );
+                }
 
                 //email
-                UpdateExecutionStatus(
-                    ((OutboundClientProfileEmailProcessor)serviceProvider.GetService(typeof(OutboundClientProfileEmailProcessor))).Execute(
-                        clientProfileMessages.Where(
-                            a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase)
-                        ),
-                        messagesReceivedOn
-                    )
-                );
+                if (
+                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase))
+                )
+                {
+                    UpdateExecutionStatus(
+                        ((OutboundClientProfileEmailProcessor)serviceProvider.GetService(typeof(OutboundClientProfileEmailProcessor))).Execute(
+                            clientProfileMessages.Where(
+                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase)
+                            ),
+                            messagesReceivedOn
+                        )
+                    );
+                }
 
                 //address
-                UpdateExecutionStatus(
-                    ((OutboundClientProfileAddressProcessor)serviceProvider.GetService(typeof(OutboundClientProfileAddressProcessor))).Execute(
-                        clientProfileMessages.Where(
-                            a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.AddressDetails, StringComparison.InvariantCultureIgnoreCase)
-                        ),
-                        messagesReceivedOn
-                    )
-                );
+                if (
+                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.AddressDetails, StringComparison.InvariantCultureIgnoreCase))
+                )
+                {
+                    UpdateExecutionStatus(
+                        ((OutboundClientProfileAddressProcessor)serviceProvider.GetService(typeof(OutboundClientProfileAddressProcessor))).Execute(
+                            clientProfileMessages.Where(
+                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.AddressDetails, StringComparison.InvariantCultureIgnoreCase)
+                            ),
+                            messagesReceivedOn
+                        )
+                    );
+                }
 
                 //contact
-                UpdateExecutionStatus(
-                    ((OutboundClientProfileContactProcessor)serviceProvider.GetService(typeof(OutboundClientProfileContactProcessor))).Execute(
-                        clientProfileMessages.Where(
-                            a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.ContactDetails, StringComparison.InvariantCultureIgnoreCase)
-                        ),
-                        messagesReceivedOn
-                    )
-                );
+                if (
+                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.ContactDetails, StringComparison.InvariantCultureIgnoreCase))
+                )
+                {
+                    UpdateExecutionStatus(
+                        ((OutboundClientProfileContactProcessor)serviceProvider.GetService(typeof(OutboundClientProfileContactProcessor))).Execute(
+                            clientProfileMessages.Where(
+                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.ContactDetails, StringComparison.InvariantCultureIgnoreCase)
+                            ),
+                            messagesReceivedOn
+                        )
+                    );
+                }
 
                 //vehicle
-                UpdateExecutionStatus(
-                    ((OutboundClientProfileVehicleProcessor)serviceProvider.GetService(typeof(OutboundClientProfileVehicleProcessor))).Execute(
-                        clientProfileMessages.Where(
-                            a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.VehicleDetails, StringComparison.InvariantCultureIgnoreCase)
-                        ),
-                        messagesReceivedOn
-                    )
-                );
+                if (
+                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.VehicleDetails, StringComparison.InvariantCultureIgnoreCase))
+                )
+                {
+                    UpdateExecutionStatus(
+                        ((OutboundClientProfileVehicleProcessor)serviceProvider.GetService(typeof(OutboundClientProfileVehicleProcessor))).Execute(
+                            clientProfileMessages.Where(
+                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.VehicleDetails, StringComparison.InvariantCultureIgnoreCase)
+                            ),
+                            messagesReceivedOn
+                        )
+                    );
+                }
 
                 //employment
-                UpdateExecutionStatus(
-                    ((OutboundClientProfileEmploymentProcessor)serviceProvider.GetService(typeof(OutboundClientProfileEmploymentProcessor))).Execute(
-                        clientProfileMessages.Where(
-                            a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.EmploymentDetails, StringComparison.InvariantCultureIgnoreCase)
-                        ),
-                        messagesReceivedOn
-                    )
-                );
+                if (
+                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.EmploymentDetails, StringComparison.InvariantCultureIgnoreCase))
+                )
+                {
+                    UpdateExecutionStatus(
+                        ((OutboundClientProfileEmploymentProcessor)serviceProvider.GetService(typeof(OutboundClientProfileEmploymentProcessor))).Execute(
+                            clientProfileMessages.Where(
+                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.EmploymentDetails, StringComparison.InvariantCultureIgnoreCase)
+                            ),
+                            messagesReceivedOn
+                        )
+                    );
+                }
             }
 
             //general notes

@@ -22,5 +22,6 @@ namespace CMI.Processor.DAL
     {
         public string ProcessorTypeToExecute { get; set; }
         public IEnumerable<string> ActivityTypesToProcess { get; set; }
+        public IEnumerable<string> ActivitySubTypesToProcess { get; set; }
     }
 }
