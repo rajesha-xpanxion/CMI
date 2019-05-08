@@ -107,16 +107,6 @@ namespace CMI.Processor
                         && JsonConvert.DeserializeObject<DetailsResponse>(a.Details) != null
                 );
 
-                //details
-                //UpdateExecutionStatus(
-                //    ((OutboundClientProfileProcessor)serviceProvider.GetService(typeof(OutboundClientProfileProcessor))).Execute(
-                //        clientProfileMessages.Where(
-                //            a => string.IsNullOrEmpty(a.ActivitySubTypeName)
-                //        ),
-                //        messagesReceivedOn
-                //    )
-                //);
-
                 //personal details
                 UpdateExecutionStatus(
                     ((OutboundClientProfilePersonalDetailsProcessor)serviceProvider.GetService(typeof(OutboundClientProfilePersonalDetailsProcessor))).Execute(
@@ -199,6 +189,19 @@ namespace CMI.Processor
             {
                 UpdateExecutionStatus(((OutboundClientProfileOfficeVisitProcessor)serviceProvider.GetService(typeof(OutboundClientProfileOfficeVisitProcessor))).Execute(
                     toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.OfficeVisit, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+            }
+
+            //drug test appointment
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.DrugTestAppointment, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundClientProfileDrugTestAppointmentProcessor)serviceProvider.GetService(typeof(OutboundClientProfileDrugTestAppointmentProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.DrugTestAppointment, StringComparison.InvariantCultureIgnoreCase)),
                     messagesReceivedOn
                     )
                 );

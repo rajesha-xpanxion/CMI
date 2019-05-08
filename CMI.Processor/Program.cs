@@ -132,6 +132,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<IOffenderEmploymentService, OffenderEmploymentService>();
             serviceCollection.AddSingleton<IOffenderCaseService, OffenderCaseService>();
             serviceCollection.AddSingleton<IOffenderNoteService, OffenderNoteService>();
+            serviceCollection.AddSingleton<IOffenderDrugTestAppointmentService, OffenderDrugTestAppointmentService>();
             serviceCollection.AddSingleton<IOffenderDrugTestResultService, OffenderDrugTestResultService>();
             serviceCollection.AddSingleton<IOffenderOfficeVisitService, OffenderOfficeVisitService>();
             serviceCollection.AddSingleton<IOffenderFieldVisitService, OffenderFieldVisitService>();
@@ -178,6 +179,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<OutboundClientProfileEmploymentProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileNoteProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileOfficeVisitProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileDrugTestAppointmentProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileDrugTestResultProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileFieldVisitProcessor>();
             

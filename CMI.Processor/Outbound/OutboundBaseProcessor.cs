@@ -72,6 +72,26 @@ namespace CMI.Processor
 
                 };
             }
+            //Drug Test Appointment
+            else if (typeof(T) == typeof(ClientProfileDrugTestAppointmentDetailsActivityResponse))
+            {
+                ClientProfileDrugTestAppointmentDetailsActivityResponse details = (ClientProfileDrugTestAppointmentDetailsActivityResponse)(object)activityDetails;
+                return new OffenderDrugTestAppointment()
+                {
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+                    StartDate = details.AppointmentDateTime,
+                    EndDate = details.AppointmentDateTime,
+                    Status = details.AppointmentStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                        ? 2
+                        : details.AppointmentStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
+                            ? 16
+                            : details.AppointmentStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                                ? 16
+                                : 0,
+                    Location = details.Location
+                };
+            }
             //Drug Test Result
             else if (typeof(T) == typeof(ClientProfileDrugTestResultDetailsActivityResponse))
             {
