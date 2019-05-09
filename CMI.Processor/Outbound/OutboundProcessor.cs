@@ -269,6 +269,19 @@ namespace CMI.Processor
                 );
             }
 
+            //treatment appointment
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.TreatmentAppointment, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundClientProfileTreatmentAppointmentProcessor)serviceProvider.GetService(typeof(OutboundClientProfileTreatmentAppointmentProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.TreatmentAppointment, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+            }
+
             //derive final processor execution status and save it to database
             ProcessorExecutionStatus.ExecutionStatusMessage = ProcessorExecutionStatus.IsSuccessful
                 ? "Outbound Processor execution completed successfully."

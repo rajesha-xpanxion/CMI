@@ -83,6 +83,7 @@
         public static string DrugTestAppointment { get { return "Drug Test Appointment"; } }
         public static string DrugTestResult { get { return "Drug Test Result"; } }
         public static string FieldVisit { get { return "FieldVisit"; } }
+        public static string TreatmentAppointment { get { return "Treatment Appointment"; } }
     }
 
     public static class OutboundProcessorClientProfileActivitySubType

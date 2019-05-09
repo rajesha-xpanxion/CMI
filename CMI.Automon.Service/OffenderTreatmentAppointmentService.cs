@@ -5,14 +5,14 @@ using System.Data.SqlClient;
 
 namespace CMI.Automon.Service
 {
-    public class OffenderDrugTestAppointmentService : IOffenderDrugTestAppointmentService
+    public class OffenderTreatmentAppointmentService : IOffenderTreatmentAppointmentService
     {
         #region Private Member Variables
         private readonly AutomonConfig automonConfig;
         #endregion
 
         #region Constructor
-        public OffenderDrugTestAppointmentService(
+        public OffenderTreatmentAppointmentService(
             IOptions<AutomonConfig> automonConfig
         )
         {
@@ -21,7 +21,7 @@ namespace CMI.Automon.Service
         #endregion
 
         #region Public Methods
-        public void SaveOffenderDrugTestAppointmentDetails(string CmiDbConnString, OffenderDrugTestAppointment offenderDrugTestAppointmentDetails)
+        public void SaveOffenderTreatmentAppointmentDetails(string CmiDbConnString, OffenderTreatmentAppointment offenderTreatmentAppointmentDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -40,7 +40,7 @@ namespace CMI.Automon.Service
 
                     using (SqlCommand cmd = new SqlCommand())
                     {
-                        cmd.CommandText = StoredProc.SaveOffenderDrugTestAppointmentDetails;
+                        cmd.CommandText = StoredProc.SaveOffenderTreatmentAppointmentDetails;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
                         cmd.Parameters.Add(new SqlParameter()
@@ -53,37 +53,45 @@ namespace CMI.Automon.Service
                         {
                             ParameterName = SqlParamName.Pin,
                             SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderDrugTestAppointmentDetails.Pin,
+                            Value = offenderTreatmentAppointmentDetails.Pin,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.UpdatedBy,
                             SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderDrugTestAppointmentDetails.UpdatedBy,
+                            Value = offenderTreatmentAppointmentDetails.UpdatedBy,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.StartDate,
                             SqlDbType = System.Data.SqlDbType.DateTime,
-                            Value = offenderDrugTestAppointmentDetails.StartDate,
+                            Value = offenderTreatmentAppointmentDetails.StartDate,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Comment,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderTreatmentAppointmentDetails.Comment,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.EndDate,
                             SqlDbType = System.Data.SqlDbType.DateTime,
-                            Value = offenderDrugTestAppointmentDetails.EndDate,
+                            Value = offenderTreatmentAppointmentDetails.EndDate,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.Status,
                             SqlDbType = System.Data.SqlDbType.Int,
-                            Value = offenderDrugTestAppointmentDetails.Status,
+                            Value = offenderTreatmentAppointmentDetails.Status,
                             IsNullable = false
                         });
+
 
 
                         cmd.Connection = conn;

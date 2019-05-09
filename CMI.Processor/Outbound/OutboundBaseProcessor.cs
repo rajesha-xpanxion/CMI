@@ -317,6 +317,26 @@ namespace CMI.Processor
 
                 };
             }
+            //Treatment Appointment
+            else if (typeof(T) == typeof(ClientProfileTreatmentAppointmentDetailsActivityResponse))
+            {
+                ClientProfileTreatmentAppointmentDetailsActivityResponse details = (ClientProfileTreatmentAppointmentDetailsActivityResponse)(object)activityDetails;
+                return new OffenderTreatmentAppointment()
+                {
+                    Pin = clientIntegrationId,
+                    UpdatedBy = updatedBy,
+
+                    StartDate = details.AppointmentDateTime,
+                    EndDate = details.AppointmentDateTime,
+                    Status = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                        ? 2
+                        : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
+                            ? 16
+                            : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                                ? 16
+                                : 0
+                };
+            }
 
             return null;
         }
