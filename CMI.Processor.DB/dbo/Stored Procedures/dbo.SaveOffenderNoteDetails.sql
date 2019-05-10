@@ -18,6 +18,7 @@ EXEC
 History:-
 Date			Author			Changes
 03-Apr-19		Rajesh Awate	Created.
+10-May-19		Rajesh Awate	Changes to use new event type for notes.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderNoteDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -33,7 +34,7 @@ BEGIN
 		'
 		--declare required variables and assign it with values
 		DECLARE 
-			@EventTypeId	INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''CaseNote''),
+			@EventTypeId	INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''NexusCaseNote''),
 			@EventDateTime	DATETIME		= @Date,
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @AuthorEmail), 0),
 			@Comment		VARCHAR(MAX)	= @Text,
