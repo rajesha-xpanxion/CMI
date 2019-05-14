@@ -334,7 +334,8 @@ namespace CMI.Processor
                             ? 16
                             : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
-                                : 0
+                                : 0,
+                    Comment = details.Notes
                 };
             }
 
