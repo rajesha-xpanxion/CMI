@@ -5,6 +5,7 @@ namespace CMI.Common.Notification
     {
         #region Template File Names
         public static string ProcessorExecutionStatusReportEmailTemplateFileName { get { return "ProcessorExecutionStatusReportEmailTemplate.html"; } }
+        public static string CriticalErrorEmailTemplateFileName { get { return "CriticalErrorEmailTemplateFileName.html"; } }
         #endregion
 
         #region Template Variable Names

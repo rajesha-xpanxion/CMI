@@ -9,6 +9,15 @@ namespace CMI.Automon.Service
         public static string TestDataJsonFileNameAllOffenderEmailContactDetails { get { return "AllOffenderEmailContactDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderCaseDetails { get { return "AllOffenderCaseDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderNoteDetails { get { return "AllOffenderNoteDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderDrugTestAppointmentDetails { get { return "AllOffenderDrugTestAppointmentDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderDrugTestResultDetails { get { return "AllOffenderDrugTestResultDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderEmploymentDetails { get { return "AllOffenderEmploymentDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderFieldVisitDetails { get { return "AllOffenderFieldVisitDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderOfficeVisitDetails { get { return "AllOffenderOfficeVisitDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderPersonalDetails { get { return "AllOffenderPersonalDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderPhoneDetails { get { return "AllOffenderPhoneDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderTreatmentAppointmentDetails { get { return "AllOffenderTreatmentAppointmentDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderVehicleDetails { get { return "AllOffenderVehicleDetails.json"; } }
     }
 
     public static class SqlParamName

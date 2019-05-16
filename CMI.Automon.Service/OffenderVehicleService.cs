@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Options;
 using CMI.Automon.Interface;
 using CMI.Automon.Model;
+using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace CMI.Automon.Service
 {
@@ -24,12 +27,24 @@ namespace CMI.Automon.Service
         {
             if (automonConfig.IsDevMode)
             {
-                //test data
-                //string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderNoteDetails);
+                string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderVehicleDetails);
 
-                //return File.Exists(testDataJsonFileName)
-                //    ? JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(testDataJsonFileName))
-                //    : new List<OffenderNote>();
+                //check if repository parent directory exists, if not then create
+                if (!Directory.Exists(automonConfig.TestDataJsonRepoPath))
+                {
+                    Directory.CreateDirectory(automonConfig.TestDataJsonRepoPath);
+                }
+
+                //read existing objects
+                List<OffenderVehicle> offenderVehicleDetailsList = File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<OffenderVehicle>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderVehicle>();
+
+                //merge
+                offenderVehicleDetailsList.Add(offenderVehicleDetails);
+
+                //write back
+                File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderVehicleDetailsList));
             }
             else
             {

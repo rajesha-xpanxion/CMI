@@ -39,7 +39,7 @@ namespace CMI.MessageRetriever.REST
             if (this.messageRetrieverConfig.IsDevMode)
             {
                 //test data
-                string testDataJsonFileName = Path.Combine(messageRetrieverConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOutboundMessages);
+                string testDataJsonFileName = Path.Combine(messageRetrieverConfig.TestDataJsonFileFullPath, Constants.TestDataJsonFileNameAllOutboundMessages);
 
                 return File.Exists(testDataJsonFileName)
                     ? JsonConvert.DeserializeObject<IEnumerable<MessageBodyResponse>>(File.ReadAllText(testDataJsonFileName))

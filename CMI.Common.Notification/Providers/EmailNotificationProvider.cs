@@ -58,6 +58,40 @@ namespace CMI.Common.Notification
 
             return response;
         }
+
+        public ExecutionStatusReportEmailResponse SendCriticalErrorEmail(BaseEmailRequest request)
+        {
+            var response = new ExecutionStatusReportEmailResponse { IsSuccessful = true };
+            try
+            {
+                if (emailNotificationConfig.IsEmailNotificationEnabled)
+                {
+                    string emailBody = GetEmailBodyForCriticalErrorEmail();
+
+                    SendEmail(
+                        emailNotificationConfig.SmtpServerHost,
+                        emailNotificationConfig.SmtpServerPort,
+                        emailNotificationConfig.MailServerUserName,
+                        emailNotificationConfig.MailServerPassword,
+                        emailNotificationConfig.IsEnableSsl,
+                        emailNotificationConfig.FromEmailAddress,
+                        request.ToEmailAddress,
+                        string.Empty,
+                        request.Subject,
+                        emailBody,
+                        MailPriority.Normal,
+                        null
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccessful = false;
+                response.Exception = ex;
+            }
+
+            return response;
+        }
         #endregion
 
         #region Private Helper Methods
@@ -206,6 +240,18 @@ namespace CMI.Common.Notification
             else
             {
                 body = body.Replace(Constants.TemplateVariableOutboundExecutionStatusDetails, Constants.NoOutboundExecutionHtml);
+            }
+
+            return body;
+        }
+
+        private string GetEmailBodyForCriticalErrorEmail()
+        {
+            string body = string.Empty;
+
+            using (StreamReader reader = new StreamReader(Path.Combine(emailNotificationConfig.EmailAlertTemplatesPath, Constants.CriticalErrorEmailTemplateFileName)))
+            {
+                body = reader.ReadToEnd();
             }
 
             return body;

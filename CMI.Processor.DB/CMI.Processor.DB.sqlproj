@@ -99,7 +99,6 @@
     <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderVehicleDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderEmploymentDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderEmploymentDetails.sql" />
-    <Build Include="dbo\Stored Procedures\dbo.GetFailedOutboundMessages.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveNewOffender.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderDrugTestAppointmentDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderTreatmentAppointmentDetails.sql" />

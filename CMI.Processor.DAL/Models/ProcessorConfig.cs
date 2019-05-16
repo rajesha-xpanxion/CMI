@@ -8,6 +8,7 @@ namespace CMI.Processor.DAL
         public string CmiDbConnString { get; set; }
         public string ExecutionStatusReportReceiverEmailAddresses { get; set; }
         public string ExecutionStatusReportEmailSubject { get; set; }
+        public string CriticalErrorEmailSubject { get; set; }
         public string ProcessorTypesToExecute { get; set; }
         public InboundProcessorConfig InboundProcessorConfig { get; set; }
         public OutboundProcessorConfig OutboundProcessorConfig { get; set; }
@@ -23,5 +24,6 @@ namespace CMI.Processor.DAL
         public string ProcessorTypeToExecute { get; set; }
         public IEnumerable<string> ActivityTypesToProcess { get; set; }
         public IEnumerable<string> ActivitySubTypesToProcess { get; set; }
+        public string SecondaryStorageRepositoryFileFullPath { get; set; }
     }
 }

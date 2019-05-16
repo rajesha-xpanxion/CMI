@@ -154,7 +154,7 @@ namespace CMI.Processor
             //update message wise processing status
             if (messages != null && messages.Any())
             {
-                ProcessorProvider.SaveOutboundMessages(messages, messagesReceivedOn);
+                ProcessorProvider.SaveOutboundMessagesToDatabase(messages);
             }
 
             Logger.LogInfo(new LogRequest

@@ -36,7 +36,6 @@
         public static string GetLastExecutionDateTime { get { return @"[dbo].[GetLastExecutionDateTime]"; } }
         public static string SaveExecutionStatus { get { return @"[dbo].[SaveExecutionStatus]"; } }
         public static string SaveOutboundMessages { get { return @"[dbo].[SaveOutboundMessages]"; } }
-        public static string GetFailedOutboundMessages { get { return @"[dbo].[GetFailedOutboundMessages]"; } }
     }
 
     public static class UserDefinedTableType
@@ -62,6 +61,7 @@
         public static string ErrorDetails { get { return "ErrorDetails"; } }
         public static string RawData { get { return "RawData"; } }
         public static string IsProcessed { get { return "IsProcessed"; } }
+        public static string ReceivedOn { get { return "ReceivedOn"; } }
     }
 
     public static class InboundProcessorStage

@@ -88,12 +88,24 @@ namespace CMI.Automon.Service
         {
             if (automonConfig.IsDevMode)
             {
-                //test data
-                //string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderNoteDetails);
+                string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderEmailContactDetails);
 
-                //return File.Exists(testDataJsonFileName)
-                //    ? JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(testDataJsonFileName))
-                //    : new List<OffenderNote>();
+                //check if repository parent directory exists, if not then create
+                if (!Directory.Exists(automonConfig.TestDataJsonRepoPath))
+                {
+                    Directory.CreateDirectory(automonConfig.TestDataJsonRepoPath);
+                }
+
+                //read existing objects
+                List<OffenderEmail> offenderEmailDetailsList = File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<OffenderEmail>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderEmail>();
+
+                //merge
+                offenderEmailDetailsList.Add(offenderEmailDetails);
+
+                //write back
+                File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderEmailDetailsList));
             }
             else
             {

@@ -15,15 +15,18 @@ namespace CMI.Processor
     {
         private readonly IServiceProvider serviceProvider;
         private readonly IConfiguration configuration;
+        private readonly IEmailNotificationProvider emailNotificationProvider;
 
         public OutboundProcessor(
             IServiceProvider serviceProvider,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IEmailNotificationProvider emailNotificationProvider
         )
             : base(serviceProvider, configuration)
         {
             this.serviceProvider = serviceProvider;
             this.configuration = configuration;
+            this.emailNotificationProvider = emailNotificationProvider;
 
             ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = DAL.ProcessorType.Outbound, ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
             TaskExecutionStatuses = new List<TaskExecutionStatus>();
@@ -40,45 +43,92 @@ namespace CMI.Processor
             });
 
             //retrieve all messages from queue
-            IEnumerable<MessageBodyResponse> allOutboundMessages = ((IMessageRetrieverService)serviceProvider.GetService(typeof(IMessageRetrieverService))).Execute().Result;
-
-            //filter out valid outbound messages
-            IEnumerable<MessageBodyResponse> validOutboundMessages = allOutboundMessages.Where(x => x.Client != null && x.Activity != null && x.Details != null && x.Action != null);
-
-            //retrieve failed outbound messages from database to process it again
-            IEnumerable<OutboundMessageDetails> failedOutboundMessages = ProcessorProvider.GetFailedOutboundMessages();
+            IEnumerable<MessageBodyResponse> newlyReceivedOutboundMessages = ((IMessageRetrieverService)serviceProvider.GetService(typeof(IMessageRetrieverService))).Execute().Result;
 
             DateTime messagesReceivedOn = DateTime.Now;
 
-            //save details of received messages in database
-            IEnumerable<OutboundMessageDetails> savedOutboundMessages = ProcessorProvider.SaveOutboundMessages(validOutboundMessages
-                .Select(m => new OutboundMessageDetails
-                {
-                    Id = 0,
-                    ActivityTypeName = m.Activity.Type,
-                    ActivitySubTypeName = (
-                        !string.IsNullOrEmpty(JsonConvert.SerializeObject(m.Details)) && JsonConvert.DeserializeObject<DetailsResponse>(JsonConvert.SerializeObject(m.Details)) != null
-                        ? JsonConvert.DeserializeObject<DetailsResponse>(JsonConvert.SerializeObject(m.Details)).SubType
-                        : string.Empty
-                    ),
-                    ActionReasonName = m.Action.Reason,
-                    ClientIntegrationId = m.Client.IntegrationId,
-                    ActivityIdentifier = m.Activity.Identifier,
-                    ActionOccurredOn = m.Action.OccurredOn,
-                    ActionUpdatedBy = m.Action.UpdatedBy,
-                    Details = JsonConvert.SerializeObject(m.Details),
-                    IsSuccessful = false,
-                    RawData = JsonConvert.SerializeObject(m),
-                    IsProcessed = false
-                }),
-                messagesReceivedOn
-            );
+            //filter out valid outbound messages
+            IEnumerable<MessageBodyResponse> newlyReceivedValidOutboundMessages = newlyReceivedOutboundMessages.Where(x => x.Client != null && x.Activity != null && x.Details != null && x.Action != null);
 
-            //combine newly saved outbound messages and failed outbound messages so that both list will be processed together
-            IEnumerable<OutboundMessageDetails> toBeProcessedOutboundMessages = savedOutboundMessages.Concat(failedOutboundMessages);
+            //convert messages in required format
+            IEnumerable<OutboundMessageDetails> convertedOutboundMessages = newlyReceivedValidOutboundMessages
+                    .Select(m => new OutboundMessageDetails
+                    {
+                        Id = 0,
+                        ActivityTypeName = m.Activity.Type,
+                        ActivitySubTypeName = (
+                            !string.IsNullOrEmpty(JsonConvert.SerializeObject(m.Details)) && JsonConvert.DeserializeObject<DetailsResponse>(JsonConvert.SerializeObject(m.Details)) != null
+                            ? JsonConvert.DeserializeObject<DetailsResponse>(JsonConvert.SerializeObject(m.Details)).SubType
+                            : string.Empty
+                        ),
+                        ActionReasonName = m.Action.Reason,
+                        ClientIntegrationId = m.Client.IntegrationId,
+                        ActivityIdentifier = m.Activity.Identifier,
+                        ActionOccurredOn = m.Action.OccurredOn,
+                        ActionUpdatedBy = m.Action.UpdatedBy,
+                        Details = JsonConvert.SerializeObject(m.Details),
+                        IsSuccessful = false,
+                        RawData = JsonConvert.SerializeObject(m),
+                        IsProcessed = false,
+                        ReceivedOn = messagesReceivedOn
+                    });
+
+            //check if any new outbound message received and log as debug log for reference
+            if (convertedOutboundMessages != null && convertedOutboundMessages.Any())
+            {
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "New Outbound messages received from Nexus.",
+                    CustomParams = JsonConvert.SerializeObject(convertedOutboundMessages)
+                });
+            }
+
+            //try to read failed messages (if any) from secondary storage (disk)
+            IEnumerable<OutboundMessageDetails> outboundMessagesFromDisk = ProcessorProvider.GetOutboundMessagesFromDisk();
+
+            //check if any failed outbound messages received from secondary storage (disk) and log as debug log for reference
+            //also append in main list
+            if (outboundMessagesFromDisk != null && outboundMessagesFromDisk.Any())
+            {
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Failed Outbound messages read from secondary storage (disk).",
+                    CustomParams = JsonConvert.SerializeObject(outboundMessagesFromDisk)
+                });
+
+                //append messages to mail list
+                convertedOutboundMessages = convertedOutboundMessages.Concat(outboundMessagesFromDisk);
+            }
+
+            //continue with regular processing
+            IEnumerable<OutboundMessageDetails> toBeProcessedOutboundMessages = null;
+
+            //try to save received outbound messages in database
+            try
+            {
+                toBeProcessedOutboundMessages = ProcessorProvider.SaveOutboundMessagesToDatabase(convertedOutboundMessages);
+            }
+            catch(Exception)
+            {
+                //save messages to disk in case of failure in saving it to database
+                ProcessorProvider.SaveOutboundMessagesToDisk(convertedOutboundMessages);
+
+                //send critical email to support persons configured
+                emailNotificationProvider.SendCriticalErrorEmail(new BaseEmailRequest
+                {
+                    Subject = ProcessorConfig.CriticalErrorEmailSubject,
+                    ToEmailAddress = ProcessorConfig.ExecutionStatusReportReceiverEmailAddresses
+                });
+
+                //application will not proceed further as there is no use of it. Hence just return from here and end execution of this processor.
+                return TaskExecutionStatuses;
+            }
 
             //process each type of message based on whether it is allowed or not
-
             //new client
             if (
                 ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null

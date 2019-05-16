@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace CMI.Processor.DAL
 {
@@ -141,9 +143,9 @@ namespace CMI.Processor.DAL
             }
         }
 
-        public IEnumerable<OutboundMessageDetails> SaveOutboundMessages(IEnumerable<OutboundMessageDetails> receivedOutboundMessages, DateTime receivedOn)
+        public IEnumerable<OutboundMessageDetails> SaveOutboundMessagesToDatabase(IEnumerable<OutboundMessageDetails> receivedOutboundMessages)
         {
-            List<OutboundMessageDetails> updatedOutboundMessages = new List<OutboundMessageDetails>();
+            List<OutboundMessageDetails> outboundMessages = new List<OutboundMessageDetails>();
 
             //check if any outbound message received
             if (receivedOutboundMessages != null && receivedOutboundMessages.Any())
@@ -176,6 +178,7 @@ namespace CMI.Processor.DAL
                         dataTable.Columns.Add(TableColumnName.ErrorDetails, typeof(string));
                         dataTable.Columns.Add(TableColumnName.RawData, typeof(string));
                         dataTable.Columns.Add(TableColumnName.IsProcessed, typeof(bool));
+                        dataTable.Columns.Add(TableColumnName.ReceivedOn, typeof(DateTime));
 
                         foreach (var outboundMessageDetails in receivedOutboundMessages)
                         {
@@ -192,7 +195,8 @@ namespace CMI.Processor.DAL
                                 outboundMessageDetails.IsSuccessful,
                                 outboundMessageDetails.ErrorDetails,
                                 outboundMessageDetails.RawData,
-                                outboundMessageDetails.IsProcessed
+                                outboundMessageDetails.IsProcessed,
+                                outboundMessageDetails.ReceivedOn
                             );
                         }
 
@@ -203,19 +207,12 @@ namespace CMI.Processor.DAL
                             SqlDbType = SqlDbType.Structured,
                             Direction = ParameterDirection.Input
                         });
-                        cmd.Parameters.Add(new SqlParameter
-                        {
-                            ParameterName = SqlParamName.ReceivedOn,
-                            Value = receivedOn,
-                            SqlDbType = SqlDbType.DateTime,
-                            Direction = ParameterDirection.Input
-                        });
 
                         using (var reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                updatedOutboundMessages.Add(new OutboundMessageDetails
+                                outboundMessages.Add(new OutboundMessageDetails
                                 {
                                     Id = Convert.ToInt32(reader[TableColumnName.Id]),
                                     ActivityTypeName = Convert.ToString(reader[TableColumnName.ActivityTypeName]),
@@ -228,7 +225,8 @@ namespace CMI.Processor.DAL
                                     Details = Convert.ToString(reader[TableColumnName.Details]),
                                     IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
                                     ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails]),
-                                    RawData = Convert.ToString(reader[TableColumnName.RawData])
+                                    RawData = Convert.ToString(reader[TableColumnName.RawData]),
+                                    ReceivedOn = Convert.ToDateTime(reader[TableColumnName.ReceivedOn])
                                 });
                             }
                         }
@@ -236,51 +234,40 @@ namespace CMI.Processor.DAL
                 }
             }
 
-            return updatedOutboundMessages;
+            return outboundMessages;
         }
 
-        public IEnumerable<OutboundMessageDetails> GetFailedOutboundMessages()
+        public IEnumerable<OutboundMessageDetails> GetOutboundMessagesFromDisk()
         {
-            List<OutboundMessageDetails> failedOutboundMessages = new List<OutboundMessageDetails>();
-
-
-            using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
+            //check if file exist for failed outbound messages
+            if(File.Exists(processorConfig.OutboundProcessorConfig.SecondaryStorageRepositoryFileFullPath))
             {
-                conn.Open();
+                //read messages from file
+                IEnumerable<OutboundMessageDetails> outboundMessages = JsonConvert.DeserializeObject<IEnumerable<OutboundMessageDetails>>(
+                    File.ReadAllText(processorConfig.OutboundProcessorConfig.SecondaryStorageRepositoryFileFullPath)
+                );
 
-                using (SqlCommand cmd = new SqlCommand())
-                {
-                    cmd.CommandText = StoredProc.GetFailedOutboundMessages;
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Connection = conn;
+                //delete file as it will no longer be required
+                File.Delete(processorConfig.OutboundProcessorConfig.SecondaryStorageRepositoryFileFullPath);
 
-                    using (var reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            failedOutboundMessages.Add(new OutboundMessageDetails
-                            {
-                                Id = Convert.ToInt32(reader[TableColumnName.Id]),
-                                ActivityTypeName = Convert.ToString(reader[TableColumnName.ActivityTypeName]),
-                                ActivitySubTypeName = Convert.ToString(reader[TableColumnName.ActivitySubTypeName]),
-                                ActionReasonName = Convert.ToString(reader[TableColumnName.ActionReasonName]),
-                                ClientIntegrationId = Convert.ToString(reader[TableColumnName.ClientIntegrationId]),
-                                ActivityIdentifier = Convert.ToString(reader[TableColumnName.ActivityIdentifier]),
-                                ActionOccurredOn = Convert.ToDateTime(reader[TableColumnName.ActionOccurredOn]),
-                                ActionUpdatedBy = Convert.ToString(reader[TableColumnName.ActionUpdatedBy]),
-                                Details = Convert.ToString(reader[TableColumnName.Details]),
-                                IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
-                                ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails]),
-                                RawData = Convert.ToString(reader[TableColumnName.RawData]),
-                                IsProcessed = Convert.ToBoolean(reader[TableColumnName.IsProcessed])
-                            });
-                        }
-                    }
-                }
+                return outboundMessages;
             }
 
+            return new List<OutboundMessageDetails>();
+        }
 
-            return failedOutboundMessages;
+        public void SaveOutboundMessagesToDisk(IEnumerable<OutboundMessageDetails> outboundMessages)
+        {
+            FileInfo fileInfo = new FileInfo(processorConfig.OutboundProcessorConfig.SecondaryStorageRepositoryFileFullPath);
+
+            //check if repository parent directory exists, if not then create
+            if(!Directory.Exists(fileInfo.DirectoryName))
+            {
+                Directory.CreateDirectory(fileInfo.DirectoryName);
+            }
+
+            //write message by serializing into file
+            File.WriteAllText(processorConfig.OutboundProcessorConfig.SecondaryStorageRepositoryFileFullPath, JsonConvert.SerializeObject(outboundMessages));
         }
         #endregion
     }

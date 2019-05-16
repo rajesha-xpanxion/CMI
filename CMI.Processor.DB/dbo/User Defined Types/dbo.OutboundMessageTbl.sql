@@ -11,7 +11,10 @@
     [IsSuccessful]        BIT            NULL,
     [ErrorDetails]        NVARCHAR (MAX) NULL,
     [RawData]             NVARCHAR (MAX) NULL,
-    [IsProcessed]         BIT            NULL);
+    [IsProcessed]         BIT            NULL,
+    [ReceivedOn]          DATETIME       NOT NULL);
+
+
 
 
 

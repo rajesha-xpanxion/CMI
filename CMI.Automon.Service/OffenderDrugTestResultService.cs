@@ -1,7 +1,10 @@
 ﻿using CMI.Automon.Interface;
 using CMI.Automon.Model;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace CMI.Automon.Service
 {
@@ -23,12 +26,24 @@ namespace CMI.Automon.Service
         {
             if (automonConfig.IsDevMode)
             {
-                //test data
-                //string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderNoteDetails);
+                string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderDrugTestResultDetails);
 
-                //return File.Exists(testDataJsonFileName)
-                //    ? JsonConvert.DeserializeObject<IEnumerable<OffenderNote>>(File.ReadAllText(testDataJsonFileName))
-                //    : new List<OffenderNote>();
+                //check if repository parent directory exists, if not then create
+                if (!Directory.Exists(automonConfig.TestDataJsonRepoPath))
+                {
+                    Directory.CreateDirectory(automonConfig.TestDataJsonRepoPath);
+                }
+
+                //read existing objects
+                List<OffenderDrugTestResult> offenderDrugTestResultDetailsList = File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<OffenderDrugTestResult>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderDrugTestResult>();
+
+                //merge
+                offenderDrugTestResultDetailsList.Add(offenderDrugTestResultDetails);
+
+                //write back
+                File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderDrugTestResultDetailsList));
             }
             else
             {

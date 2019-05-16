@@ -3,6 +3,7 @@
 
 
 
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	04-Apr-19
@@ -10,11 +11,12 @@ Description:	Save received outbound message details
 ---------------------------------------------------------------------------------
 Test execution:-
 DECLARE @OutboundMessageTbl [dbo].[OutboundMessageTbl];
+DECLARE @ReceivedOn DATETIME = GETDATE();
 INSERT INTO @OutboundMessageTbl
-	([Id], [ActivityTypeName], [ActivitySubTypeName], [ActionReasonName], [ClientIntegrationId], [ActivityIdentifier], [ActionOccurredOn], [ActionUpdatedBy], [Details])
+	([Id], [ActivityTypeName], [ActivitySubTypeName], [ActionReasonName], [ClientIntegrationId], [ActivityIdentifier], [ActionOccurredOn], [ActionUpdatedBy], [Details], [IsProcessed], [IsSuccessful], [ReceivedOn])
 VALUES
-	(0, 'Test Activity Type 1', 'Test Sub Activity Type 1', 'Test Action Reason 1', 'Test Client Integration Id 1', 'Test Activity Identifier 1', GETDATE(), 'Test Action Updated By 1', 'Test Details 1'),
-	(0, 'Test Activity Type 2', NULL, 'Test Action Reason 2', 'Test Client Integration Id 2', 'Test Activity Identifier 2', GETDATE(), 'Test Action Updated By 2', 'Test Details 2')
+	(0, 'Test Activity Type 1', 'Test Sub Activity Type 1', 'Test Action Reason 1', 'Test Client Integration Id 1', 'Test Activity Identifier 1', GETDATE(), 'Test Action Updated By 1', 'Test Details 1', 0, 0, @ReceivedOn),
+	(0, 'Test Activity Type 2', NULL, 'Test Action Reason 2', 'Test Client Integration Id 2', 'Test Activity Identifier 2', GETDATE(), 'Test Action Updated By 2', 'Test Details 2', 0, 0, @ReceivedOn)
 EXEC	
 	[dbo].[SaveOutboundMessages]
 		@OutboundMessageTbl = @OutboundMessageTbl
@@ -24,8 +26,7 @@ Date			Author			Changes
 04-Apr-19		Rajesh Awate	Created.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOutboundMessages]
-	@OutboundMessageTbl [dbo].[OutboundMessageTbl] READONLY,
-	@ReceivedOn DATETIME = NULL
+	@OutboundMessageTbl [dbo].[OutboundMessageTbl] READONLY
 AS
 BEGIN
 	DECLARE @OutboundMessageOutput TABLE
@@ -47,11 +48,6 @@ BEGIN
 	   [IsProcessed] BIT
 	);
 
-
-	IF(@ReceivedOn IS NULL)
-	BEGIN
-		SET @ReceivedOn = GETDATE();
-	END
 
 	--retrieve distinct activity type names and merge it with table
 	MERGE [dbo].[ActivityType] AS Tgt
@@ -121,7 +117,7 @@ BEGIN
 			OMT.[ActionOccurredOn],
 			OMT.[ActionUpdatedBy],
 			OMT.[Details],
-			@ReceivedOn AS [ReceivedOn],
+			OMT.[ReceivedOn],
 			OMT.[IsSuccessful],
 			OMT.[ErrorDetails],
 			OMT.[RawData],
@@ -144,7 +140,7 @@ BEGIN
 		VALUES 
 		(
 			Src.[ActivityTypeId], Src.[ActivitySubTypeId], Src.[ActionReasonId], Src.[ClientIntegrationId], Src.[ActivityIdentifier], 
-			Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], @ReceivedOn, Src.[IsSuccessful], Src.[RawData], Src.[IsProcessed]
+			Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], Src.[ReceivedOn], Src.[IsSuccessful], Src.[RawData], Src.[IsProcessed]
 		)
 	WHEN MATCHED THEN
 		UPDATE SET
@@ -166,15 +162,43 @@ BEGIN
 
 
 	SELECT DISTINCT
+		[OutboundMessageId] AS [Id],
+		[ActivityTypeId],
+		[ActivityTypeName],
+		[ActivitySubTypeId],
+		[ActivitySubTypeName],
+		[ActionReasonId],
+		[ActionReasonName],
+		[ClientIntegrationId],
+		[ActivityIdentifier],
+		[ActionOccurredOn],
+		[ActionUpdatedBy],
+		[Details],
+		[ReceivedOn],
+		[IsSuccessful],
+		[ErrorDetails],
+		[RawData],
+		[IsProcessed]
+	FROM 
+		[dbo].[vw_AllOutboundMessageDetails]
+	WHERE
+		[IsProcessed] = 1
+		AND [IsSuccessful] = 0
+	UNION
+	SELECT DISTINCT
 		OMO.[Id],
+		AT.[Id],
 		AT.[Name] AS [ActivityTypeName],
+		AST.[Id],
 		AST.[Name] AS [ActivitySubTypeName],
+		AR.[Id],
 		AR.[Name] AS [ActionReasonName],
 		OMO.[ClientIntegrationId],
 		OMO.[ActivityIdentifier],
 		OMO.[ActionOccurredOn],
 		OMO.[ActionUpdatedBy],
 		OMO.[Details],
+		OMO.[ReceivedOn],
 		OMO.[IsSuccessful],
 		OMO.[ErrorDetails],
 		OMO.[RawData],
