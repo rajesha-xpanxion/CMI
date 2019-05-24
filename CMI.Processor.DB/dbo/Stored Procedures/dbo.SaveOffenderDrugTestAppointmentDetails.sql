@@ -43,7 +43,7 @@ BEGIN
 			@EventId			INT = 0,
 			@Value				VARCHAR(255);
 
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEvent] @EventTypeId, @StartDate, @EnteredByPId, @Comment, 0, NULL, NULL, 0, @EndDate, NULL, @Status, NULL, @EventId OUTPUT;
+		EXEC [$AutomonDatabaseName].[dbo].[UpdateEvent] @EventTypeId, @StartDate, @EnteredByPId, NULL, 0, NULL, NULL, 0, @EndDate, NULL, @Status, NULL, @EventId OUTPUT;
 
 		EXEC [$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] @OffenderId, @EventId;
 

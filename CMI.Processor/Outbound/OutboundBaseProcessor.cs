@@ -61,14 +61,24 @@ namespace CMI.Processor
                     StartDate = details.DateTime,
                     Comment = details.Notes,
                     EndDate = details.DateTime,
-                    Status = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                        ? 2
-                        : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                            ? 16
-                            : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                    Status =
+                        details.Status != null
+                        ?
+                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            ? 2
+                            : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
-                                : 0,
-                    IsOffenderPresent = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                                : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                                    ? 16
+                                    : 0
+                        :
+                            0,
+                    IsOffenderPresent =
+                        details.Status != null
+                        ?
+                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                        :
+                            false
 
                 };
             }
@@ -82,13 +92,18 @@ namespace CMI.Processor
                     UpdatedBy = updatedBy,
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
-                    Status = details.AppointmentStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                        ? 2
-                        : details.AppointmentStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                            ? 16
-                            : details.AppointmentStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                    Status =
+                        details.AppointmentStatus != null
+                        ?
+                            details.AppointmentStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            ? 2
+                            : details.AppointmentStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
-                                : 0,
+                                : details.AppointmentStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                                    ? 16
+                                    : 0
+                        :
+                            0,
                     Location = details.Location
                 };
             }
@@ -100,21 +115,30 @@ namespace CMI.Processor
                 {
                     Pin = clientIntegrationId,
                     UpdatedBy = updatedBy,
-
                     StartDate = details.TestDateTime,
                     EndDate = details.TestDateTime,
-                    Status = details.ResultStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                        ? 2
-                        : details.ResultStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                            ? 16
-                            : details.ResultStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                    Status =
+                        details.ResultStatus != null
+                        ?
+                            details.ResultStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            ? 2
+                            : details.ResultStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
-                                : 0,
+                                : details.ResultStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                                    ? 16
+                                    : 0
+                        :
+                            0,
                     DeviceType = details.DrugTestType,
                     TestResult = details.ResultStatus,
-                    Validities = details.Dilute.Equals("Yes", StringComparison.InvariantCultureIgnoreCase)
-                        ? "Diluted"
-                        : string.Empty
+                    Validities =
+                        details.Dilute != null
+                        ?
+                            details.Dilute.Equals("Yes", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Diluted"
+                            : string.Empty
+                        :
+                            string.Empty
                 };
             }
             //Field Visit
@@ -145,14 +169,24 @@ namespace CMI.Processor
                     StartDate = details.DateTime,
                     Comment = details.Note,
                     EndDate = details.DateTime,
-                    Status = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                        ? 2
-                        : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                            ? 16
-                            : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                    Status =
+                        details.Status != null
+                        ?
+                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            ? 2
+                            : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
-                                : 0,
-                    IsOffenderPresent = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase),
+                                : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                                    ? 16
+                                    : 0
+                        :
+                            0,
+                    IsOffenderPresent =
+                        details.Status != null
+                        ?
+                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                        :
+                            false,
                     IsSearchConducted = isSearchConducted,
                     SearchLocations = searchLocations,
                     SearchResults = searchResults
@@ -199,9 +233,13 @@ namespace CMI.Processor
                     Line1 = details.Address,
                     //Line2 = details.Address,
                     AddressType =
-                        details.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase)
-                        ? "Residential"
-                        : "Mailing"
+                        details.AddressType != null
+                        ?
+                            details.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Residential"
+                            : "Mailing"
+                        :
+                            "Unknown"
                 };
             }
             //Client Profile - Contact Details
@@ -213,16 +251,25 @@ namespace CMI.Processor
                 {
                     Pin = clientIntegrationId,
                     UpdatedBy = updatedBy,
-                    Phone = details.Contact.Replace(" ", string.Empty),
-                    PhoneNumberType = 
-                        details.ContactType.Equals("HomePhone", StringComparison.InvariantCultureIgnoreCase)
-                        ? "Residential"
-                        : 
-                        (
-                            details.ContactType.Equals("MobilePhone", StringComparison.InvariantCultureIgnoreCase)
-                            ? "Mobile"
-                            : "Message"
-                        )
+                    Phone =
+                        details.Contact != null
+                        ?
+                            details.Contact.Replace(" ", string.Empty)
+                        :
+                            string.Empty,
+                    PhoneNumberType =
+                        details.ContactType != null
+                        ?
+                            details.ContactType.Equals("HomePhone", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Residential"
+                            : 
+                            (
+                                details.ContactType.Equals("MobilePhone", StringComparison.InvariantCultureIgnoreCase)
+                                ? "Mobile"
+                                : "Message"
+                            )
+                        :
+                            "Residential"
                 };
             }
             //Client Profile - Vehicle Details
@@ -288,12 +335,16 @@ namespace CMI.Processor
                     FirstName = details.FirstName,
                     MiddleName = details.MiddleName,
                     LastName = details.LastName,
-                    ClientType = 
-                        details.ClientType.Equals("Adult.Interstate", StringComparison.InvariantCultureIgnoreCase) 
-                            ? "Adult" 
-                            : details.ClientType.Equals("Probation", StringComparison.InvariantCultureIgnoreCase)
-                                ? "Juvenile"
-                                : null,
+                    ClientType =
+                        details.ClientType != null
+                        ?
+                            details.ClientType.Equals("Adult.Interstate", StringComparison.InvariantCultureIgnoreCase) 
+                                ? 
+                                    "Adult" 
+                                : 
+                                    "Juvenile"
+                        :
+                            "Unknown",
                     Race = details.Ethinicity,
                     DateOfBirth = details.DateOfBirth,
                     Gender = details.Gender,
@@ -301,19 +352,27 @@ namespace CMI.Processor
                     Line1 = details.Address,
                     //Line2 = details.Address,
                     AddressType =
-                        details.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase)
-                        ? "Residential"
-                        : "Mailing",
-                    Phone = details.Contact.Replace(" ", string.Empty),
-                    PhoneNumberType =
-                        details.ContactType.Equals("HomePhone", StringComparison.InvariantCultureIgnoreCase)
-                        ? "Residential"
+                        details.AddressType != null
+                        ?
+                            details.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Residential"
+                            : "Mailing"
                         :
-                        (
-                            details.ContactType.Equals("MobilePhone", StringComparison.InvariantCultureIgnoreCase)
-                            ? "Mobile"
-                            : "Message"
-                        )
+                            null,
+                    Phone = details.Contact != null ? details.Contact.Replace(" ", string.Empty) : null,
+                    PhoneNumberType =
+                        details.ContactType != null
+                        ?
+                            details.ContactType.Equals("HomePhone", StringComparison.InvariantCultureIgnoreCase)
+                            ? "Residential"
+                            :
+                            (
+                                details.ContactType.Equals("MobilePhone", StringComparison.InvariantCultureIgnoreCase)
+                                ? "Mobile"
+                                : "Message"
+                            )
+                        :
+                            null
 
                 };
             }
@@ -328,13 +387,18 @@ namespace CMI.Processor
 
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
-                    Status = details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                        ? 2
-                        : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                            ? 16
-                            : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                    Status =
+                        details.Status != null
+                        ?
+                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            ? 2
+                            : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
-                                : 0,
+                                : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
+                                    ? 16
+                                    : 0
+                        :
+                            0,
                     Comment = details.Notes
                 };
             }

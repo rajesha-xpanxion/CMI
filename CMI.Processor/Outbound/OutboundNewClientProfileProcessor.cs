@@ -81,35 +81,75 @@ namespace CMI.Processor
                         //update back client id in Nexus
                         clientService.UpdateClientId(message.ClientIntegrationId, offenderDetails.Pin);
 
-                        //save personal details of newly created offender
-                        offenderPersonalDetailsService.SaveOffenderPersonalDetails(ProcessorConfig.CmiDbConnString, offenderDetails);
-
-                        //save email details of newly created offender
-                        offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, new OffenderEmail
+                        //check if personal details processing enabled
+                        if (
+                            ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.PersonalDetails, StringComparison.InvariantCultureIgnoreCase))
+                        )
                         {
-                            Pin = offenderDetails.Pin,
-                            UpdatedBy = offenderDetails.UpdatedBy,
-                            EmailAddress = offenderDetails.EmailAddress
-                        });
+                            //save personal details of newly created offender
+                            offenderPersonalDetailsService.SaveOffenderPersonalDetails(ProcessorConfig.CmiDbConnString, offenderDetails);
+                        }
 
-                        //save address details of newly created offender
-                        offenderAddressService.SaveOffenderAddressDetails(ProcessorConfig.CmiDbConnString, new OffenderAddress
+                        //check if email details processing enabled
+                        if (
+                            ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase))
+                        )
                         {
-                            Pin = offenderDetails.Pin,
-                            UpdatedBy = offenderDetails.UpdatedBy,
-                            Line1 = offenderDetails.Line1,
-                            Line2 = offenderDetails.Line2,
-                            AddressType = offenderDetails.AddressType
-                        });
+                            //check if email address was passed in new client profile message
+                            if (offenderDetails.EmailAddress != null)
+                            {
+                                //save email details of newly created offender
+                                offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, new OffenderEmail
+                                {
+                                    Pin = offenderDetails.Pin,
+                                    UpdatedBy = offenderDetails.UpdatedBy,
+                                    EmailAddress = offenderDetails.EmailAddress
+                                });
+                            }
+                        }
 
-                        //save phone details of newly created offender
-                        offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, new OffenderPhone
+                        //check if address details processing enabled
+                        if (
+                            ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.AddressDetails, StringComparison.InvariantCultureIgnoreCase))
+                        )
                         {
-                            Pin = offenderDetails.Pin,
-                            UpdatedBy = offenderDetails.UpdatedBy,
-                            Phone = offenderDetails.Phone,
-                            PhoneNumberType = offenderDetails.PhoneNumberType
-                        });
+                            //check if minimum address details are passed in new client profile message
+                            if (offenderDetails.Line1 != null && offenderDetails.AddressType != null)
+                            {
+                                //save address details of newly created offender
+                                offenderAddressService.SaveOffenderAddressDetails(ProcessorConfig.CmiDbConnString, new OffenderAddress
+                                {
+                                    Pin = offenderDetails.Pin,
+                                    UpdatedBy = offenderDetails.UpdatedBy,
+                                    Line1 = offenderDetails.Line1,
+                                    Line2 = offenderDetails.Line2,
+                                    AddressType = offenderDetails.AddressType
+                                });
+                            }
+                        }
+
+                        //check if contact details processing enabled
+                        if (
+                            ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.ContactDetails, StringComparison.InvariantCultureIgnoreCase))
+                        )
+                        {
+                            //check if minimum phone details are passed in new client profile message
+                            if (offenderDetails.Phone != null && offenderDetails.PhoneNumberType != null)
+                            {
+                                //save phone details of newly created offender
+                                offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, new OffenderPhone
+                                {
+                                    Pin = offenderDetails.Pin,
+                                    UpdatedBy = offenderDetails.UpdatedBy,
+                                    Phone = offenderDetails.Phone,
+                                    PhoneNumberType = offenderDetails.PhoneNumberType
+                                });
+                            }
+                        }
 
                         taskExecutionStatus.AutomonAddMessageCount++;
                         message.IsSuccessful = true;

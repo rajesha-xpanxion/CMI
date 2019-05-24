@@ -147,39 +147,39 @@ namespace CMI.Processor.DAL
         {
             List<OutboundMessageDetails> outboundMessages = new List<OutboundMessageDetails>();
 
-            //check if any outbound message received
-            if (receivedOutboundMessages != null && receivedOutboundMessages.Any())
+            using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
             {
-                using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
+                conn.Open();
+
+                using (SqlCommand cmd = new SqlCommand())
                 {
-                    conn.Open();
+                    cmd.CommandText = StoredProc.SaveOutboundMessages;
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Connection = conn;
 
-                    using (SqlCommand cmd = new SqlCommand())
+                    var dataTable = new DataTable(UserDefinedTableType.OutboundMessageTbl)
                     {
-                        cmd.CommandText = StoredProc.SaveOutboundMessages;
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Connection = conn;
+                        Locale = CultureInfo.InvariantCulture
+                    };
 
-                        var dataTable = new DataTable(UserDefinedTableType.OutboundMessageTbl)
-                        {
-                            Locale = CultureInfo.InvariantCulture
-                        };
+                    dataTable.Columns.Add(TableColumnName.Id, typeof(int));
+                    dataTable.Columns.Add(TableColumnName.ActivityTypeName, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.ActivitySubTypeName, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.ActionReasonName, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.ClientIntegrationId, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.ActivityIdentifier, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.ActionOccurredOn, typeof(DateTime));
+                    dataTable.Columns.Add(TableColumnName.ActionUpdatedBy, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.Details, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.IsSuccessful, typeof(bool));
+                    dataTable.Columns.Add(TableColumnName.ErrorDetails, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.RawData, typeof(string));
+                    dataTable.Columns.Add(TableColumnName.IsProcessed, typeof(bool));
+                    dataTable.Columns.Add(TableColumnName.ReceivedOn, typeof(DateTime));
 
-                        dataTable.Columns.Add(TableColumnName.Id, typeof(int));
-                        dataTable.Columns.Add(TableColumnName.ActivityTypeName, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.ActivitySubTypeName, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.ActionReasonName, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.ClientIntegrationId, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.ActivityIdentifier, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.ActionOccurredOn, typeof(DateTime));
-                        dataTable.Columns.Add(TableColumnName.ActionUpdatedBy, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.Details, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.IsSuccessful, typeof(bool));
-                        dataTable.Columns.Add(TableColumnName.ErrorDetails, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.RawData, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.IsProcessed, typeof(bool));
-                        dataTable.Columns.Add(TableColumnName.ReceivedOn, typeof(DateTime));
-
+                    //check for null & check if any record to process
+                    if (receivedOutboundMessages != null && receivedOutboundMessages.Any())
+                    {
                         foreach (var outboundMessageDetails in receivedOutboundMessages)
                         {
                             dataTable.Rows.Add(
@@ -199,36 +199,35 @@ namespace CMI.Processor.DAL
                                 outboundMessageDetails.ReceivedOn
                             );
                         }
+                    }
+                    cmd.Parameters.Add(new SqlParameter
+                    {
+                        ParameterName = SqlParamName.OutboundMessageTbl,
+                        Value = dataTable,
+                        SqlDbType = SqlDbType.Structured,
+                        Direction = ParameterDirection.Input
+                    });
 
-                        cmd.Parameters.Add(new SqlParameter
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            ParameterName = SqlParamName.OutboundMessageTbl,
-                            Value = dataTable,
-                            SqlDbType = SqlDbType.Structured,
-                            Direction = ParameterDirection.Input
-                        });
-
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            while (reader.Read())
+                            outboundMessages.Add(new OutboundMessageDetails
                             {
-                                outboundMessages.Add(new OutboundMessageDetails
-                                {
-                                    Id = Convert.ToInt32(reader[TableColumnName.Id]),
-                                    ActivityTypeName = Convert.ToString(reader[TableColumnName.ActivityTypeName]),
-                                    ActivitySubTypeName = Convert.ToString(reader[TableColumnName.ActivitySubTypeName]),
-                                    ActionReasonName = Convert.ToString(reader[TableColumnName.ActionReasonName]),
-                                    ClientIntegrationId = Convert.ToString(reader[TableColumnName.ClientIntegrationId]),
-                                    ActivityIdentifier = Convert.ToString(reader[TableColumnName.ActivityIdentifier]),
-                                    ActionOccurredOn = Convert.ToDateTime(reader[TableColumnName.ActionOccurredOn]),
-                                    ActionUpdatedBy = Convert.ToString(reader[TableColumnName.ActionUpdatedBy]),
-                                    Details = Convert.ToString(reader[TableColumnName.Details]),
-                                    IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
-                                    ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails]),
-                                    RawData = Convert.ToString(reader[TableColumnName.RawData]),
-                                    ReceivedOn = Convert.ToDateTime(reader[TableColumnName.ReceivedOn])
-                                });
-                            }
+                                Id = Convert.ToInt32(reader[TableColumnName.Id]),
+                                ActivityTypeName = Convert.ToString(reader[TableColumnName.ActivityTypeName]),
+                                ActivitySubTypeName = Convert.ToString(reader[TableColumnName.ActivitySubTypeName]),
+                                ActionReasonName = Convert.ToString(reader[TableColumnName.ActionReasonName]),
+                                ClientIntegrationId = Convert.ToString(reader[TableColumnName.ClientIntegrationId]),
+                                ActivityIdentifier = Convert.ToString(reader[TableColumnName.ActivityIdentifier]),
+                                ActionOccurredOn = Convert.ToDateTime(reader[TableColumnName.ActionOccurredOn]),
+                                ActionUpdatedBy = Convert.ToString(reader[TableColumnName.ActionUpdatedBy]),
+                                Details = Convert.ToString(reader[TableColumnName.Details]),
+                                IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
+                                ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails]),
+                                RawData = Convert.ToString(reader[TableColumnName.RawData]),
+                                ReceivedOn = Convert.ToDateTime(reader[TableColumnName.ReceivedOn])
+                            });
                         }
                     }
                 }
