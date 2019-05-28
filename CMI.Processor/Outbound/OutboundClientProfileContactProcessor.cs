@@ -15,15 +15,18 @@ namespace CMI.Processor
 {
     public class OutboundClientProfileContactProcessor : OutboundBaseProcessor
     {
+        private readonly IOffenderEmailService offenderEmailService;
         private readonly IOffenderPhoneService offenderPhoneService;
 
         public OutboundClientProfileContactProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
+            IOffenderEmailService offenderEmailService,
             IOffenderPhoneService offenderPhoneService
         )
             : base(serviceProvider, configuration)
         {
+            this.offenderEmailService = offenderEmailService;
             this.offenderPhoneService = offenderPhoneService;
         }
 
@@ -48,17 +51,29 @@ namespace CMI.Processor
             {
                 foreach (OutboundMessageDetails message in messages)
                 {
+                    Offender offenderContactDetails = null;
                     OffenderPhone offenderPhoneDetails = null;
+                    OffenderEmail offenderEmailDetails = null;
                     message.IsProcessed = true;
                     try
                     {
-                        offenderPhoneDetails = (OffenderPhone)ConvertResponseToObject<ClientProfileContactDetailsActivityResponse>(
+                        offenderContactDetails = (Offender)ConvertResponseToObject<ClientProfileContactDetailsActivityResponse>(
                             message.ClientIntegrationId,
                             RetrieveActivityDetails<ClientProfileContactDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
 
-                        offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, offenderPhoneDetails);
+                        if (offenderContactDetails.GetType() == typeof(OffenderEmail))
+                        {
+                            offenderEmailDetails = (OffenderEmail)offenderContactDetails;
+                            offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, offenderEmailDetails);
+                        }
+                        else
+                        {
+                            offenderPhoneDetails = (OffenderPhone)offenderContactDetails; 
+
+                            offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, offenderPhoneDetails);
+                        }
 
                         taskExecutionStatus.AutomonAddMessageCount++;
                         message.IsSuccessful = true;
@@ -68,7 +83,7 @@ namespace CMI.Processor
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
                             Message = "New Offender - Contact Details added successfully.",
-                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                            AutomonData = JsonConvert.SerializeObject(offenderContactDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
@@ -84,7 +99,7 @@ namespace CMI.Processor
                             MethodName = "Execute",
                             Message = "Error occurred while processing a Client Profile - Contact Details activity.",
                             Exception = ce,
-                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                            AutomonData = JsonConvert.SerializeObject(offenderContactDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }
@@ -100,7 +115,7 @@ namespace CMI.Processor
                             MethodName = "Execute",
                             Message = "Critical error occurred while processing a Client Profile - Contact Details activity.",
                             Exception = ex,
-                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                            AutomonData = JsonConvert.SerializeObject(offenderContactDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });
                     }

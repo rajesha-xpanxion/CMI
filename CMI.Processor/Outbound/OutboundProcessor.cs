@@ -173,22 +173,6 @@ namespace CMI.Processor
                     );
                 }
 
-                //email
-                if (
-                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
-                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase))
-                )
-                {
-                    UpdateExecutionStatus(
-                        ((OutboundClientProfileEmailProcessor)serviceProvider.GetService(typeof(OutboundClientProfileEmailProcessor))).Execute(
-                            clientProfileMessages.Where(
-                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase)
-                            ),
-                            messagesReceivedOn
-                        )
-                    );
-                }
-
                 //address
                 if (
                     ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null

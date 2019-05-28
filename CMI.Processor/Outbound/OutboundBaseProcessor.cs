@@ -247,30 +247,53 @@ namespace CMI.Processor
             {
                 ClientProfileContactDetailsActivityResponse details = (ClientProfileContactDetailsActivityResponse)(object)activityDetails;
 
-                return new OffenderPhone
+                if (details.ContactType.Equals("E-mail", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Pin = clientIntegrationId,
-                    UpdatedBy = updatedBy,
-                    Phone =
-                        details.Contact != null
-                        ?
-                            details.Contact.Replace(" ", string.Empty)
-                        :
-                            string.Empty,
-                    PhoneNumberType =
-                        details.ContactType != null
-                        ?
-                            details.ContactType.Equals("HomePhone", StringComparison.InvariantCultureIgnoreCase)
-                            ? "Residential"
-                            : 
-                            (
-                                details.ContactType.Equals("MobilePhone", StringComparison.InvariantCultureIgnoreCase)
-                                ? "Mobile"
-                                : "Message"
-                            )
-                        :
-                            "Residential"
-                };
+                    return new OffenderEmail
+                    {
+                        Pin = clientIntegrationId,
+                        UpdatedBy = updatedBy,
+                        EmailAddress = details.Contact
+                    };
+                }
+                else
+                {
+                    string autmonPhoneNumberType = string.Empty;
+
+                    switch(details.ContactType)
+                    {
+                        case "Cell Phone":
+                        case "Emergency Phone":
+                            autmonPhoneNumberType = "Mobile";
+                            break;
+                        case "Home Phone":
+                            autmonPhoneNumberType = "Residential";
+                            break;
+                        case "Fax":
+                            autmonPhoneNumberType = "Fax";
+                            break;
+                        case "Business Phone":
+                        case "Work Phone":
+                            autmonPhoneNumberType = "Office";
+                            break;
+                        default:
+                            autmonPhoneNumberType = "Message";
+                            break;
+                    }
+
+                    return new OffenderPhone
+                    {
+                        Pin = clientIntegrationId,
+                        UpdatedBy = updatedBy,
+                        Phone =
+                            details.Contact != null
+                            ?
+                                details.Contact.Replace(" ", string.Empty)
+                            :
+                                string.Empty,
+                        PhoneNumberType = autmonPhoneNumberType
+                    };
+                }
             }
             //Client Profile - Vehicle Details
             else if (typeof(T) == typeof(ClientProfileVehicleDetailsActivityResponse))
