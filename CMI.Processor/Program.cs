@@ -18,6 +18,47 @@ namespace CMI.Processor
         #region Entry Point
         static void Main(string[] args)
         {
+            if(args != null && args.Length > 0)
+            {
+                if(args[0].Equals("crypto", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Console.WriteLine("1. Encrypt");
+                    Console.WriteLine("2. Decrypt");
+                    Console.WriteLine("3. Exit");
+                    Console.WriteLine("Please enter your choice...");
+                    int choice = 3;
+                    if (Int32.TryParse(Console.ReadLine(), out choice))
+                    {
+                        string passPhrase = string.Empty, plainText = string.Empty, cipherText = string.Empty;
+                        switch (choice)
+                        {
+                            case 1:
+                                Console.WriteLine("Please enter pass phrase:");
+                                passPhrase = Console.ReadLine();
+                                Console.WriteLine("Please enter plain text:");
+                                plainText = Console.ReadLine();
+                                Console.WriteLine("Encrypted text: {0}", CryptographyHelper.EncryptString(plainText, passPhrase));
+                                break;
+                            case 2:
+                                Console.WriteLine("Please enter pass phrase:");
+                                passPhrase = Console.ReadLine();
+                                Console.WriteLine("Please enter cipher text:");
+                                cipherText = Console.ReadLine();
+                                Console.WriteLine("Decrypted text: {0}", CryptographyHelper.DecryptString(cipherText, passPhrase));
+                                break;
+                            default:
+                                return;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid choice entered!!! Press enter key to exit...");
+                    }
+                    Console.ReadKey();
+                    return;
+                }
+            }
+
             // create service collection
             var serviceCollection = new ServiceCollection();
             

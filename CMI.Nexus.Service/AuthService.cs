@@ -97,7 +97,7 @@ namespace CMI.Nexus.Service
                 inputParams.Add("grant_type", nexusConfig.TokenGeneratorConfig.GrantType);
                 inputParams.Add("scope", nexusConfig.TokenGeneratorConfig.Scope);
                 inputParams.Add("username", nexusConfig.TokenGeneratorConfig.UserName);
-                inputParams.Add("password", nexusConfig.TokenGeneratorConfig.Password);
+                inputParams.Add("password", CryptographyHelper.DecryptString(nexusConfig.TokenGeneratorConfig.Password, nexusConfig.TokenGeneratorConfig.PassPhrase));
                 HttpContent content = new FormUrlEncodedContent(inputParams);
 
                 //call API
