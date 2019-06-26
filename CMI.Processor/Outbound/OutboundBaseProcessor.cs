@@ -61,6 +61,7 @@ namespace CMI.Processor
                     StartDate = details.DateTime,
                     Comment = details.Notes,
                     EndDate = details.DateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
                         ?
@@ -69,7 +70,7 @@ namespace CMI.Processor
                             : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
                                 : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
+                                    ? 10
                                     : 0
                         :
                             0,
@@ -92,15 +93,17 @@ namespace CMI.Processor
                     UpdatedBy = updatedBy,
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.AppointmentStatus != null
                         ?
-                            details.AppointmentStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            details.AppointmentStatus.Equals("Completed", StringComparison.InvariantCultureIgnoreCase) 
+                            || details.AppointmentStatus.Equals("Tampered", StringComparison.InvariantCultureIgnoreCase)
                             ? 2
                             : details.AppointmentStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
                                 : details.AppointmentStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
+                                    ? 10
                                     : 0
                         :
                             0,
@@ -117,16 +120,17 @@ namespace CMI.Processor
                     UpdatedBy = updatedBy,
                     StartDate = details.TestDateTime,
                     EndDate = details.TestDateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.ResultStatus != null
                         ?
-                            details.ResultStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                            ? 2
-                            : details.ResultStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                                ? 16
-                                : details.ResultStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
-                                    : 0
+                            details.ResultStatus.Equals("Passed", StringComparison.InvariantCultureIgnoreCase)
+                            || details.ResultStatus.Equals("Failed", StringComparison.InvariantCultureIgnoreCase)
+                            || details.ResultStatus.Equals("Tampered", StringComparison.InvariantCultureIgnoreCase)
+                            ?
+                                2
+                            :
+                                0
                         :
                             0,
                     DeviceType = details.DrugTestType,
@@ -169,16 +173,16 @@ namespace CMI.Processor
                     StartDate = details.DateTime,
                     Comment = details.Note,
                     EndDate = details.DateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
                         ?
                             details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                            ? 2
-                            : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                                ? 16
-                                : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
-                                    : 0
+                            || details.Status.Equals("Attempted", StringComparison.InvariantCultureIgnoreCase)
+                            ? 
+                                2
+                            : 
+                                0
                         :
                             0,
                     IsOffenderPresent =
@@ -410,6 +414,7 @@ namespace CMI.Processor
 
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
                         ?
@@ -418,7 +423,7 @@ namespace CMI.Processor
                             : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
                                 : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
+                                    ? 10
                                     : 0
                         :
                             0,
