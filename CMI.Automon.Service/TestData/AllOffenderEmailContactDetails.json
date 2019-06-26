@@ -1,1 +1,9 @@
-[{"Id":0,"EmailAddress":"edccase@scramtest.com","IsPrimary":false,"IsActive":false,"Pin":"16733","FirstName":null,"MiddleName":null,"LastName":null,"DateOfBirth":"0001-01-01T00:00:00","ClientType":null,"TimeZone":null,"Gender":null,"Race":null,"CaseloadName":null,"OfficerLogon":null,"OfficerEmail":null,"OfficerFirstName":null,"OfficerLastName":null,"UpdatedBy":"edcuser@scramtest.com"}]
+﻿[
+  {
+    "Id": 169,
+    "EmailAddress": "leon09966@gmail.com",
+    "IsPrimary": true,
+    "IsActive": true,
+    "Pin": "10405"
+  }
+]
