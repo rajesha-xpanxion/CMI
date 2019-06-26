@@ -61,6 +61,7 @@ namespace CMI.Processor
                     StartDate = details.DateTime,
                     Comment = details.Notes,
                     EndDate = details.DateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
                         ?
@@ -69,7 +70,7 @@ namespace CMI.Processor
                             : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
                                 : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
+                                    ? 10
                                     : 0
                         :
                             0,
@@ -92,15 +93,17 @@ namespace CMI.Processor
                     UpdatedBy = updatedBy,
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.AppointmentStatus != null
                         ?
-                            details.AppointmentStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            details.AppointmentStatus.Equals("Completed", StringComparison.InvariantCultureIgnoreCase)
+                            || details.AppointmentStatus.Equals("Tampered", StringComparison.InvariantCultureIgnoreCase)
                             ? 2
                             : details.AppointmentStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
                                 : details.AppointmentStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
+                                    ? 10
                                     : 0
                         :
                             0,
@@ -117,16 +120,17 @@ namespace CMI.Processor
                     UpdatedBy = updatedBy,
                     StartDate = details.TestDateTime,
                     EndDate = details.TestDateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.ResultStatus != null
                         ?
-                            details.ResultStatus.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                            ? 2
-                            : details.ResultStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                                ? 16
-                                : details.ResultStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
-                                    : 0
+                            details.ResultStatus.Equals("Passed", StringComparison.InvariantCultureIgnoreCase)
+                            || details.ResultStatus.Equals("Failed", StringComparison.InvariantCultureIgnoreCase)
+                            || details.ResultStatus.Equals("Tampered", StringComparison.InvariantCultureIgnoreCase)
+                            ?
+                                2
+                            :
+                                0
                         :
                             0,
                     DeviceType = details.DrugTestType,
@@ -156,7 +160,7 @@ namespace CMI.Processor
                     searchLocations = isSearchConducted ? string.Join(", ", details.VisitedLocations.Select(v => string.Join(", ", v.SearchedAreas))) : string.Empty;
                 }
 
-                if(details.FoundContraband != null && details.FoundContraband.Any())
+                if (details.FoundContraband != null && details.FoundContraband.Any())
                 {
                     searchResults = string.Join(", ", details.FoundContraband.Select(fc => fc.Type));
                 }
@@ -169,16 +173,16 @@ namespace CMI.Processor
                     StartDate = details.DateTime,
                     Comment = details.Note,
                     EndDate = details.DateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
                         ?
                             details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                            ? 2
-                            : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                                ? 16
-                                : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
-                                    : 0
+                            || details.Status.Equals("Attempted", StringComparison.InvariantCultureIgnoreCase)
+                            ?
+                                2
+                            :
+                                0
                         :
                             0,
                     IsOffenderPresent =
@@ -260,7 +264,7 @@ namespace CMI.Processor
                 {
                     string autmonPhoneNumberType = string.Empty;
 
-                    switch(details.ContactType)
+                    switch (details.ContactType)
                     {
                         case "Cell Phone":
                         case "Emergency Phone":
@@ -317,7 +321,7 @@ namespace CMI.Processor
                 ClientProfileEmploymentDetailsActivityResponse details = (ClientProfileEmploymentDetailsActivityResponse)(object)activityDetails;
 
                 string payFrequency = string.Empty;
-                if(!string.IsNullOrEmpty(details.WageUnit))
+                if (!string.IsNullOrEmpty(details.WageUnit))
                 {
                     payFrequency =
                         details.WageUnit.Equals("per Hour", StringComparison.InvariantCultureIgnoreCase)
@@ -361,10 +365,10 @@ namespace CMI.Processor
                     ClientType =
                         details.ClientType != null
                         ?
-                            details.ClientType.Equals("Adult.Interstate", StringComparison.InvariantCultureIgnoreCase) 
-                                ? 
-                                    "Adult" 
-                                : 
+                            details.ClientType.Equals("Adult.Interstate", StringComparison.InvariantCultureIgnoreCase)
+                                ?
+                                    "Adult"
+                                :
                                     "Juvenile"
                         :
                             "Unknown",
@@ -410,6 +414,7 @@ namespace CMI.Processor
 
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
                         ?
@@ -418,7 +423,7 @@ namespace CMI.Processor
                             : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
                                 ? 16
                                 : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 16
+                                    ? 10
                                     : 0
                         :
                             0,
