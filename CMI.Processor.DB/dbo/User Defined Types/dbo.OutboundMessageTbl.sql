@@ -12,7 +12,10 @@
     [ErrorDetails]        NVARCHAR (MAX) NULL,
     [RawData]             NVARCHAR (MAX) NULL,
     [IsProcessed]         BIT            NULL,
-    [ReceivedOn]          DATETIME       NOT NULL);
+    [ReceivedOn]          DATETIME       NOT NULL,
+    [AutomonIdentifier]   NVARCHAR (200) NULL);
+
+
 
 
 

@@ -176,6 +176,7 @@ namespace CMI.Processor.DAL
                     dataTable.Columns.Add(TableColumnName.RawData, typeof(string));
                     dataTable.Columns.Add(TableColumnName.IsProcessed, typeof(bool));
                     dataTable.Columns.Add(TableColumnName.ReceivedOn, typeof(DateTime));
+                    dataTable.Columns.Add(TableColumnName.AutomonIdentifier, typeof(string));
 
                     //check for null & check if any record to process
                     if (receivedOutboundMessages != null && receivedOutboundMessages.Any())
@@ -196,7 +197,8 @@ namespace CMI.Processor.DAL
                                 outboundMessageDetails.ErrorDetails,
                                 outboundMessageDetails.RawData,
                                 outboundMessageDetails.IsProcessed,
-                                outboundMessageDetails.ReceivedOn
+                                outboundMessageDetails.ReceivedOn,
+                                string.IsNullOrEmpty(outboundMessageDetails.AutomonIdentifier) ? null : outboundMessageDetails.AutomonIdentifier
                             );
                         }
                     }
@@ -226,7 +228,8 @@ namespace CMI.Processor.DAL
                                 IsSuccessful = Convert.ToBoolean(reader[TableColumnName.IsSuccessful]),
                                 ErrorDetails = Convert.ToString(reader[TableColumnName.ErrorDetails]),
                                 RawData = Convert.ToString(reader[TableColumnName.RawData]),
-                                ReceivedOn = Convert.ToDateTime(reader[TableColumnName.ReceivedOn])
+                                ReceivedOn = Convert.ToDateTime(reader[TableColumnName.ReceivedOn]),
+                                AutomonIdentifier = Convert.ToString(reader[TableColumnName.AutomonIdentifier])
                             });
                         }
                     }

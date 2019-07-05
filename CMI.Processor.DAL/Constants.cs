@@ -62,6 +62,7 @@
         public static string RawData { get { return "RawData"; } }
         public static string IsProcessed { get { return "IsProcessed"; } }
         public static string ReceivedOn { get { return "ReceivedOn"; } }
+        public static string AutomonIdentifier { get { return "AutomonIdentifier"; } }
     }
 
     public static class InboundProcessorStage

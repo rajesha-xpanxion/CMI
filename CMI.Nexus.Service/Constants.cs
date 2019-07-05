@@ -23,4 +23,23 @@ namespace CMI.Nexus.Service
         /// </summary>
         public static string AuthTokenFormat { get { return "{0} {1}"; } }
     }
+
+    public static class Status
+    {
+        public static string Attended { get { return "Attended"; } }
+
+        public static string Missed { get { return "Missed"; } }
+
+        public static string Excused { get { return "Excused"; } }
+
+        public static string Completed { get { return "Completed"; } }
+
+        public static string Tampered { get { return "Tampered"; } }
+
+        public static string Passed { get { return "Passed"; } }
+
+        public static string Failed { get { return "Failed"; } }
+
+        public static string Attempted { get { return "Attempted"; } }
+    }
 }

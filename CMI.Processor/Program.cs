@@ -189,6 +189,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<INoteService, NoteService>();
             serviceCollection.AddSingleton<ILookupService, LookupService>();
             serviceCollection.AddSingleton<IAuthService, AuthService>();
+            serviceCollection.AddSingleton<ICommonService, CommonService>();
         }
 
         private static void ConfigureCommonServices(IServiceCollection serviceCollection)

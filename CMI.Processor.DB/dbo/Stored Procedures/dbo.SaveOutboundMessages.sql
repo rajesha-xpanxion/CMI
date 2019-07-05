@@ -4,6 +4,7 @@
 
 
 
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	04-Apr-19
@@ -45,7 +46,8 @@ BEGIN
 	   [IsSuccessful] BIT,
 	   [ErrorDetails] NVARCHAR(MAX),
 	   [RawData] NVARCHAR(MAX),
-	   [IsProcessed] BIT
+	   [IsProcessed] BIT,
+	   [AutomonIdentifier] NVARCHAR(200)
 	);
 
 
@@ -121,7 +123,8 @@ BEGIN
 			OMT.[IsSuccessful],
 			OMT.[ErrorDetails],
 			OMT.[RawData],
-			OMT.[IsProcessed]
+			OMT.[IsProcessed],
+			OMT.[AutomonIdentifier]
 		FROM
 			@OutboundMessageTbl OMT JOIN [dbo].[ActivityType] AT
 				ON OMT.[ActivityTypeName] = AT.[Name]
@@ -135,12 +138,14 @@ BEGIN
 		INSERT 
 		(
 			[ActivityTypeId], [ActivitySubTypeId], [ActionReasonId], [ClientIntegrationId], [ActivityIdentifier], 
-			[ActionOccurredOn], [ActionUpdatedBy], [Details], [ReceivedOn], [IsSuccessful], [RawData], [IsProcessed]
+			[ActionOccurredOn], [ActionUpdatedBy], [Details], [ReceivedOn], [IsSuccessful], [RawData], [IsProcessed],
+			[AutomonIdentifier]
 		)
 		VALUES 
 		(
 			Src.[ActivityTypeId], Src.[ActivitySubTypeId], Src.[ActionReasonId], Src.[ClientIntegrationId], Src.[ActivityIdentifier], 
-			Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], Src.[ReceivedOn], Src.[IsSuccessful], Src.[RawData], Src.[IsProcessed]
+			Src.[ActionOccurredOn], Src.[ActionUpdatedBy], Src.[Details], Src.[ReceivedOn], Src.[IsSuccessful], Src.[RawData], Src.[IsProcessed],
+			Src.[AutomonIdentifier]
 		)
 	WHEN MATCHED THEN
 		UPDATE SET
@@ -156,7 +161,8 @@ BEGIN
 			Tgt.[IsSuccessful] = Src.[IsSuccessful],
 			Tgt.[ErrorDetails] = Src.[ErrorDetails],
 			Tgt.[RawData] = Src.[RawData],
-			Tgt.[IsProcessed] = Src.[IsProcessed]
+			Tgt.[IsProcessed] = Src.[IsProcessed],
+			Tgt.[AutomonIdentifier] = Src.[AutomonIdentifier]
 	OUTPUT
 		$action, inserted.* INTO @OutboundMessageOutput;
 
@@ -178,7 +184,8 @@ BEGIN
 		[IsSuccessful],
 		[ErrorDetails],
 		[RawData],
-		[IsProcessed]
+		[IsProcessed],
+		[AutomonIdentifier]
 	FROM 
 		[dbo].[vw_AllOutboundMessageDetails]
 	WHERE
@@ -202,7 +209,8 @@ BEGIN
 		OMO.[IsSuccessful],
 		OMO.[ErrorDetails],
 		OMO.[RawData],
-		OMO.[IsProcessed]
+		OMO.[IsProcessed],
+		[AutomonIdentifier]
 	FROM
 		@OutboundMessageOutput OMO JOIN [dbo].[ActivityType] AT
 			ON OMO.[ActivityTypeId] = AT.[Id]

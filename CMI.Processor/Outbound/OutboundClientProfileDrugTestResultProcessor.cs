@@ -54,6 +54,7 @@ namespace CMI.Processor
                     {
                         offenderDrugTestResultDetails = (OffenderDrugTestResult)ConvertResponseToObject<ClientProfileDrugTestResultDetailsActivityResponse>(
                             message.ClientIntegrationId,
+                            message.ActivityIdentifier,
                             RetrieveActivityDetails<ClientProfileDrugTestResultDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );

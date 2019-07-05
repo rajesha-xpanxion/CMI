@@ -54,6 +54,7 @@ namespace CMI.Processor
                     {
                         offenderVehicleDetails = (OffenderVehicle)ConvertResponseToObject<ClientProfileVehicleDetailsActivityResponse>(
                             message.ClientIntegrationId,
+                            message.ActivityIdentifier,
                             RetrieveActivityDetails<ClientProfileVehicleDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );

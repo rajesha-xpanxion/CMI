@@ -11,6 +11,7 @@ EXEC
 	[dbo].[SaveOffenderNoteDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
+		@Id = 0,
 		@Text = 'test comment 2',
 		@AuthorEmail = 'rawate@xpanxion.com',
 		@Date = @CurrentTimestamp;
@@ -19,10 +20,12 @@ History:-
 Date			Author			Changes
 03-Apr-19		Rajesh Awate	Created.
 10-May-19		Rajesh Awate	Changes to use new event type for notes.
+05-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderNoteDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@Text VARCHAR(MAX),
 	@AuthorEmail VARCHAR(255),
 	@Date DATETIME
@@ -38,7 +41,7 @@ BEGIN
 			@EventDateTime	DATETIME		= @Date,
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @AuthorEmail), 0),
 			@Comment		VARCHAR(MAX)	= @Text,
-			@EventId		INT				= 0,
+			@EventId		INT				= @Id,
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin);
 
 		--SELECT @EventTypeId, @EventDateTime, @EnteredByPId, @Comment, @EventId, @OffenderId;
@@ -60,8 +63,7 @@ BEGIN
 				NULL,
 				@Id = @EventId OUTPUT;
 
-		--SELECT * FROM [$AutomonDatabaseName].[dbo].[Event] WHERE [Id] = @EventId;
-
+		
 		--associate newly added event with given offender
 		IF(@EventId IS NOT NULL)
 		BEGIN
@@ -71,13 +73,14 @@ BEGIN
 					@EventId;
 		END
 
-		--SELECT * FROM [$AutomonDatabaseName].[dbo].[OffenderEvent] WHERE [OffenderId] = @OffenderId AND [EventId] = @EventId;
+		SELECT @EventId;
 		';
 
 	SET @SQLString = REPLACE(@SQLString, '$AutomonDatabaseName', @AutomonDatabaseName);
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(200),
+		@Id INT,
 		@Text VARCHAR(MAX),
 		@AuthorEmail VARCHAR(200),
 		@Date DATETIME';
@@ -88,6 +91,7 @@ PRINT @SQLString;
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
+				@Id = @Id,
 				@Text = @Text,
 				@AuthorEmail = @AuthorEmail,
 				@Date = @Date;

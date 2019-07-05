@@ -18,5 +18,6 @@ namespace CMI.Processor.DAL
         public string RawData { get; set; }
         public bool IsProcessed { get; set; }
         public DateTime ReceivedOn { get; set; }
+        public string AutomonIdentifier { get; set; }
     }
 }

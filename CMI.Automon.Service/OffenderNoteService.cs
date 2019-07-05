@@ -85,7 +85,7 @@ namespace CMI.Automon.Service
             }
         }
 
-        public void SaveOffenderNoteDetails(string CmiDbConnString, OffenderNote offenderNoteDetails)
+        public int SaveOffenderNoteDetails(string CmiDbConnString, OffenderNote offenderNoteDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -107,6 +107,9 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderNoteDetailsList));
+
+
+                return offenderNoteDetails.Id == 0 ? new Random().Next(0, 10000) : offenderNoteDetails.Id;
             }
             else
             {
@@ -134,6 +137,13 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderNoteDetails.Id,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
                             ParameterName = SqlParamName.Text,
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderNoteDetails.Text,
@@ -156,7 +166,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        cmd.ExecuteNonQuery();
+                        return Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }

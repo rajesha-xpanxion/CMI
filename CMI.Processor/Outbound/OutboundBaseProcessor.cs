@@ -1,7 +1,9 @@
 ﻿using CMI.Automon.Model;
+using CMI.Automon.Service;
 using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.MessageRetriever.Model;
+using CMI.Nexus.Service;
 using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -34,20 +36,27 @@ namespace CMI.Processor
             return JsonConvert.DeserializeObject<T>(activityDetails);
         }
 
-        protected Offender ConvertResponseToObject<T>(String clientIntegrationId, T activityDetails, string updatedBy)
+        protected Offender ConvertResponseToObject<T>(string clientIntegrationId, string activityIdentifier, T activityDetails, string updatedBy)
         {
             //Note
             if (typeof(T) == typeof(ClientProfileNoteActivityDetailsResponse))
             {
                 ClientProfileNoteActivityDetailsResponse noteActivityDetailsResponse = (ClientProfileNoteActivityDetailsResponse)(object)activityDetails;
+
+                //try to retrieve Automon identifier
+                int id = 0;
+                if(!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 return new OffenderNote()
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     Text = noteActivityDetailsResponse.NoteText,
                     AuthorEmail = noteActivityDetailsResponse.NoteAuthor,
                     Date = noteActivityDetailsResponse.CreatedDate
-
                 };
             }
             //Office Visit
@@ -65,19 +74,19 @@ namespace CMI.Processor
                     Status =
                         details.Status != null
                         ?
-                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                            ? 2
-                            : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                                ? 16
-                                : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 10
-                                    : 0
+                            details.Status.Equals(Status.Attended, StringComparison.InvariantCultureIgnoreCase)
+                            ? (int)EventStatus.Complete
+                            : details.Status.Equals(Status.Missed, StringComparison.InvariantCultureIgnoreCase)
+                                ? (int)EventStatus.Missed
+                                : details.Status.Equals(Status.Excused, StringComparison.InvariantCultureIgnoreCase)
+                                    ? (int)EventStatus.Cancelled
+                                    : (int)EventStatus.Pending
                         :
-                            0,
+                            (int)EventStatus.Pending,
                     IsOffenderPresent =
                         details.Status != null
                         ?
-                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            details.Status.Equals(Status.Attended, StringComparison.InvariantCultureIgnoreCase)
                         :
                             false
 
@@ -97,16 +106,16 @@ namespace CMI.Processor
                     Status =
                         details.AppointmentStatus != null
                         ?
-                            details.AppointmentStatus.Equals("Completed", StringComparison.InvariantCultureIgnoreCase)
-                            || details.AppointmentStatus.Equals("Tampered", StringComparison.InvariantCultureIgnoreCase)
-                            ? 2
-                            : details.AppointmentStatus.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                                ? 16
-                                : details.AppointmentStatus.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 10
-                                    : 0
+                            details.AppointmentStatus.Equals(Status.Completed, StringComparison.InvariantCultureIgnoreCase)
+                            || details.AppointmentStatus.Equals(Status.Tampered, StringComparison.InvariantCultureIgnoreCase)
+                            ? (int)EventStatus.Complete
+                            : details.AppointmentStatus.Equals(Status.Missed, StringComparison.InvariantCultureIgnoreCase)
+                                ? (int)EventStatus.Missed
+                                : details.AppointmentStatus.Equals(Status.Excused, StringComparison.InvariantCultureIgnoreCase)
+                                    ? (int)EventStatus.Cancelled
+                                    : (int)EventStatus.Pending
                         :
-                            0,
+                            (int)EventStatus.Pending,
                     Location = details.Location
                 };
             }
@@ -124,15 +133,15 @@ namespace CMI.Processor
                     Status =
                         details.ResultStatus != null
                         ?
-                            details.ResultStatus.Equals("Passed", StringComparison.InvariantCultureIgnoreCase)
-                            || details.ResultStatus.Equals("Failed", StringComparison.InvariantCultureIgnoreCase)
-                            || details.ResultStatus.Equals("Tampered", StringComparison.InvariantCultureIgnoreCase)
+                            details.ResultStatus.Equals(Status.Passed, StringComparison.InvariantCultureIgnoreCase)
+                            || details.ResultStatus.Equals(Status.Failed, StringComparison.InvariantCultureIgnoreCase)
+                            || details.ResultStatus.Equals(Status.Tampered, StringComparison.InvariantCultureIgnoreCase)
                             ?
-                                2
+                                (int)EventStatus.Complete
                             :
-                                0
+                                (int)EventStatus.Pending
                         :
-                            0,
+                            (int)EventStatus.Pending,
                     DeviceType = details.DrugTestType,
                     TestResult = details.ResultStatus,
                     Validities =
@@ -177,18 +186,18 @@ namespace CMI.Processor
                     Status =
                         details.Status != null
                         ?
-                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                            || details.Status.Equals("Attempted", StringComparison.InvariantCultureIgnoreCase)
+                            details.Status.Equals(Status.Attended, StringComparison.InvariantCultureIgnoreCase)
+                            || details.Status.Equals(Status.Attempted, StringComparison.InvariantCultureIgnoreCase)
                             ?
-                                2
+                                (int)EventStatus.Complete
                             :
-                                0
+                                (int)EventStatus.Pending
                         :
-                            0,
+                            (int)EventStatus.Pending,
                     IsOffenderPresent =
                         details.Status != null
                         ?
-                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
+                            details.Status.Equals(Status.Attended, StringComparison.InvariantCultureIgnoreCase)
                         :
                             false,
                     IsSearchConducted = isSearchConducted,
@@ -418,15 +427,15 @@ namespace CMI.Processor
                     Status =
                         details.Status != null
                         ?
-                            details.Status.Equals("Attended", StringComparison.InvariantCultureIgnoreCase)
-                            ? 2
-                            : details.Status.Equals("Missed", StringComparison.InvariantCultureIgnoreCase)
-                                ? 16
-                                : details.Status.Equals("Excused", StringComparison.InvariantCultureIgnoreCase)
-                                    ? 10
-                                    : 0
+                            details.Status.Equals(Status.Attended, StringComparison.InvariantCultureIgnoreCase)
+                            ? (int)EventStatus.Complete
+                            : details.Status.Equals(Status.Missed, StringComparison.InvariantCultureIgnoreCase)
+                                ? (int)EventStatus.Missed
+                                : details.Status.Equals(Status.Excused, StringComparison.InvariantCultureIgnoreCase)
+                                    ? (int)EventStatus.Cancelled
+                                    : (int)EventStatus.Pending
                         :
-                            0,
+                            (int)EventStatus.Pending,
                     Comment = details.Notes
                 };
             }

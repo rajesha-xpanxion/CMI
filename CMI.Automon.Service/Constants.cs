@@ -66,6 +66,7 @@ namespace CMI.Automon.Service
         public static string DeviceType { get { return "@DeviceType"; } }
         public static string TestResult { get { return "@TestResult"; } }
         public static string Validities { get { return "@Validities"; } }
+        public static string Id { get { return "@Id"; } }
     }
 
     public static class DbColumnName

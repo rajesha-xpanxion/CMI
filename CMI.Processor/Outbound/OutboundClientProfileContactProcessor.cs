@@ -59,6 +59,7 @@ namespace CMI.Processor
                     {
                         offenderContactDetails = (Offender)ConvertResponseToObject<ClientProfileContactDetailsActivityResponse>(
                             message.ClientIntegrationId,
+                            message.ActivityIdentifier,
                             RetrieveActivityDetails<ClientProfileContactDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );

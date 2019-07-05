@@ -54,6 +54,7 @@ namespace CMI.Processor
                     {
                         offenderEmailDetails = (OffenderEmail)ConvertResponseToObject<ClientProfileEmailDetailsActivityResponse>(
                             message.ClientIntegrationId,
+                            message.ActivityIdentifier,
                             RetrieveActivityDetails<ClientProfileEmailDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );

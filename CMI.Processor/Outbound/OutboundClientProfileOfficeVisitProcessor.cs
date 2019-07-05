@@ -54,6 +54,7 @@ namespace CMI.Processor
                     {
                         offenderOfficeVisitDetails = (OffenderOfficeVisit)ConvertResponseToObject<ClientProfileOfficeVisitDetailsActivityResponse>(
                             message.ClientIntegrationId,
+                            message.ActivityIdentifier,
                             RetrieveActivityDetails<ClientProfileOfficeVisitDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
