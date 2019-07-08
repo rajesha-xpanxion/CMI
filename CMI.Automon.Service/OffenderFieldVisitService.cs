@@ -24,7 +24,7 @@ namespace CMI.Automon.Service
         }
         #endregion
 
-        public void SaveOffenderFieldVisitDetails(string CmiDbConnString, OffenderFieldVisit offenderFieldVisitDetails)
+        public int SaveOffenderFieldVisitDetails(string CmiDbConnString, OffenderFieldVisit offenderFieldVisitDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -46,6 +46,8 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderFieldVisitDetailsList));
+
+                return offenderFieldVisitDetails.Id == 0 ? new Random().Next(0, 10000) : offenderFieldVisitDetails.Id;
             }
             else
             {
@@ -70,6 +72,13 @@ namespace CMI.Automon.Service
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderFieldVisitDetails.Pin,
                             IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderFieldVisitDetails.Id,
+                            IsNullable = true
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
@@ -140,7 +149,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        cmd.ExecuteNonQuery();
+                        return Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }

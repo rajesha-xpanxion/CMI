@@ -4,6 +4,6 @@ namespace CMI.Automon.Interface
 {
     public interface IOffenderTreatmentAppointmentService
     {
-        void SaveOffenderTreatmentAppointmentDetails(string CmiDbConnString, OffenderTreatmentAppointment offenderTreatmentAppointmentDetails);
+        int SaveOffenderTreatmentAppointmentDetails(string CmiDbConnString, OffenderTreatmentAppointment offenderTreatmentAppointmentDetails);
     }
 }

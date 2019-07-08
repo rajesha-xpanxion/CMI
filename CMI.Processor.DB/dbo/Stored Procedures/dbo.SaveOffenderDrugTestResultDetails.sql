@@ -11,6 +11,7 @@ EXEC
 	[dbo].[SaveOffenderDrugTestResultDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
+		@Id = 0,
 		@StartDate = @CurrentDate,
 		@Comment = 'test office visit',
 		@EndDate = @CurrentDate,
@@ -23,10 +24,12 @@ EXEC
 History:-
 Date			Author			Changes
 08-Apr-19		Rajesh Awate	Created.
+08-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@StartDate DATETIME,
 	@Comment VARCHAR(MAX) = NULL,
 	@EndDate DATETIME,
@@ -47,10 +50,10 @@ BEGIN
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@EventTypeId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''CeDrugTestingResults''),
-			@EventId			INT = 0,
+			@EventId			INT = @Id,
 			@Value				VARCHAR(255);
 
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEvent] @EventTypeId, @StartDate, @EnteredByPId, @Comment, 0, NULL, NULL, 0, @EndDate, NULL, @Status, NULL, @EventId OUTPUT;
+		EXEC [$AutomonDatabaseName].[dbo].[UpdateEvent] @EventTypeId, @StartDate, @EnteredByPId, @Comment, 0, NULL, NULL, 0, @EndDate, NULL, @Status, NULL, @Id = @EventId OUTPUT;
 
 		EXEC [$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] @OffenderId, @EventId;
 
@@ -76,6 +79,8 @@ BEGIN
 		BEGIN
 			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Validities, NULL, ''CeDrugTest.Validities'', NULL, NULL, NULL;
 		END
+		
+		SELECT @EventId;
 		';
 
 

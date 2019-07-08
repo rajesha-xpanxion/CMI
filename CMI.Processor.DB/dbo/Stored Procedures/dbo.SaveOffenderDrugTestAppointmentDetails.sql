@@ -11,6 +11,7 @@ EXEC
 	[dbo].[SaveOffenderDrugTestAppointmentDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
+		@Id = 0,
 		@StartDate = @CurrentDate,
 		@EndDate = @CurrentDate,
 		@Status = 2, --Pending = 0, Missed = 16, Cancelled = 10, Complete = 2
@@ -20,10 +21,12 @@ History:-
 Date			Author			Changes
 08-May-19		Rajesh Awate	Created.
 27-May-19		Rajesh Awate	Updated event type.
+08-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestAppointmentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@StartDate DATETIME,
 	@EndDate DATETIME,
 	@Status INT = 0, --Pending = 0, Missed = 16, Cancelled = 10, Complete = 2
@@ -40,7 +43,7 @@ BEGIN
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@EventTypeId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''NexusContact''),
-			@EventId			INT = 0,
+			@EventId			INT = @Id,
 			@Value				VARCHAR(255);
 
 		EXEC 
@@ -57,7 +60,7 @@ BEGIN
 				NULL, 
 				@Status, 
 				NULL, 
-				@EventId OUTPUT;
+				@Id = @EventId OUTPUT;
 
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
@@ -89,6 +92,8 @@ BEGIN
 				NULL, 
 				NULL, 
 				NULL;
+		
+		SELECT @EventId;
 		';
 
 

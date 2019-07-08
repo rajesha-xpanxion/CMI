@@ -63,9 +63,17 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileOfficeVisitDetailsActivityResponse))
             {
                 ClientProfileOfficeVisitDetailsActivityResponse details = (ClientProfileOfficeVisitDetailsActivityResponse)(object)activityDetails;
+
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 return new OffenderOfficeVisit()
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     StartDate = details.DateTime,
                     Comment = details.Notes,
@@ -96,9 +104,17 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileDrugTestAppointmentDetailsActivityResponse))
             {
                 ClientProfileDrugTestAppointmentDetailsActivityResponse details = (ClientProfileDrugTestAppointmentDetailsActivityResponse)(object)activityDetails;
+
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 return new OffenderDrugTestAppointment()
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
@@ -123,9 +139,17 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileDrugTestResultDetailsActivityResponse))
             {
                 ClientProfileDrugTestResultDetailsActivityResponse details = (ClientProfileDrugTestResultDetailsActivityResponse)(object)activityDetails;
+
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 return new OffenderDrugTestResult()
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     StartDate = details.TestDateTime,
                     EndDate = details.TestDateTime,
@@ -159,6 +183,12 @@ namespace CMI.Processor
             {
                 ClientProfileFieldVisitDetailsActivityResponse details = (ClientProfileFieldVisitDetailsActivityResponse)(object)activityDetails;
 
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 bool isSearchConducted = false;
                 string searchLocations = string.Empty;
                 string searchResults = string.Empty;
@@ -175,9 +205,11 @@ namespace CMI.Processor
                 }
 
                 List<VisitedLocationDetails> visitedLocations = new List<VisitedLocationDetails>(details.VisitedLocations);
+
                 return new OffenderFieldVisit()
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     StartDate = details.DateTime,
                     Comment = details.Note,
@@ -416,11 +448,18 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileTreatmentAppointmentDetailsActivityResponse))
             {
                 ClientProfileTreatmentAppointmentDetailsActivityResponse details = (ClientProfileTreatmentAppointmentDetailsActivityResponse)(object)activityDetails;
+
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 return new OffenderTreatmentAppointment()
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
-
                     StartDate = details.AppointmentDateTime,
                     EndDate = details.AppointmentDateTime,
                     /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */

@@ -2,6 +2,7 @@
 using CMI.Automon.Model;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
@@ -24,7 +25,7 @@ namespace CMI.Automon.Service
         #endregion
 
         #region Public Methods
-        public void SaveOffenderTreatmentAppointmentDetails(string CmiDbConnString, OffenderTreatmentAppointment offenderTreatmentAppointmentDetails)
+        public int SaveOffenderTreatmentAppointmentDetails(string CmiDbConnString, OffenderTreatmentAppointment offenderTreatmentAppointmentDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -46,6 +47,8 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderTreatmentAppointmentDetailsList));
+
+                return offenderTreatmentAppointmentDetails.Id == 0 ? new Random().Next(0, 10000) : offenderTreatmentAppointmentDetails.Id;
             }
             else
             {
@@ -70,6 +73,13 @@ namespace CMI.Automon.Service
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderTreatmentAppointmentDetails.Pin,
                             IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderTreatmentAppointmentDetails.Id,
+                            IsNullable = true
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
@@ -111,7 +121,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        cmd.ExecuteNonQuery();
+                        return Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }

@@ -11,6 +11,7 @@ EXEC
 	[dbo].[SaveOffenderOfficeVisitDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
+		@Id = 0,
 		@StartDate DATETIME = @CurrentDate,
 		@Comment VARCHAR(MAX) = 'test office visit',
 		@EndDate DATETIME = @CurrentDate,
@@ -21,10 +22,12 @@ EXEC
 History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
+08-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderOfficeVisitDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@StartDate DATETIME,
 	@Comment VARCHAR(MAX),
 	@EndDate DATETIME,
@@ -43,7 +46,7 @@ BEGIN
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@EventTypeId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''NexusContact''),
-			@EventId			INT = 0,
+			@EventId			INT = @Id,
 			@Value				VARCHAR(255);
 
 		EXEC 
@@ -60,7 +63,7 @@ BEGIN
 				NULL, 
 				@Status, 
 				NULL, 
-				@EventId OUTPUT;
+				@Id = @EventId OUTPUT;
 
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
@@ -104,6 +107,8 @@ BEGIN
 				NULL, 
 				NULL, 
 				NULL;
+		
+		SELECT @EventId;
 		';
 
 

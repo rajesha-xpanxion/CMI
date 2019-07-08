@@ -3,6 +3,7 @@ using CMI.Automon.Model;
 using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.MessageRetriever.Model;
+using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
 using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
@@ -16,15 +17,18 @@ namespace CMI.Processor
     public class OutboundClientProfileFieldVisitProcessor: OutboundBaseProcessor
     {
         private readonly IOffenderFieldVisitService offenderFieldVisitService;
+        private readonly ICommonService commonService;
 
         public OutboundClientProfileFieldVisitProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderFieldVisitService offenderFieldVisitService
+            IOffenderFieldVisitService offenderFieldVisitService,
+            ICommonService commonService
         )
             : base(serviceProvider, configuration)
         {
             this.offenderFieldVisitService = offenderFieldVisitService;
+            this.commonService = commonService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<OutboundMessageDetails> messages, DateTime messagesReceivedOn)
@@ -59,19 +63,55 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
-                        offenderFieldVisitService.SaveOffenderFieldVisitDetails(ProcessorConfig.CmiDbConnString, offenderFieldVisitDetails);
+                        offenderFieldVisitDetails.Id = offenderFieldVisitService.SaveOffenderFieldVisitDetails(ProcessorConfig.CmiDbConnString, offenderFieldVisitDetails);
 
-                        taskExecutionStatus.AutomonAddMessageCount++;
+                        //check if saving details to Automon was successsful
+                        if (offenderFieldVisitDetails.Id == 0)
+                        {
+                            throw new CmiException("Offender - Field Visit details could not be saved in Automon.");
+                        }
+
+                        //derive current integration id & new integration id & flag whether integration id has been changed or not
+                        string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderFieldVisitDetails.Pin, offenderFieldVisitDetails.Id.ToString());
+                        bool isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
+
+                        //update integration identifier in Nexus if it is updated
+                        if (isIntegrationIdUpdated)
+                        {
+                            commonService.UpdateId(offenderFieldVisitDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = "FieldVisit", CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                        }
+
+                        //mark this message as successful
                         message.IsSuccessful = true;
 
-                        Logger.LogDebug(new LogRequest
+                        //save new identifier in message details
+                        message.AutomonIdentifier = offenderFieldVisitDetails.Id.ToString();
+
+                        //check if it was add or update operation and update Automon message counter accordingly
+                        if (isIntegrationIdUpdated)
                         {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "New Offender - Field Visit Details added successfully.",
-                            AutomonData = JsonConvert.SerializeObject(offenderFieldVisitDetails),
-                            NexusData = JsonConvert.SerializeObject(message)
-                        });
+                            taskExecutionStatus.AutomonAddMessageCount++;
+                            Logger.LogDebug(new LogRequest
+                            {
+                                OperationName = this.GetType().Name,
+                                MethodName = "Execute",
+                                Message = "New Offender - Field Visit details added successfully.",
+                                AutomonData = JsonConvert.SerializeObject(offenderFieldVisitDetails),
+                                NexusData = JsonConvert.SerializeObject(message)
+                            });
+                        }
+                        else
+                        {
+                            taskExecutionStatus.AutomonUpdateMessageCount++;
+                            Logger.LogDebug(new LogRequest
+                            {
+                                OperationName = this.GetType().Name,
+                                MethodName = "Execute",
+                                Message = "Existing Offender - Field Visit details updated successfully.",
+                                AutomonData = JsonConvert.SerializeObject(offenderFieldVisitDetails),
+                                NexusData = JsonConvert.SerializeObject(message)
+                            });
+                        }
                     }
                     catch (CmiException ce)
                     {

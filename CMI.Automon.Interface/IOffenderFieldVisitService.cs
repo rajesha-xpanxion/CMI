@@ -5,6 +5,6 @@ namespace CMI.Automon.Interface
 {
     public interface IOffenderFieldVisitService
     {
-        void SaveOffenderFieldVisitDetails(string CmiDbConnString, OffenderFieldVisit offenderFieldVisitDetails);
+        int SaveOffenderFieldVisitDetails(string CmiDbConnString, OffenderFieldVisit offenderFieldVisitDetails);
     }
 }
