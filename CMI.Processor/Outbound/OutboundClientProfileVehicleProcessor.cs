@@ -3,6 +3,7 @@ using CMI.Automon.Model;
 using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.MessageRetriever.Model;
+using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
 using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
@@ -16,15 +17,18 @@ namespace CMI.Processor
     public class OutboundClientProfileVehicleProcessor : OutboundBaseProcessor
     {
         private readonly IOffenderVehicleService offenderVehicleService;
+        private readonly ICommonService commonService;
 
         public OutboundClientProfileVehicleProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderVehicleService offenderVehicleService
+            IOffenderVehicleService offenderVehicleService,
+            ICommonService commonService
         )
             : base(serviceProvider, configuration)
         {
             this.offenderVehicleService = offenderVehicleService;
+            this.commonService = commonService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<OutboundMessageDetails> messages, DateTime messagesReceivedOn)
@@ -64,17 +68,52 @@ namespace CMI.Processor
                             || message.ActionReasonName.Equals(OutboundProcessorActionReason.Updated, StringComparison.InvariantCultureIgnoreCase)
                         )
                         {
-                            offenderVehicleService.SaveOffenderVehicleDetails(ProcessorConfig.CmiDbConnString, offenderVehicleDetails);
-                            taskExecutionStatus.AutomonAddMessageCount++;
+                            offenderVehicleDetails.Id = offenderVehicleService.SaveOffenderVehicleDetails(ProcessorConfig.CmiDbConnString, offenderVehicleDetails);
 
-                            Logger.LogDebug(new LogRequest
+                            //check if saving details to Automon was successsful
+                            if (offenderVehicleDetails.Id == 0)
                             {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "New Offender - Vehicle Details added successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
+                                throw new CmiException("Offender - Vehicle details could not be saved in Automon.");
+                            }
+
+                            //derive current integration id & new integration id & flag whether integration id has been changed or not
+                            string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderVehicleDetails.Pin, offenderVehicleDetails.Id.ToString());
+                            bool isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
+
+                            //update integration identifier in Nexus if it is updated
+                            if (isIntegrationIdUpdated)
+                            {
+                                commonService.UpdateId(offenderVehicleDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = "VehicleDetails", CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                            }
+
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderVehicleDetails.Id.ToString();
+
+                            //check if it was add or update operation and update Automon message counter accordingly
+                            if (isIntegrationIdUpdated)
+                            {
+                                taskExecutionStatus.AutomonAddMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "New Offender - Vehicle details added successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
+                            else
+                            {
+                                taskExecutionStatus.AutomonUpdateMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Existing Offender - Vehicle details updated successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
                         }
                         else if(message.ActionReasonName.Equals(OutboundProcessorActionReason.Removed, StringComparison.InvariantCultureIgnoreCase))
                         {
@@ -94,7 +133,8 @@ namespace CMI.Processor
                         {
                             throw new CmiException("Invalid action reason found.");
                         }
-                        
+
+                        //mark this message as successful
                         message.IsSuccessful = true;
                     }
                     catch (CmiException ce)

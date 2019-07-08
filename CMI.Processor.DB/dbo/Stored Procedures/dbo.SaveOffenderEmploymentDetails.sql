@@ -10,6 +10,7 @@ EXEC
 	[dbo].[SaveOffenderEmploymentDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5115',
+		@Id = 0,
 		@OrganizationName = 'new org 111',
 		@OrganizationAddress = 'Test Org Address 2',
 		@OrganizationPhone = '(911)007-4444',
@@ -22,10 +23,12 @@ EXEC
 History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
+08-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderEmploymentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@OrganizationName VARCHAR(100),
 	@OrganizationAddress VARCHAR(75) = NULL,
 	@OrganizationPhone VARCHAR(15) = NULL,
@@ -45,25 +48,7 @@ BEGIN
 			@EnteredByPId				INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId					INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@OrganizationTypeId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OrganizationType] WHERE [Description] = ''Other'' AND [IsActive] = 1),
-			@OrganizationId				INT	= ISNULL
-				(
-					(
-						SELECT TOP 1 
-							OI.[Id] 
-						FROM
-							[$AutomonDatabaseName].[dbo].[OrganizationInfo] OI LEFT JOIN [$AutomonDatabaseName].[dbo].[AddressInfo] AI
-								ON OI.[FullAddress] = AI.[FullAddress]
-								LEFT JOIN [$AutomonDatabaseName].[dbo].[PhoneNumberInfo] PNI
-									ON OI.[FullPhoneNumber] = PNI.[FullPhone]
-						WHERE
-							OI.[Name] = @OrganizationName
-							AND OI.[IsActive] = 1
-							AND AI.[Line1] = @OrganizationAddress
-							AND PNI.[Phone] = @OrganizationPhone
-						ORDER BY
-							OI.[EnteredDateTime] DESC
-					), 
-				0),
+			@OrganizationId				INT	= @Id,
 			@PersonAssociationId		INT	= 0,
 			@PersonAssociationRoleId	INT	= 0,
 			@AddressId					INT = ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[AddressInfo] WHERE [Line1] = @OrganizationAddress ORDER BY [FromTime] DESC), 0),
@@ -209,6 +194,8 @@ BEGIN
 					NULL,
 					NULL;
 		END
+		
+		SELECT @OrganizationId;
 		';
 
 
@@ -216,6 +203,7 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
+		@Id INT,
 		@OrganizationName VARCHAR(100),
 		@OrganizationAddress VARCHAR(75),
 		@OrganizationPhone VARCHAR(15),
@@ -231,6 +219,7 @@ PRINT @SQLString;
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
+				@Id = @Id,
 				@OrganizationName = @OrganizationName,
 				@OrganizationAddress = @OrganizationAddress,
 				@OrganizationPhone = @OrganizationPhone,

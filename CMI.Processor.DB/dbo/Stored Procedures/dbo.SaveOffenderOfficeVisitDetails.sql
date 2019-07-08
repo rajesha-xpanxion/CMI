@@ -116,6 +116,7 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
+		@Id INT,
 		@StartDate DATETIME,
 		@Comment VARCHAR(MAX),
 		@EndDate DATETIME,
@@ -129,6 +130,7 @@ PRINT @SQLString;
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
+				@Id = @Id,
 				@StartDate = @StartDate,
 				@Comment = @Comment,
 				@EndDate = @EndDate,

@@ -5,6 +5,7 @@ using CMI.Automon.Model;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using System;
 
 namespace CMI.Automon.Service
 {
@@ -23,7 +24,7 @@ namespace CMI.Automon.Service
         }
         #endregion
 
-        public void SaveOffenderVehicleDetails(string CmiDbConnString, OffenderVehicle offenderVehicleDetails)
+        public int SaveOffenderVehicleDetails(string CmiDbConnString, OffenderVehicle offenderVehicleDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -45,6 +46,8 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderVehicleDetailsList));
+
+                return offenderVehicleDetails.Id == 0 ? new Random().Next(0, 10000) : offenderVehicleDetails.Id;
             }
             else
             {
@@ -69,6 +72,13 @@ namespace CMI.Automon.Service
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderVehicleDetails.Pin,
                             IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderVehicleDetails.Id,
+                            IsNullable = true
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
@@ -116,7 +126,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        cmd.ExecuteNonQuery();
+                        return Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }

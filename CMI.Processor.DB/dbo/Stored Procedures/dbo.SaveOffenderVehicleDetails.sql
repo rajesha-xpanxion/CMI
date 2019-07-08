@@ -9,6 +9,7 @@ EXEC
 	[dbo].[SaveOffenderVehicleDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
+		@Id = 0,
 		@VehicleYear = 2012,
 		@Make = 'Suzuki',
 		@BodyStyle = 'Sedan',
@@ -19,10 +20,12 @@ EXEC
 History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
+08-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderVehicleDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@VehicleYear INT = NULL,
 	@Make VARCHAR(150),
 	@BodyStyle VARCHAR(150),
@@ -43,46 +46,30 @@ BEGIN
 			@BodyStyleLId		INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Body Style'' AND L.[PermDesc] = @BodyStyle),
 			@ColorLId			INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Color'' AND L.[PermDesc] = @Color),
 			@AssociationLId		INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Association'' AND L.[PermDesc] = ''Offender''),
-			@VehicleId			INT	= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[VehicleInfo] WHERE [ToTime] IS NULL AND [LicensePlate] = @LicensePlate AND [Vyear] = @VehicleYear AND [Make] = @Make AND [BodyStyle] = @BodyStyle AND [Color] = @Color ORDER BY [FromTime] DESC), 0);
+			@VehicleId			INT	= @Id;
 
-		IF(
-			NOT EXISTS
-			(
-				SELECT 
-					1 
-				FROM 
-					[$AutomonDatabaseName].[dbo].[VehicleInfo] 
-				WHERE 
-					[ToTime] IS NULL 
-					AND [LicensePlate] = @LicensePlate 
-					AND [Vyear] = @VehicleYear 
-					AND [Make] = @Make 
-					AND [BodyStyle] = @BodyStyle 
-					AND [Color] = @Color
-			)
-		)
-		BEGIN
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdateVehicle] 
-					@PersonId, 
-					@VehicleYear, 
-					@MakeLId, 
-					@BodyStyleLId, 
-					@ColorLId, 
-					@LicensePlate, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					@AssociationLId, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					@EnteredByPId, 
-					@VehicleId OUTPUT;
-		END
+		EXEC 
+			[$AutomonDatabaseName].[dbo].[UpdateVehicle] 
+				@PersonId, 
+				@VehicleYear, 
+				@MakeLId, 
+				@BodyStyleLId, 
+				@ColorLId, 
+				@LicensePlate, 
+				NULL, 
+				NULL, 
+				NULL, 
+				NULL, 
+				@AssociationLId, 
+				NULL, 
+				NULL, 
+				NULL, 
+				NULL, 
+				NULL, 
+				@EnteredByPId, 
+				@Id = @VehicleId OUTPUT;
+
+		SELECT @VehicleId;
 		';
 
 
@@ -90,6 +77,7 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
+		@Id INT,
 		@VehicleYear INT,
 		@Make VARCHAR(150),
 		@BodyStyle VARCHAR(150),
@@ -103,6 +91,7 @@ PRINT @SQLString;
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
+				@Id = @Id,
 				@VehicleYear = @VehicleYear,
 				@Make = @Make,
 				@BodyStyle = @BodyStyle,

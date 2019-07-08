@@ -101,6 +101,7 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
+		@Id INT,
 		@StartDate DATETIME,
 		@EndDate DATETIME,
 		@Status INT,
@@ -112,6 +113,7 @@ PRINT @SQLString;
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
+				@Id = @Id,
 				@StartDate = @StartDate,
 				@EndDate = @EndDate,
 				@Status = @Status,

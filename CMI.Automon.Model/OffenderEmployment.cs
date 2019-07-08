@@ -6,6 +6,7 @@ namespace CMI.Automon.Model
 {
     public class OffenderEmployment : Offender
     {
+        public int Id { get; set; }
         public string OrganizationName { get; set; }
         public string OrganizationAddress { get; set; }
         public string OrganizationPhone { get; set; }

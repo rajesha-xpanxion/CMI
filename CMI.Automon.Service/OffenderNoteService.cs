@@ -108,7 +108,6 @@ namespace CMI.Automon.Service
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderNoteDetailsList));
 
-
                 return offenderNoteDetails.Id == 0 ? new Random().Next(0, 10000) : offenderNoteDetails.Id;
             }
             else

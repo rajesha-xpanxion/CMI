@@ -345,9 +345,16 @@ namespace CMI.Processor
             {
                 ClientProfileVehicleDetailsActivityResponse details = (ClientProfileVehicleDetailsActivityResponse)(object)activityDetails;
 
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 return new OffenderVehicle
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     VehicleYear = details.Year,
                     Make = details.Make,
@@ -360,6 +367,12 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileEmploymentDetailsActivityResponse))
             {
                 ClientProfileEmploymentDetailsActivityResponse details = (ClientProfileEmploymentDetailsActivityResponse)(object)activityDetails;
+
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
 
                 string payFrequency = string.Empty;
                 if (!string.IsNullOrEmpty(details.WageUnit))
@@ -381,6 +394,7 @@ namespace CMI.Processor
                 return new OffenderEmployment
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     OrganizationName = details.Employer,
                     OrganizationAddress = details.WorkAddress,
