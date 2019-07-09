@@ -86,7 +86,7 @@ namespace CMI.Automon.Service
             }
         }
 
-        public void SaveOffenderPhoneDetails(string CmiDbConnString, OffenderPhone offenderPhoneDetails)
+        public int SaveOffenderPhoneDetails(string CmiDbConnString, OffenderPhone offenderPhoneDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -108,6 +108,8 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderPhoneDetailsList));
+
+                return offenderPhoneDetails.Id == 0 ? new Random().Next(0, 10000) : offenderPhoneDetails.Id;
             }
             else
             {
@@ -135,6 +137,13 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderPhoneDetails.Id,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
                             ParameterName = SqlParamName.UpdatedBy,
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderPhoneDetails.UpdatedBy,
@@ -157,7 +166,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        cmd.ExecuteNonQuery();
+                        return Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }

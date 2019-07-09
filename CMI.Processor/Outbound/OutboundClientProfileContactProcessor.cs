@@ -3,6 +3,7 @@ using CMI.Automon.Model;
 using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.MessageRetriever.Model;
+using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
 using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
@@ -17,17 +18,20 @@ namespace CMI.Processor
     {
         private readonly IOffenderEmailService offenderEmailService;
         private readonly IOffenderPhoneService offenderPhoneService;
+        private readonly ICommonService commonService;
 
         public OutboundClientProfileContactProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
             IOffenderEmailService offenderEmailService,
-            IOffenderPhoneService offenderPhoneService
+            IOffenderPhoneService offenderPhoneService,
+            ICommonService commonService
         )
             : base(serviceProvider, configuration)
         {
             this.offenderEmailService = offenderEmailService;
             this.offenderPhoneService = offenderPhoneService;
+            this.commonService = commonService;
         }
 
         public override TaskExecutionStatus Execute(IEnumerable<OutboundMessageDetails> messages, DateTime messagesReceivedOn)
@@ -64,29 +68,108 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
+                        string currentIntegrationId = string.Empty, newIntegrationId = string.Empty;
+                        bool isIntegrationIdUpdated = false;
+
                         if (offenderContactDetails.GetType() == typeof(OffenderEmail))
                         {
                             offenderEmailDetails = (OffenderEmail)offenderContactDetails;
-                            offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, offenderEmailDetails);
+                            offenderEmailDetails.Id = offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, offenderEmailDetails);
+
+                            //check if saving details to Automon was successsful
+                            if (offenderEmailDetails.Id == 0)
+                            {
+                                throw new CmiException("Offender - Email details could not be saved in Automon.");
+                            }
+
+                            //derive current integration id & new integration id & flag whether integration id has been changed or not
+                            currentIntegrationId = message.ActivityIdentifier;
+                            newIntegrationId = string.Format("{0}-{1}", offenderEmailDetails.Pin, offenderEmailDetails.Id.ToString());
+                            isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
+
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderEmailDetails.Id.ToString();
+
+                            //check if it was add or update operation and update Automon message counter accordingly
+                            if (isIntegrationIdUpdated)
+                            {
+                                taskExecutionStatus.AutomonAddMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "New Offender - Email details added successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
+                            else
+                            {
+                                taskExecutionStatus.AutomonUpdateMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Existing Offender - Email details updated successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
                         }
                         else
                         {
-                            offenderPhoneDetails = (OffenderPhone)offenderContactDetails; 
+                            offenderPhoneDetails = (OffenderPhone)offenderContactDetails;
+                            offenderPhoneDetails.Id = offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, offenderPhoneDetails);
 
-                            offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, offenderPhoneDetails);
+                            //check if saving details to Automon was successsful
+                            if (offenderPhoneDetails.Id == 0)
+                            {
+                                throw new CmiException("Offender - Phone details could not be saved in Automon.");
+                            }
+
+                            //derive current integration id & new integration id & flag whether integration id has been changed or not
+                            currentIntegrationId = message.ActivityIdentifier;
+                            newIntegrationId = string.Format("{0}-{1}", offenderPhoneDetails.Pin, offenderPhoneDetails.Id.ToString());
+                            isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
+
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderEmailDetails.Id.ToString();
+
+                            //check if it was add or update operation and update Automon message counter accordingly
+                            if (isIntegrationIdUpdated)
+                            {
+                                taskExecutionStatus.AutomonAddMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "New Offender - Phone details added successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
+                            else
+                            {
+                                taskExecutionStatus.AutomonUpdateMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Existing Offender - Phone details updated successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
                         }
 
-                        taskExecutionStatus.AutomonAddMessageCount++;
-                        message.IsSuccessful = true;
-
-                        Logger.LogDebug(new LogRequest
+                        //update integration identifier in Nexus if it is updated
+                        if (isIntegrationIdUpdated)
                         {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "New Offender - Contact Details added successfully.",
-                            AutomonData = JsonConvert.SerializeObject(offenderContactDetails),
-                            NexusData = JsonConvert.SerializeObject(message)
-                        });
+                            commonService.UpdateId(offenderEmailDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = "ContactDetails", CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                        }
+
+                        //mark this message as successful
+                        message.IsSuccessful = true;
                     }
                     catch (CmiException ce)
                     {

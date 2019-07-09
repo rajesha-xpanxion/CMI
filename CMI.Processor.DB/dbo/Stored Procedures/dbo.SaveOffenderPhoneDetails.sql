@@ -9,6 +9,7 @@ EXEC
 	[dbo].[SaveOffenderPhoneDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '10772',
+		@Id = 0,
 		@Phone = '(541)555-8778',
 		@PhoneNumberType = 'Residential',
 		@UpdatedBy = 'rawate@xpanxion.com';
@@ -16,10 +17,12 @@ EXEC
 History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
+09-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderPhoneDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@Phone VARCHAR(15),
 	@PhoneNumberType VARCHAR(100),
 	@UpdatedBy VARCHAR(255)
@@ -34,53 +37,30 @@ BEGIN
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@PhoneNumberId	INT				= 0,
+			@PhoneNumberId	INT				= @Id,
 			@PersonPhoneId	INT				= 0;
+		
+		EXEC 
+			[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
+				@EnteredByPId, 
+				@Phone, 
+				NULL, 
+				NULL, 
+				NULL, 
+				@Id = @PhoneNumberId OUTPUT;
 
-		--check if given phone is already associated with given person. avoid duplicate records
-		IF(
-			NOT EXISTS
-			(
-				SELECT
-					1
-				FROM
-					[$AutomonDatabaseName].[dbo].[PhoneNumber] PN JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] PP
-						ON PN.[Id] = PP.[PhoneNumberId]
-						JOIN [$AutomonDatabaseName].[dbo].[Lookup] L 
-							ON PP.[PhoneTypeLId] = L.[Id]
-							JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
-								ON L.[LookupTypeId] = LT.[Id]
-				WHERE
-					PP.[PersonId] = @PersonId
-					AND PN.[Phone] = @Phone
-					AND PN.[ToTime] IS NULL
-					AND LT.[Description] = ''PhoneNumberTypes''
-					AND L.[PermDesc] = @PhoneNumberType
-					AND LT.[IsActive] = 1
-					AND L.[IsActive] = 1
-			)
-		)
-		BEGIN
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
-					@EnteredByPId, 
-					@Phone, 
-					NULL, 
-					NULL, 
-					NULL, 
-					@PhoneNumberId OUTPUT;
-
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdatePersonPhone] 
-					@PersonId, 
-					@PhoneNumberId, 
-					NULL, 
-					0, 
-					@PersonPhoneId OUTPUT, 
-					@PhoneNumberType, 
-					NULL, 
-					NULL;
-		END
+		EXEC 
+			[$AutomonDatabaseName].[dbo].[UpdatePersonPhone] 
+				@PersonId, 
+				@PhoneNumberId, 
+				NULL, 
+				0, 
+				@PersonPhoneId OUTPUT, 
+				@PhoneNumberType, 
+				NULL, 
+				NULL;
+		
+		SELECT @PhoneNumberId;
 		';
 
 
@@ -88,6 +68,7 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
+		@Id INT,
 		@Phone VARCHAR(15),
 		@PhoneNumberType VARCHAR(100),
 		@UpdatedBy VARCHAR(255)';
@@ -98,6 +79,7 @@ PRINT @SQLString;
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
+				@Id = @Id,
 				@Phone = @Phone,
 				@PhoneNumberType = @PhoneNumberType,
 				@UpdatedBy = @UpdatedBy;

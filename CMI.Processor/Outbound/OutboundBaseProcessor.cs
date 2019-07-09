@@ -292,11 +292,18 @@ namespace CMI.Processor
             {
                 ClientProfileContactDetailsActivityResponse details = (ClientProfileContactDetailsActivityResponse)(object)activityDetails;
 
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 if (details.ContactType.Equals("E-mail", StringComparison.InvariantCultureIgnoreCase))
                 {
                     return new OffenderEmail
                     {
                         Pin = clientIntegrationId,
+                        Id = id,
                         UpdatedBy = updatedBy,
                         EmailAddress = details.Contact
                     };
@@ -329,6 +336,7 @@ namespace CMI.Processor
                     return new OffenderPhone
                     {
                         Pin = clientIntegrationId,
+                        Id = id,
                         UpdatedBy = updatedBy,
                         Phone =
                             details.Contact != null
