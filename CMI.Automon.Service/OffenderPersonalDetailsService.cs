@@ -26,7 +26,7 @@ namespace CMI.Automon.Service
         #endregion
 
         #region Public Methods
-        public void SaveOffenderPersonalDetails(string CmiDbConnString, Offender offenderDetails)
+        public int SaveOffenderPersonalDetails(string CmiDbConnString, Offender offenderDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -48,6 +48,8 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderDetailsList));
+
+                return offenderDetails.Id == 0 ? new Random().Next(0, 10000) : offenderDetails.Id;
             }
             else
             {
@@ -72,6 +74,13 @@ namespace CMI.Automon.Service
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderDetails.Pin,
                             IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderDetails.Id,
+                            IsNullable = true
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
@@ -125,7 +134,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        cmd.ExecuteNonQuery();
+                        return Convert.ToInt32(cmd.ExecuteScalar());
                     }
                 }
             }

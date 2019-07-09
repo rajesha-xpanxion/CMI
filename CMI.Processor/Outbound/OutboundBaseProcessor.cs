@@ -242,9 +242,16 @@ namespace CMI.Processor
             {
                 ClientProfilePersonalDetailsActivityResponse details = (ClientProfilePersonalDetailsActivityResponse)(object)activityDetails;
 
+                //try to retrieve Automon identifier
+                int id = 0;
+                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+                {
+                }
+
                 return new Offender
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     FirstName = details.FirstName,
                     MiddleName = details.MiddleName,

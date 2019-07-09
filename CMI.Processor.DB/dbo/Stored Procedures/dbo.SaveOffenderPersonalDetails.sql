@@ -9,6 +9,7 @@ EXEC
 	[dbo].[SaveOffenderPersonalDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5115',
+		@Id = 0,
 		@FirstName = 'Sarah',
 		@MiddleName = NULL,
 		@LastName = 'Anderson',
@@ -22,10 +23,12 @@ Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 16-Apr-19		Rajesh Awate	Check if given race matches, else set it as Unknown
 16-Apr-19		Rajesh Awate	Changes to save DateOfBirth & Gender information
+09-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderPersonalDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@FirstName VARCHAR(32) = NULL,
 	@MiddleName VARCHAR(32) = NULL,
 	@LastName VARCHAR(32),
@@ -43,7 +46,7 @@ BEGIN
 		DECLARE 
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@AnyNameId		INT				= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[AnyName] WHERE [Firstname] = @FirstName AND [LastName] = @LastName AND [ToTime] IS NULL ORDER BY [FromTime]), 0),
+			@AnyNameId		INT				= @Id,
 			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin);
 
 		--update name based on given info
@@ -57,7 +60,7 @@ BEGIN
 				NULL,
 				0,
 				NULL,
-				@AnyNameId OUTPUT;
+				@Id = @AnyNameId OUTPUT;
 
 
 		EXEC 
@@ -137,6 +140,8 @@ BEGIN
 					NULL,
 					@PersonAttributeId OUTPUT;
 		END
+		
+		SELECT @AnyNameId;
 		';
 
 

@@ -4,6 +4,8 @@ namespace CMI.Automon.Model
 {
     public class Offender
     {
+        public int Id { get; set; }
+
         public string Pin { get; set; }
 
         public string FirstName { get; set; }
