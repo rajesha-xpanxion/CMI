@@ -6,7 +6,6 @@ namespace CMI.Automon.Model
 {
     public class OffenderVehicle : Offender
     {
-        public int Id { get; set; }
         public int VehicleYear { get; set; }
         public string Make { get; set; }
         public string BodyStyle { get; set; }

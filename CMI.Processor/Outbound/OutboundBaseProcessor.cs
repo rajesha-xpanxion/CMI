@@ -38,16 +38,16 @@ namespace CMI.Processor
 
         protected Offender ConvertResponseToObject<T>(string clientIntegrationId, string activityIdentifier, T activityDetails, string updatedBy)
         {
+            //try to retrieve Automon identifier
+            int id = 0;
+            if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+            {
+            }
+
             //Note
             if (typeof(T) == typeof(ClientProfileNoteActivityDetailsResponse))
             {
                 ClientProfileNoteActivityDetailsResponse noteActivityDetailsResponse = (ClientProfileNoteActivityDetailsResponse)(object)activityDetails;
-
-                //try to retrieve Automon identifier
-                int id = 0;
-                if(!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
 
                 return new OffenderNote()
                 {
@@ -63,12 +63,6 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileOfficeVisitDetailsActivityResponse))
             {
                 ClientProfileOfficeVisitDetailsActivityResponse details = (ClientProfileOfficeVisitDetailsActivityResponse)(object)activityDetails;
-
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
 
                 return new OffenderOfficeVisit()
                 {
@@ -105,12 +99,6 @@ namespace CMI.Processor
             {
                 ClientProfileDrugTestAppointmentDetailsActivityResponse details = (ClientProfileDrugTestAppointmentDetailsActivityResponse)(object)activityDetails;
 
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
-
                 return new OffenderDrugTestAppointment()
                 {
                     Pin = clientIntegrationId,
@@ -139,12 +127,6 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileDrugTestResultDetailsActivityResponse))
             {
                 ClientProfileDrugTestResultDetailsActivityResponse details = (ClientProfileDrugTestResultDetailsActivityResponse)(object)activityDetails;
-
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
 
                 return new OffenderDrugTestResult()
                 {
@@ -182,12 +164,6 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileFieldVisitDetailsActivityResponse))
             {
                 ClientProfileFieldVisitDetailsActivityResponse details = (ClientProfileFieldVisitDetailsActivityResponse)(object)activityDetails;
-
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
 
                 bool isSearchConducted = false;
                 string searchLocations = string.Empty;
@@ -242,12 +218,6 @@ namespace CMI.Processor
             {
                 ClientProfilePersonalDetailsActivityResponse details = (ClientProfilePersonalDetailsActivityResponse)(object)activityDetails;
 
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
-
                 return new Offender
                 {
                     Pin = clientIntegrationId,
@@ -269,6 +239,7 @@ namespace CMI.Processor
                 return new OffenderEmail
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     EmailAddress = details.Email
                 };
@@ -281,6 +252,7 @@ namespace CMI.Processor
                 return new OffenderAddress
                 {
                     Pin = clientIntegrationId,
+                    Id = id,
                     UpdatedBy = updatedBy,
                     Line1 = details.Address,
                     //Line2 = details.Address,
@@ -298,12 +270,6 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileContactDetailsActivityResponse))
             {
                 ClientProfileContactDetailsActivityResponse details = (ClientProfileContactDetailsActivityResponse)(object)activityDetails;
-
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
 
                 if (details.ContactType.Equals("E-mail", StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -360,12 +326,6 @@ namespace CMI.Processor
             {
                 ClientProfileVehicleDetailsActivityResponse details = (ClientProfileVehicleDetailsActivityResponse)(object)activityDetails;
 
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
-
                 return new OffenderVehicle
                 {
                     Pin = clientIntegrationId,
@@ -382,12 +342,6 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileEmploymentDetailsActivityResponse))
             {
                 ClientProfileEmploymentDetailsActivityResponse details = (ClientProfileEmploymentDetailsActivityResponse)(object)activityDetails;
-
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
 
                 string payFrequency = string.Empty;
                 if (!string.IsNullOrEmpty(details.WageUnit))
@@ -477,12 +431,6 @@ namespace CMI.Processor
             else if (typeof(T) == typeof(ClientProfileTreatmentAppointmentDetailsActivityResponse))
             {
                 ClientProfileTreatmentAppointmentDetailsActivityResponse details = (ClientProfileTreatmentAppointmentDetailsActivityResponse)(object)activityDetails;
-
-                //try to retrieve Automon identifier
-                int id = 0;
-                if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
-                {
-                }
 
                 return new OffenderTreatmentAppointment()
                 {

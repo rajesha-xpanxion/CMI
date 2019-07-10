@@ -9,6 +9,7 @@ EXEC
 	[dbo].[SaveOffenderAddressDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '10772',
+		@Id = 0,
 		@Line1 = '12357 Old Follows Lane, St. Helens, Oregon 97409',
 		@Line2 = NULL,
 		@AddressType = 'Residential',
@@ -17,10 +18,12 @@ EXEC
 History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
+10-July-19		Rajesh Awate	Changes to handle update scenario.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderAddressDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
+	@Id INT = 0,
 	@Line1 VARCHAR(75),
 	@Line2 VARCHAR(75) = NULL,
 	@AddressType VARCHAR(100),
@@ -35,7 +38,7 @@ BEGIN
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@AddressId			INT = 0,
+			@AddressId			INT = @Id,
 			@PersonAddressId	INT = 0;
 
 		EXEC 
@@ -58,6 +61,8 @@ BEGIN
 				0, 
 				@PersonAddressId OUTPUT, 
 				@AddressType;
+		
+		SELECT @AddressId;
 		';
 
 
@@ -65,6 +70,7 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
+		@Id INT,
 		@Line1 VARCHAR(75),
 		@Line2 VARCHAR(75),
 		@AddressType VARCHAR(100),
@@ -76,6 +82,7 @@ PRINT @SQLString;
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
+				@Id = @Id,
 				@Line1 = @Line1,
 				@Line2 = @Line2,
 				@AddressType = @AddressType,

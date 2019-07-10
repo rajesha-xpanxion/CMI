@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CMI.Automon.Model
 {
     public class OffenderDrugTestResult : Offender
     {
-        public int Id { get; set; }
         public DateTime StartDate { get; set; }
         public string Comment { get; set; }
         public DateTime EndDate { get; set; }
