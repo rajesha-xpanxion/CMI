@@ -9,25 +9,18 @@ EXEC
 	[dbo].[DeleteOffenderVehicleDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
-		@VehicleYear = 2012,
-		@Make = 'Suzuki',
-		@BodyStyle = 'Sedan',
-		@Color = 'Grey',
-		@LicensePlate = 'MH14DF5029',
+		@Id = 999,
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
 18-Apr-19		Rajesh Awate	Created.
+12-July-19		Rajesh Awate	Changes to delete vehicle using Id.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[DeleteOffenderVehicleDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
-	@VehicleYear INT = NULL,
-	@Make VARCHAR(150),
-	@BodyStyle VARCHAR(150),
-	@Color VARCHAR(150),
-	@LicensePlate VARCHAR(10),
+	@Id INT,
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -39,11 +32,7 @@ BEGIN
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@MakeLId			INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Make'' AND L.[PermDesc] = @Make),
-			@BodyStyleLId		INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Body Style'' AND L.[PermDesc] = @BodyStyle),
-			@ColorLId			INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Color'' AND L.[PermDesc] = @Color),
-			@AssociationLId		INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Association'' AND L.[PermDesc] = ''Offender''),
-			@VehicleId			INT	= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[VehicleInfo] WHERE [ToTime] IS NULL AND [LicensePlate] = @LicensePlate AND [Vyear] = @VehicleYear AND [Make] = @Make AND [BodyStyle] = @BodyStyle AND [Color] = @Color ORDER BY [FromTime] DESC), 0);
+			@VehicleId			INT	= @Id;
 
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[DeleteVehicle]
@@ -55,23 +44,15 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
-		@VehicleYear INT,
-		@Make VARCHAR(150),
-		@BodyStyle VARCHAR(150),
-		@Color VARCHAR(150),
-		@LicensePlate VARCHAR(10),
+		@Id INT,
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 
 				@ParmDefinition,  
 				@Pin = @Pin,
-				@VehicleYear = @VehicleYear,
-				@Make = @Make,
-				@BodyStyle = @BodyStyle,
-				@Color = @Color,
-				@LicensePlate = @LicensePlate,
+				@Id = @Id,
 				@UpdatedBy = @UpdatedBy;
 END

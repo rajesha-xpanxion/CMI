@@ -182,32 +182,19 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderEmploymentDetails.Id,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
                             ParameterName = SqlParamName.UpdatedBy,
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderEmploymentDetails.UpdatedBy,
                             IsNullable = false
                         });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.OrganizationName,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.OrganizationName,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.OrganizationAddress,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.OrganizationAddress,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.OrganizationPhone,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderEmploymentDetails.OrganizationPhone,
-                            IsNullable = false
-                        });
+                        
 
                         cmd.Connection = conn;
 

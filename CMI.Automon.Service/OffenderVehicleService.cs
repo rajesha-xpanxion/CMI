@@ -167,6 +167,13 @@ namespace CMI.Automon.Service
                             Value = offenderVehicleDetails.Pin,
                             IsNullable = false
                         });
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderVehicleDetails.Id,
+                            IsNullable = false
+                        });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.UpdatedBy,
@@ -174,42 +181,6 @@ namespace CMI.Automon.Service
                             Value = offenderVehicleDetails.UpdatedBy,
                             IsNullable = false
                         });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.VehicleYear,
-                            SqlDbType = System.Data.SqlDbType.Int,
-                            Value = offenderVehicleDetails.VehicleYear,
-                            IsNullable = true
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.Make,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderVehicleDetails.Make,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.BodyStyle,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderVehicleDetails.BodyStyle,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.Color,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderVehicleDetails.Color,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.LicensePlate,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderVehicleDetails.LicensePlate,
-                            IsNullable = false
-                        });
-
 
                         cmd.Connection = conn;
 
