@@ -1,4 +1,5 @@
 ﻿using CMI.Nexus.Model;
+using System.Collections.Generic;
 
 namespace CMI.Nexus.Interface
 {
@@ -7,6 +8,8 @@ namespace CMI.Nexus.Interface
         bool AddNewAddressDetails(Address address);
 
         Address GetAddressDetails(string clientId, string addressId);
+
+        List<Address> GetAllAddressDetails(string clientId);
 
         bool UpdateAddressDetails(Address address);
 

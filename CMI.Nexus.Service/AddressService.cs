@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 using CMI.Nexus.Interface;
+using System.Collections.Generic;
 
 namespace CMI.Nexus.Service
 {
@@ -75,6 +76,33 @@ namespace CMI.Nexus.Service
             }
 
             return addressDetails;
+        }
+
+        public List<Address> GetAllAddressDetails(string clientId)
+        {
+            List<Address> allAddressDetails = null;
+
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/addresses", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    allAddressDetails = apiResponse.Content.ReadAsAsync<List<Address>>().Result;
+                }
+                else
+                {
+                    allAddressDetails = null;
+                }
+            }
+
+            return allAddressDetails;
         }
 
         public bool UpdateAddressDetails(Address address)

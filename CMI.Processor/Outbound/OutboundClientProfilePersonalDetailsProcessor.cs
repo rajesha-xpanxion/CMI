@@ -59,59 +59,31 @@ namespace CMI.Processor
                         offenderPersonalDetails = ConvertResponseToObject<ClientProfilePersonalDetailsActivityResponse>(
                             message.ClientIntegrationId,
                             message.ActivityIdentifier,
+                            message.AutomonIdentifier,
                             RetrieveActivityDetails<ClientProfilePersonalDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
 
-                        offenderPersonalDetails.Id = offenderPersonalDetailsService.SaveOffenderPersonalDetails(ProcessorConfig.CmiDbConnString, offenderPersonalDetails);
-
-                        //check if saving details to Automon was successsful
-                        if (offenderPersonalDetails.Id == 0)
-                        {
-                            throw new CmiException("Offender - Personal details could not be saved in Automon.");
-                        }
-
-                        //derive current integration id & new integration id & flag whether integration id has been changed or not
-                        string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderPersonalDetails.Pin, offenderPersonalDetails.Id.ToString());
-                        bool isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
-
-                        //update integration identifier in Nexus if it is updated
-                        if (isIntegrationIdUpdated)
-                        {
-                            commonService.UpdateId(offenderPersonalDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = "PersonalDetails", CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
-                        }
+                        //save details to Automon
+                        offenderPersonalDetailsService.SaveOffenderPersonalDetails(ProcessorConfig.CmiDbConnString, offenderPersonalDetails);
 
                         //mark this message as successful
                         message.IsSuccessful = true;
 
                         //save new identifier in message details
-                        message.AutomonIdentifier = offenderPersonalDetails.Id.ToString();
+                        message.AutomonIdentifier = offenderPersonalDetails.Pin;
 
-                        //check if it was add or update operation and update Automon message counter accordingly
-                        if (isIntegrationIdUpdated)
+                        //update counter
+                        taskExecutionStatus.AutomonUpdateMessageCount++;
+
+                        Logger.LogDebug(new LogRequest
                         {
-                            taskExecutionStatus.AutomonAddMessageCount++;
-                            Logger.LogDebug(new LogRequest
-                            {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "New Offender - Personal details added successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderPersonalDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
-                        }
-                        else
-                        {
-                            taskExecutionStatus.AutomonUpdateMessageCount++;
-                            Logger.LogDebug(new LogRequest
-                            {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "Existing Offender - Personal details updated successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderPersonalDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
-                        }
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
+                            Message = "Existing Offender - Personal details updated successfully.",
+                            AutomonData = JsonConvert.SerializeObject(offenderPersonalDetails),
+                            NexusData = JsonConvert.SerializeObject(message)
+                        });
                     }
                     catch (CmiException ce)
                     {

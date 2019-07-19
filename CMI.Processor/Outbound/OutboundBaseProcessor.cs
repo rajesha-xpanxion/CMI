@@ -36,11 +36,14 @@ namespace CMI.Processor
             return JsonConvert.DeserializeObject<T>(activityDetails);
         }
 
-        protected Offender ConvertResponseToObject<T>(string clientIntegrationId, string activityIdentifier, T activityDetails, string updatedBy)
+        protected Offender ConvertResponseToObject<T>(string clientIntegrationId, string activityIdentifier, string automonIdentifier, T activityDetails, string updatedBy)
         {
             //try to retrieve Automon identifier
             int id = 0;
-            if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(clientIntegrationId, string.Empty).Replace("-", string.Empty), out id))
+            if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(string.Format("{0}-{1}", clientIntegrationId, "-"), string.Empty), out id))
+            {
+            }
+            else if (!string.IsNullOrEmpty(automonIdentifier) && int.TryParse(automonIdentifier, out id))
             {
             }
 
@@ -220,8 +223,7 @@ namespace CMI.Processor
 
                 return new Offender
                 {
-                    Pin = clientIntegrationId,
-                    Id = id,
+                    Pin = string.IsNullOrEmpty(automonIdentifier) ? clientIntegrationId : automonIdentifier,
                     UpdatedBy = updatedBy,
                     FirstName = details.FirstName,
                     MiddleName = details.MiddleName,
@@ -255,7 +257,6 @@ namespace CMI.Processor
                     Id = id,
                     UpdatedBy = updatedBy,
                     Line1 = details.Address,
-                    //Line2 = details.Address,
                     AddressType =
                         details.AddressType != null
                         ?

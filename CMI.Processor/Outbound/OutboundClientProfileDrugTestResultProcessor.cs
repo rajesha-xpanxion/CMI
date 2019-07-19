@@ -59,27 +59,24 @@ namespace CMI.Processor
                         offenderDrugTestResultDetails = (OffenderDrugTestResult)ConvertResponseToObject<ClientProfileDrugTestResultDetailsActivityResponse>(
                             message.ClientIntegrationId,
                             message.ActivityIdentifier,
+                            message.AutomonIdentifier,
                             RetrieveActivityDetails<ClientProfileDrugTestResultDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
 
-                        offenderDrugTestResultDetails.Id = offenderDrugTestResultService.SaveOffenderDrugTestResultDetails(ProcessorConfig.CmiDbConnString, offenderDrugTestResultDetails);
+                        //save details to Automon and get Id
+                        int automonId = offenderDrugTestResultService.SaveOffenderDrugTestResultDetails(ProcessorConfig.CmiDbConnString, offenderDrugTestResultDetails);
 
                         //check if saving details to Automon was successsful
-                        if (offenderDrugTestResultDetails.Id == 0)
+                        if (automonId == 0)
                         {
                             throw new CmiException("Offender - Drug Test Result details could not be saved in Automon.");
                         }
 
-                        //derive current integration id & new integration id & flag whether integration id has been changed or not
-                        string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderDrugTestResultDetails.Pin, offenderDrugTestResultDetails.Id.ToString());
-                        bool isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
+                        //check if details got newly added in Automon
+                        bool isDetailsAddedInAutomon = offenderDrugTestResultDetails.Id == 0 && automonId > 0 && offenderDrugTestResultDetails.Id != automonId;
 
-                        //update integration identifier in Nexus if it is updated
-                        if (isIntegrationIdUpdated)
-                        {
-                            commonService.UpdateId(offenderDrugTestResultDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = "DrugTestResult", CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
-                        }
+                        offenderDrugTestResultDetails.Id = automonId;
 
                         //mark this message as successful
                         message.IsSuccessful = true;
@@ -88,7 +85,7 @@ namespace CMI.Processor
                         message.AutomonIdentifier = offenderDrugTestResultDetails.Id.ToString();
 
                         //check if it was add or update operation and update Automon message counter accordingly
-                        if (isIntegrationIdUpdated)
+                        if (isDetailsAddedInAutomon)
                         {
                             taskExecutionStatus.AutomonAddMessageCount++;
                             Logger.LogDebug(new LogRequest

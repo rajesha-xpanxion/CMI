@@ -140,6 +140,19 @@ namespace CMI.Processor
                     messagesReceivedOn
                     )
                 );
+
+                toBeProcessedOutboundMessages.ToList().ForEach(m =>
+                {
+                    if (toBeProcessedOutboundMessages.Any(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        m.AutomonIdentifier = 
+                            toBeProcessedOutboundMessages
+                                .Where(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                                .OrderByDescending(y => y.ReceivedOn)
+                                .FirstOrDefault()
+                                .AutomonIdentifier;
+                    }
+                });
             }
 
             //client profile

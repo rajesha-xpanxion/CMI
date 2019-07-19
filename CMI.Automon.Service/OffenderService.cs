@@ -119,6 +119,8 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderDetailsList));
+
+                pin = string.IsNullOrEmpty(offenderDetails.Pin) ? new Random().Next(0, 10000).ToString() : offenderDetails.Pin;
             }
             else
             {

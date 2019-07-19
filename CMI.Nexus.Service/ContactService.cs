@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 using CMI.Nexus.Interface;
+using System.Collections.Generic;
 
 namespace CMI.Nexus.Service
 {
@@ -75,6 +76,33 @@ namespace CMI.Nexus.Service
             }
 
             return contactDetails;
+        }
+
+        public List<Contact> GetAllContactDetails(string clientId)
+        {
+            List<Contact> allContactDetails = null;
+
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/contacts/", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    allContactDetails = apiResponse.Content.ReadAsAsync<List<Contact>>().Result;
+                }
+                else
+                {
+                    allContactDetails = null;
+                }
+            }
+
+            return allContactDetails;
         }
 
         public bool UpdateContactDetails(Contact contact)

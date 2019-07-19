@@ -5,6 +5,7 @@ using CMI.Common.Notification;
 using CMI.MessageRetriever.Model;
 using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
+using CMI.Nexus.Service;
 using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -59,6 +60,7 @@ namespace CMI.Processor
                         offenderAddressDetails = (OffenderAddress)ConvertResponseToObject<ClientProfileAddressDetailsActivityResponse>(
                             message.ClientIntegrationId,
                             message.ActivityIdentifier,
+                            message.AutomonIdentifier,
                             RetrieveActivityDetails<ClientProfileAddressDetailsActivityResponse>(message.Details),
                             message.ActionUpdatedBy
                         );
@@ -78,7 +80,7 @@ namespace CMI.Processor
                         //update integration identifier in Nexus if it is updated
                         if (isIntegrationIdUpdated)
                         {
-                            commonService.UpdateId(offenderAddressDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = "AddressDetails", CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                            commonService.UpdateId(offenderAddressDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Address, CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
                         }
 
                         //mark this message as successful

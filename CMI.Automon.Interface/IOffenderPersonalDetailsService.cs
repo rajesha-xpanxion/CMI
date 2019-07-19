@@ -7,6 +7,6 @@ namespace CMI.Automon.Interface
 {
     public interface IOffenderPersonalDetailsService
     {
-        int SaveOffenderPersonalDetails(string CmiDbConnString, Offender offenderDetails);
+        void SaveOffenderPersonalDetails(string CmiDbConnString, Offender offenderDetails);
     }
 }

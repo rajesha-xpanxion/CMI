@@ -42,4 +42,17 @@ namespace CMI.Nexus.Service
 
         public static string Attempted { get { return "Attempted"; } }
     }
+
+    public static class DataElementType
+    {
+        public static string Client { get { return "Client"; } }
+        public static string Address { get { return "Address"; } }
+        public static string Contact { get { return "Contact"; } }
+        public static string Case { get { return "Case"; } }
+        public static string Employer { get { return "Employer"; } }
+        public static string Vehicle { get { return "Vehicle"; } }
+        public static string Note { get { return "Note"; } }
+        public static string ProtectiveOrder { get { return "ProtectiveOrder"; } }
+
+    }
 }
