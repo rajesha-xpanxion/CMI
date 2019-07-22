@@ -135,7 +135,7 @@ namespace CMI.Processor
                             isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
 
                             //save new identifier in message details
-                            message.AutomonIdentifier = offenderEmailDetails.Id.ToString();
+                            message.AutomonIdentifier = offenderPhoneDetails.Id.ToString();
 
                             //check if it was add or update operation and update Automon message counter accordingly
                             if (isIntegrationIdUpdated)
@@ -167,7 +167,18 @@ namespace CMI.Processor
                         //update integration identifier in Nexus if it is updated
                         if (isIntegrationIdUpdated)
                         {
-                            commonService.UpdateId(offenderEmailDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Contact, CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                            commonService.UpdateId(
+                                (offenderContactDetails.GetType() == typeof(OffenderEmail))
+                                    ? offenderEmailDetails.Pin
+                                    : offenderPhoneDetails.Pin
+                                , 
+                                new ReplaceIntegrationIdDetails
+                                {
+                                    ElementType = DataElementType.Contact,
+                                    CurrentIntegrationId = currentIntegrationId,
+                                    NewIntegrationId = newIntegrationId
+                                }
+                            );
                         }
 
                         //mark this message as successful

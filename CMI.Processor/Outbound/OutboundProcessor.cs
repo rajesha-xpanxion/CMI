@@ -141,18 +141,8 @@ namespace CMI.Processor
                     )
                 );
 
-                toBeProcessedOutboundMessages.ToList().ForEach(m =>
-                {
-                    if (toBeProcessedOutboundMessages.Any(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        m.AutomonIdentifier = 
-                            toBeProcessedOutboundMessages
-                                .Where(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase))
-                                .OrderByDescending(y => y.ReceivedOn)
-                                .FirstOrDefault()
-                                .AutomonIdentifier;
-                    }
-                });
+                //update required identifiers in all outbound message details
+                toBeProcessedOutboundMessages = UpdateIdentifiers(toBeProcessedOutboundMessages, true);
             }
 
             //client profile
@@ -184,6 +174,9 @@ namespace CMI.Processor
                             messagesReceivedOn
                         )
                     );
+
+                    //update required identifiers in all outbound message details
+                    UpdateIdentifiers(clientProfileMessages);
                 }
 
                 //address
@@ -200,6 +193,9 @@ namespace CMI.Processor
                             messagesReceivedOn
                         )
                     );
+
+                    //update required identifiers in all outbound message details
+                    UpdateIdentifiers(clientProfileMessages);
                 }
 
                 //contact
@@ -216,6 +212,9 @@ namespace CMI.Processor
                             messagesReceivedOn
                         )
                     );
+
+                    //update required identifiers in all outbound message details
+                    UpdateIdentifiers(clientProfileMessages);
                 }
 
                 //vehicle
@@ -232,6 +231,9 @@ namespace CMI.Processor
                             messagesReceivedOn
                         )
                     );
+
+                    //update required identifiers in all outbound message details
+                    UpdateIdentifiers(clientProfileMessages);
                 }
 
                 //employment
@@ -248,6 +250,9 @@ namespace CMI.Processor
                             messagesReceivedOn
                         )
                     );
+
+                    //update required identifiers in all outbound message details
+                    UpdateIdentifiers(clientProfileMessages);
                 }
             }
 
@@ -262,6 +267,9 @@ namespace CMI.Processor
                     messagesReceivedOn
                     )
                 );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
             }
 
             //office visit
@@ -275,6 +283,9 @@ namespace CMI.Processor
                     messagesReceivedOn
                     )
                 );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
             }
 
             //drug test appointment
@@ -288,6 +299,9 @@ namespace CMI.Processor
                     messagesReceivedOn
                     )
                 );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
             }
 
             //drug test result
@@ -301,6 +315,9 @@ namespace CMI.Processor
                     messagesReceivedOn
                     )
                 );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
             }
 
             //field visit
@@ -314,6 +331,9 @@ namespace CMI.Processor
                     messagesReceivedOn
                     )
                 );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
             }
 
             //treatment appointment
@@ -327,6 +347,15 @@ namespace CMI.Processor
                     messagesReceivedOn
                     )
                 );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
+            }
+
+            //update message wise processing status
+            if (toBeProcessedOutboundMessages != null && toBeProcessedOutboundMessages.Any())
+            {
+                ProcessorProvider.SaveOutboundMessagesToDatabase(toBeProcessedOutboundMessages);
             }
 
             //derive final processor execution status and save it to database

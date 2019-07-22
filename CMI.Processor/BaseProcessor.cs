@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CMI.Processor
 {
@@ -69,6 +70,52 @@ namespace CMI.Processor
                     CustomParams = JsonConvert.SerializeObject(executionStatus)
                 });
             }
+        }
+
+        protected IEnumerable<OutboundMessageDetails> UpdateIdentifiers(IEnumerable<OutboundMessageDetails> outboundMessages, bool isUpdateClientIntegrationId = false)
+        {
+            List<OutboundMessageDetails> updatedOutboundMessages = new List<OutboundMessageDetails>();
+
+            outboundMessages.ToList().ForEach(m =>
+            {
+                updatedOutboundMessages.Add(new OutboundMessageDetails
+                {
+                    Id = m.Id,
+                    ActivityTypeName = m.ActivityTypeName,
+                    ActivitySubTypeName = m.ActivitySubTypeName,
+                    ActionReasonName = m.ActionReasonName,
+                    ClientIntegrationId = (
+                        isUpdateClientIntegrationId
+                        && outboundMessages.Any(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ClientIntegrationId.Equals(m.ClientIntegrationId, StringComparison.InvariantCultureIgnoreCase))
+                    )
+                    ? outboundMessages
+                            .Where(p => !string.IsNullOrEmpty(p.AutomonIdentifier) && p.ClientIntegrationId.Equals(m.ClientIntegrationId, StringComparison.InvariantCultureIgnoreCase))
+                            .OrderByDescending(q => q.ReceivedOn)
+                            .FirstOrDefault()
+                            .AutomonIdentifier
+                    : m.ClientIntegrationId,
+                    ActivityIdentifier = m.ActivityIdentifier,
+                    ActionOccurredOn = m.ActionOccurredOn,
+                    ActionUpdatedBy = m.ActionUpdatedBy,
+                    Details = m.Details,
+                    IsSuccessful = m.IsSuccessful,
+                    ErrorDetails = m.ErrorDetails,
+                    RawData = m.RawData,
+                    IsProcessed = m.IsProcessed,
+                    ReceivedOn = m.ReceivedOn,
+                    AutomonIdentifier = (
+                        outboundMessages.Any(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                    )
+                    ? outboundMessages
+                            .Where(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                            .OrderByDescending(y => y.ReceivedOn)
+                            .FirstOrDefault()
+                            .AutomonIdentifier
+                    : m.AutomonIdentifier
+                });
+            });
+
+            return updatedOutboundMessages;
         }
     }
 }
