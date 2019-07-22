@@ -34,11 +34,11 @@ BEGIN
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@AnyNameId		INT				= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[AnyNameInfo] WHERE [FirstName] = @FirstName AND [MiddleName] = @MiddleName AND [LastName] = @LastName AND [ToTime] IS NULL ORDER BY [FromTime] DESC), 0),
-			@PersonId		INT				= (SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[PersonInfo] WHERE [FirstName] = @FirstName AND [MiddleName] = @MiddleName AND [LastName] = @LastName ORDER BY [FromTime] DESC),
+			@AnyNameId		INT				= 0,
+			@PersonId		INT				= 0,
 			@PersonType		INT				= CASE WHEN @OffenderType = ''Adult'' THEN 1 WHEN @OffenderType = ''Juvenile'' THEN 16 WHEN @OffenderType = ''Officer'' THEN 4 WHEN @OffenderType = ''Associate'' THEN 2 ELSE 0 END,
-			@OffenderId		INT				= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [FirstName] = @FirstName AND [MiddleName] = @MiddleName AND [LastName] = @LastName ORDER BY [FromTime] DESC), 0),
-			@Pin			VARCHAR(20)		= (SELECT TOP 1 [Pin] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [FirstName] = @FirstName AND [MiddleName] = @MiddleName AND [LastName] = @LastName ORDER BY [FromTime] DESC);
+			@OffenderId		INT				= 0,
+			@Pin			VARCHAR(20)		= NULL;
 
 
 		--update name based on given info
@@ -52,7 +52,7 @@ BEGIN
 				NULL,
 				0,
 				NULL,
-				@AnyNameId OUTPUT;
+				@Id = @AnyNameId OUTPUT;
 
 		--update person
 		EXEC
@@ -60,7 +60,7 @@ BEGIN
 				@EnteredByPId,
 				@AnyNameId,
 				@PersonType, --PersonType: 1 = Adult, 16 = Juvenile, 4 = Officer, 2 = Associate
-				@PersonId OUTPUT;
+				@Id = @PersonId OUTPUT;
 
 		--update offender
 		EXEC
@@ -68,12 +68,11 @@ BEGIN
 				@PersonId, 
 				@OffenderType, 
 				0, 
-				@Pin OUTPUT, 
-				@OffenderId OUTPUT;
+				@Pin = @Pin OUTPUT, 
+				@Id = @OffenderId OUTPUT;
 
 		--return pin
 		SELECT @Pin;
-
 		';
 
 

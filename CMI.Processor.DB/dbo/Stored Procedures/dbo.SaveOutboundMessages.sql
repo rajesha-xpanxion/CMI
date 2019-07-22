@@ -210,7 +210,20 @@ BEGIN
 		OMO.[ErrorDetails],
 		OMO.[RawData],
 		OMO.[IsProcessed],
-		[AutomonIdentifier]
+		ISNULL(
+			OMO.[AutomonIdentifier], 
+			(
+				SELECT TOP 1 
+					VWOM.[AutomonIdentifier] 
+				FROM 
+					[dbo].[vw_AllOutboundMessageDetails] VWOM 
+				WHERE 
+					VWOM.[ActivityIdentifier] = OMO.[ActivityIdentifier]
+					AND VWOM.[AutomonIdentifier] IS NOT NULL
+				ORDER BY 
+					VWOM.[ReceivedOn] DESC
+			)
+		) AS [AutomonIdentifier]
 	FROM
 		@OutboundMessageOutput OMO JOIN [dbo].[ActivityType] AT
 			ON OMO.[ActivityTypeId] = AT.[Id]
@@ -218,5 +231,6 @@ BEGIN
 				ON OMO.[ActionReasonId] = AR.[Id]
 				LEFT JOIN [dbo].[ActivitySubType] AST
 					ON OMO.[ActivitySubTypeId] = AST.[Id]
+					
 	
 END

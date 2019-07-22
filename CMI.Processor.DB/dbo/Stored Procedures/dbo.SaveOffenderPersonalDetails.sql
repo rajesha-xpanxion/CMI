@@ -9,7 +9,6 @@ EXEC
 	[dbo].[SaveOffenderPersonalDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5115',
-		@Id = 0,
 		@FirstName = 'Sarah',
 		@MiddleName = NULL,
 		@LastName = 'Anderson',
@@ -28,7 +27,6 @@ Date			Author			Changes
 CREATE PROCEDURE [dbo].[SaveOffenderPersonalDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
-	@Id INT = 0,
 	@FirstName VARCHAR(32) = NULL,
 	@MiddleName VARCHAR(32) = NULL,
 	@LastName VARCHAR(32),
@@ -45,10 +43,20 @@ BEGIN
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@AnyNameId		INT				= @Id,
-			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin);
+			@OffenderId		INT				= 0,
+			@AnyNameId		INT				= 0,
+			@PersonId		INT				= 0;
 
+		--retrieve other required Ids
+		SELECT
+			@OffenderId = [Id],
+			@PersonId = [PersonId],
+			@AnyNameId = [NameId]
+		FROM
+			[dbo].[OffenderInfo]
+		WHERE
+			[Pin] = @Pin
+			
 		--update name based on given info
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateAnyName] 
@@ -62,13 +70,12 @@ BEGIN
 				NULL,
 				@Id = @AnyNameId OUTPUT;
 
-
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdatePerson]
 				@EnteredByPId,
 				@AnyNameId,
 				1,
-				@PersonId;
+				@Id = @PersonId OUTPUT;
 
 		/*******************************RACE****************************/
 		DECLARE
@@ -140,8 +147,6 @@ BEGIN
 					NULL,
 					@PersonAttributeId OUTPUT;
 		END
-		
-		SELECT @AnyNameId;
 		';
 
 
