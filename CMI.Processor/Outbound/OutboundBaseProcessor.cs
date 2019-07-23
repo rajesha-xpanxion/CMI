@@ -40,7 +40,7 @@ namespace CMI.Processor
         {
             //try to retrieve Automon identifier
             int id = 0;
-            if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(string.Format("{0}-{1}", clientIntegrationId, "-"), string.Empty), out id))
+            if (!string.IsNullOrEmpty(activityIdentifier) && int.TryParse(activityIdentifier.Replace(string.Format("{0}-", clientIntegrationId), string.Empty), out id))
             {
             }
             else if (!string.IsNullOrEmpty(automonIdentifier) && int.TryParse(automonIdentifier, out id))

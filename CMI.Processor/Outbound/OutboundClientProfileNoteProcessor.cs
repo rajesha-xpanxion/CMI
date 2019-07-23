@@ -75,6 +75,9 @@ namespace CMI.Processor
                             throw new CmiException("Offender - Note details could not be saved in Automon.");
                         }
 
+                        //save new identifier in message details
+                        message.AutomonIdentifier = offenderNoteDetails.Id.ToString();
+
                         //derive current integration id & new integration id & flag whether integration id has been changed or not
                         string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderNoteDetails.Pin, offenderNoteDetails.Id.ToString());
                         bool isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
@@ -87,9 +90,6 @@ namespace CMI.Processor
 
                         //mark this message as successful
                         message.IsSuccessful = true;
-
-                        //save new identifier in message details
-                        message.AutomonIdentifier = offenderNoteDetails.Id.ToString();
 
                         //check if it was add or update operation and update Automon message counter accordingly
                         if (isIntegrationIdUpdated)

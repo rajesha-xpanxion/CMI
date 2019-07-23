@@ -86,10 +86,17 @@ namespace CMI.Processor
                     ActionReasonName = m.ActionReasonName,
                     ClientIntegrationId = (
                         isUpdateClientIntegrationId
-                        && outboundMessages.Any(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ClientIntegrationId.Equals(m.ClientIntegrationId, StringComparison.InvariantCultureIgnoreCase))
+                        && outboundMessages.Any(x => 
+                            x.ActivityTypeName.Equals("Client", StringComparison.InvariantCultureIgnoreCase)
+                            && !string.IsNullOrEmpty(x.AutomonIdentifier) 
+                            && x.ClientIntegrationId.Equals(m.ClientIntegrationId, StringComparison.InvariantCultureIgnoreCase)
+                        )
                     )
                     ? outboundMessages
-                            .Where(p => !string.IsNullOrEmpty(p.AutomonIdentifier) && p.ClientIntegrationId.Equals(m.ClientIntegrationId, StringComparison.InvariantCultureIgnoreCase))
+                            .Where(p => 
+                                p.ActivityTypeName.Equals("Client", StringComparison.InvariantCultureIgnoreCase)
+                                && !string.IsNullOrEmpty(p.AutomonIdentifier) && p.ClientIntegrationId.Equals(m.ClientIntegrationId, StringComparison.InvariantCultureIgnoreCase)
+                            )
                             .OrderByDescending(q => q.ReceivedOn)
                             .FirstOrDefault()
                             .AutomonIdentifier

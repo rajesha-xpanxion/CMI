@@ -36,7 +36,7 @@ namespace CMI.Nexus.Service
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PutAsJsonAsync<ReplaceIntegrationIdDetails>(string.Format("api/{0}/clients/{1}/replaceIntegrationIds", nexusConfig.CaseIntegrationApiVersion, clientId), replaceIntegrationIdDetails).Result;
+                var apiResponse = apiHost.PutAsJsonAsync<ReplaceIntegrationIdDetails>(string.Format("api/{0}/clients/{1}/replaceIntegrationId", nexusConfig.CaseIntegrationApiVersion, clientId), replaceIntegrationIdDetails).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 

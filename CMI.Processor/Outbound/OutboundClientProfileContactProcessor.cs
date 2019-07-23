@@ -84,13 +84,13 @@ namespace CMI.Processor
                                 throw new CmiException("Offender - Email details could not be saved in Automon.");
                             }
 
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderEmailDetails.Id.ToString();
+
                             //derive current integration id & new integration id & flag whether integration id has been changed or not
                             currentIntegrationId = message.ActivityIdentifier;
                             newIntegrationId = string.Format("{0}-{1}", offenderEmailDetails.Pin, offenderEmailDetails.Id.ToString());
                             isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
-
-                            //save new identifier in message details
-                            message.AutomonIdentifier = offenderEmailDetails.Id.ToString();
 
                             //check if it was add or update operation and update Automon message counter accordingly
                             if (isIntegrationIdUpdated)
@@ -129,13 +129,13 @@ namespace CMI.Processor
                                 throw new CmiException("Offender - Phone details could not be saved in Automon.");
                             }
 
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderPhoneDetails.Id.ToString();
+
                             //derive current integration id & new integration id & flag whether integration id has been changed or not
                             currentIntegrationId = message.ActivityIdentifier;
                             newIntegrationId = string.Format("{0}-{1}", offenderPhoneDetails.Pin, offenderPhoneDetails.Id.ToString());
                             isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
-
-                            //save new identifier in message details
-                            message.AutomonIdentifier = offenderPhoneDetails.Id.ToString();
 
                             //check if it was add or update operation and update Automon message counter accordingly
                             if (isIntegrationIdUpdated)

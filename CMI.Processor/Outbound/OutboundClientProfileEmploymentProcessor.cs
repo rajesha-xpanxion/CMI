@@ -79,6 +79,9 @@ namespace CMI.Processor
                                 throw new CmiException("Offender - Employment details could not be saved in Automon.");
                             }
 
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderEmploymentDetails.Id.ToString();
+
                             //derive current integration id & new integration id & flag whether integration id has been changed or not
                             string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderEmploymentDetails.Pin, offenderEmploymentDetails.Id.ToString());
                             bool isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
@@ -88,9 +91,6 @@ namespace CMI.Processor
                             {
                                 commonService.UpdateId(offenderEmploymentDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Employer, CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
                             }
-
-                            //save new identifier in message details
-                            message.AutomonIdentifier = offenderEmploymentDetails.Id.ToString();
 
                             //check if it was add or update operation and update Automon message counter accordingly
                             if (isIntegrationIdUpdated)
