@@ -88,7 +88,23 @@ namespace CMI.Processor
                             //update integration identifier in Nexus if it is updated
                             if (isIntegrationIdUpdated)
                             {
-                                commonService.UpdateId(offenderVehicleDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Vehicle, CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                                ReplaceIntegrationIdDetails replaceClientVehicleIntegrationIdDetails = new ReplaceIntegrationIdDetails
+                                {
+                                    ElementType = DataElementType.Vehicle,
+                                    CurrentIntegrationId = currentIntegrationId,
+                                    NewIntegrationId = newIntegrationId
+                                };
+                                if (commonService.UpdateId(offenderVehicleDetails.Pin, replaceClientVehicleIntegrationIdDetails))
+                                {
+                                    Logger.LogDebug(new LogRequest
+                                    {
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
+                                        Message = "Client vehicle integration Id updated successfully in Nexus.",
+                                        AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                                        NexusData = JsonConvert.SerializeObject(replaceClientVehicleIntegrationIdDetails)
+                                    });
+                                }
                             }
 
                             //check if it was add or update operation and update Automon message counter accordingly

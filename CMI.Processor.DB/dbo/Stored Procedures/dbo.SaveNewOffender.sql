@@ -8,6 +8,7 @@ Test execution:-
 EXEC	
 	[dbo].[SaveNewOffender]
 		@AutomonDatabaseName = 'CX',
+		@Pin = NULL,
 		@FirstName = 'First Name 4',
 		@MiddleName = 'Middle Name 4',
 		@LastName = 'Last Name 4',
@@ -20,6 +21,7 @@ Date			Author			Changes
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveNewOffender]
 	@AutomonDatabaseName NVARCHAR(128),
+	@Pin VARCHAR(20) = NULL,
 	@FirstName VARCHAR(32) = NULL,
 	@MiddleName VARCHAR(32) = NULL,
 	@LastName VARCHAR(32),
@@ -34,12 +36,20 @@ BEGIN
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@AnyNameId		INT				= 0,
-			@PersonId		INT				= 0,
+			@AnyNameId		INT				= NULL,
+			@PersonId		INT				= NULL,
 			@PersonType		INT				= CASE WHEN @OffenderType = ''Adult'' THEN 1 WHEN @OffenderType = ''Juvenile'' THEN 16 WHEN @OffenderType = ''Officer'' THEN 4 WHEN @OffenderType = ''Associate'' THEN 2 ELSE 0 END,
-			@OffenderId		INT				= 0,
-			@Pin			VARCHAR(20)		= NULL;
+			@OffenderId		INT				= 0;
 
+		--check if record exists for given Pin
+		SELECT
+			@AnyNameId = [NameId],
+			@PersonId = [PersonId],
+			@OffenderId = [Id]
+		FROM
+			[$AutomonDatabaseName].[dbo].[OffenderInfo]
+		WHERE
+			[Pin] = @Pin;
 
 		--update name based on given info
 		EXEC 
@@ -79,6 +89,7 @@ BEGIN
 	SET @SQLString = REPLACE(@SQLString, '$AutomonDatabaseName', @AutomonDatabaseName);
 
 	SET @ParmDefinition = '
+		@Pin VARCHAR(20),
 		@FirstName VARCHAR(32),
 		@MiddleName VARCHAR(32),
 		@LastName VARCHAR(32),
@@ -90,6 +101,7 @@ BEGIN
 	EXECUTE sp_executesql 
 				@SQLString, 
 				@ParmDefinition,  
+				@Pin = @Pin,
 				@FirstName = @FirstName,
 				@MiddleName = @MiddleName,
 				@LastName = @LastName,

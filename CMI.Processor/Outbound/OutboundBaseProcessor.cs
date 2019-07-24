@@ -382,7 +382,7 @@ namespace CMI.Processor
 
                 return new OffenderDetails
                 {
-                    Pin = null,
+                    Pin = string.IsNullOrEmpty(automonIdentifier) ? null : automonIdentifier,
                     UpdatedBy = updatedBy,
                     FirstName = details.FirstName,
                     MiddleName = details.MiddleName,

@@ -40,8 +40,8 @@ BEGIN
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@OffenderId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
+			@PersonId			INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin), 0),
+			@OffenderId			INT	= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin), 0),
 			@EventTypeId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''NexusContact''),
 			@EventId			INT = @Id,
 			@Value				VARCHAR(255);
@@ -62,11 +62,13 @@ BEGIN
 				NULL, 
 				@Id = @EventId OUTPUT;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
-				@OffenderId, 
-				@EventId;
-
+		IF(@OffenderId IS NOT NULL AND @OffenderId > 0)
+		BEGIN
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
+					@OffenderId, 
+					@EventId;
+		END
 
 		--Contact Type
 		SET @Value = 

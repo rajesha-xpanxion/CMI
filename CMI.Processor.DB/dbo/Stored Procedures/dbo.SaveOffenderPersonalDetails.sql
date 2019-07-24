@@ -53,7 +53,7 @@ BEGIN
 			@PersonId = [PersonId],
 			@AnyNameId = [NameId]
 		FROM
-			[dbo].[OffenderInfo]
+			[$AutomonDatabaseName].[dbo].[OffenderInfo]
 		WHERE
 			[Pin] = @Pin
 			

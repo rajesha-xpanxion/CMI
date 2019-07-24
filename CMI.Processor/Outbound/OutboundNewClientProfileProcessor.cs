@@ -103,13 +103,31 @@ namespace CMI.Processor
                         //update integration identifier in Nexus if it is updated
                         if (isIntegrationIdUpdated)
                         {
-                            //commonService.UpdateId(currentIntegrationId, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Client, CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                            ReplaceIntegrationIdDetails replaceClientIntegrationIdDetails = new ReplaceIntegrationIdDetails
+                            {
+                                ElementType = DataElementType.Client,
+                                CurrentIntegrationId = currentIntegrationId,
+                                NewIntegrationId = newIntegrationId
+                            };
+                            if (commonService.UpdateId(currentIntegrationId, replaceClientIntegrationIdDetails))
+                            {
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Client integration Id updated successfully in Nexus.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                                    NexusData = JsonConvert.SerializeObject(replaceClientIntegrationIdDetails)
+                                });
+                            }
                         }
 
                         //check if personal details processing enabled
                         if (
                             ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
-                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.PersonalDetails, StringComparison.InvariantCultureIgnoreCase))
+                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(
+                                a => a.Equals(OutboundProcessorClientProfileActivitySubType.PersonalDetails, StringComparison.InvariantCultureIgnoreCase)
+                            )
                         )
                         {
                             //save personal details of newly created offender
@@ -119,7 +137,9 @@ namespace CMI.Processor
                         //check if address details processing enabled
                         if (
                             ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
-                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.AddressDetails, StringComparison.InvariantCultureIgnoreCase))
+                            && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(
+                                a => a.Equals(OutboundProcessorClientProfileActivitySubType.AddressDetails, StringComparison.InvariantCultureIgnoreCase)
+                            )
                         )
                         {
                             //retrieve all address details (if any) for newly created client profile from Nexus
@@ -128,22 +148,35 @@ namespace CMI.Processor
                             //check if we got any address details from API
                             if (allAddressDetails != null && allAddressDetails.Any())
                             {
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Successfully retrieved address details for a client from Nexus.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                                    NexusData = JsonConvert.SerializeObject(allAddressDetails)
+                                });
+
                                 //iterate through all address details & push it to Automon and then update integration id in Nexus accordingly
                                 foreach (Address addressDetails in allAddressDetails)
                                 {
                                     //save address details of newly created client profile in Automon & get automon specific id
-                                    int automonAddressId = offenderAddressService.SaveOffenderAddressDetails(ProcessorConfig.CmiDbConnString, new OffenderAddress
+                                    OffenderAddress offenderAddressDetails = new OffenderAddress
                                     {
-                                        Pin = addressDetails.ClientId,
+                                        Pin = offenderDetails.Pin,
                                         Id = 0,
                                         Line1 = addressDetails.FullAddress,
                                         AddressType = addressDetails.AddressType != null
-                                            ? addressDetails.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase) || addressDetails.AddressType.Equals("Home Address", StringComparison.InvariantCultureIgnoreCase)
+                                            ? (
+                                                addressDetails.AddressType.Equals("Home", StringComparison.InvariantCultureIgnoreCase) 
+                                                || addressDetails.AddressType.Equals("Home Address", StringComparison.InvariantCultureIgnoreCase)
+                                            )
                                                 ? "Residential"
                                                 : "Mailing"
                                             : "Unknown",
                                         UpdatedBy = offenderDetails.UpdatedBy
-                                    });
+                                    };
+                                    int automonAddressId = offenderAddressService.SaveOffenderAddressDetails(ProcessorConfig.CmiDbConnString, offenderAddressDetails);
 
                                     //check if saving details to Automon was successsful
                                     if (automonAddressId == 0)
@@ -152,7 +185,23 @@ namespace CMI.Processor
                                     }
 
                                     //update integration id in Nexus
-                                    //commonService.UpdateId(addressDetails.ClientId, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Address, CurrentIntegrationId = addressDetails.AddressId, NewIntegrationId = string.Format("{0}-{1}", addressDetails.ClientId, automonAddressId.ToString()) });
+                                    ReplaceIntegrationIdDetails replaceAddressIntegrationIdDetails = new ReplaceIntegrationIdDetails
+                                    {
+                                        ElementType = DataElementType.Address,
+                                        CurrentIntegrationId = addressDetails.AddressId,
+                                        NewIntegrationId = string.Format("{0}-{1}", offenderDetails.Pin, automonAddressId.ToString())
+                                    };
+                                    if (commonService.UpdateId(offenderDetails.Pin, replaceAddressIntegrationIdDetails))
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Address integration Id updated successfully in Nexus.",
+                                            AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                                            NexusData = JsonConvert.SerializeObject(replaceAddressIntegrationIdDetails)
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -163,23 +212,35 @@ namespace CMI.Processor
                         //check if we got any contact details from API
                         if (allContactDetails != null && allContactDetails.Any())
                         {
+                            Logger.LogDebug(new LogRequest
+                            {
+                                OperationName = this.GetType().Name,
+                                MethodName = "Execute",
+                                Message = "Successfully retrieved contact details for a client from Nexus.",
+                                AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                                NexusData = JsonConvert.SerializeObject(allContactDetails)
+                            });
+
                             //check if email details processing enabled
                             if (
                                 ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
-                                && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase))
+                                && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(
+                                    a => a.Equals(OutboundProcessorClientProfileActivitySubType.EmailDetails, StringComparison.InvariantCultureIgnoreCase)
+                                )
                             )
                             {
                                 //iterate through all contact details & push it to Automon and then update integration id in Nexus accordingly
                                 foreach (Contact contactDetails in allContactDetails.Where(x => x.ContactType.Equals("E-mail", StringComparison.InvariantCultureIgnoreCase)))
                                 {
                                     //save email details of newly created client profile in Automon & get automon specific id
-                                    int automonEmailId = offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, new OffenderEmail
+                                    OffenderEmail offenderEmailDetails = new OffenderEmail
                                     {
-                                        Pin = contactDetails.ClientId,
+                                        Pin = offenderDetails.Pin,
                                         Id = 0,
                                         EmailAddress = contactDetails.ContactValue,
                                         UpdatedBy = offenderDetails.UpdatedBy
-                                    });
+                                    };
+                                    int automonEmailId = offenderEmailService.SaveOffenderEmailDetails(ProcessorConfig.CmiDbConnString, offenderEmailDetails);
 
                                     //check if saving details to Automon was successsful
                                     if (automonEmailId == 0)
@@ -188,14 +249,32 @@ namespace CMI.Processor
                                     }
 
                                     //update integration id in Nexus
-                                    //commonService.UpdateId(contactDetails.ClientId, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Address, CurrentIntegrationId = contactDetails.ContactId, NewIntegrationId = string.Format("{0}-{1}", contactDetails.ClientId, automonEmailId.ToString()) });
+                                    ReplaceIntegrationIdDetails replaceEmailContactIntegrationIdDetails = new ReplaceIntegrationIdDetails
+                                    {
+                                        ElementType = DataElementType.Contact,
+                                        CurrentIntegrationId = contactDetails.ContactId,
+                                        NewIntegrationId = string.Format("{0}-{1}", offenderDetails.Pin, automonEmailId.ToString())
+                                    };
+                                    if (commonService.UpdateId(offenderDetails.Pin, replaceEmailContactIntegrationIdDetails))
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Email contact integration Id updated successfully in Nexus.",
+                                            AutomonData = JsonConvert.SerializeObject(offenderEmailDetails),
+                                            NexusData = JsonConvert.SerializeObject(replaceEmailContactIntegrationIdDetails)
+                                        });
+                                    }
                                 }
                             }
 
                             //check if contact details processing enabled
                             if (
                                 ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
-                                && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.ContactDetails, StringComparison.InvariantCultureIgnoreCase))
+                                && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(
+                                    a => a.Equals(OutboundProcessorClientProfileActivitySubType.ContactDetails, StringComparison.InvariantCultureIgnoreCase)
+                                )
                             )
                             {
                                 //iterate through all contact details & push it to Automon and then update integration id in Nexus accordingly
@@ -225,9 +304,9 @@ namespace CMI.Processor
                                     }
 
                                     //save phone details of newly created client profile in Automon & get automon specific id
-                                    int automonPhoneNumberId = offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, new OffenderPhone
+                                    OffenderPhone offenderPhoneDetails = new OffenderPhone
                                     {
-                                        Pin = contactDetails.ClientId,
+                                        Pin = offenderDetails.Pin,
                                         Id = 0,
                                         Phone =
                                             contactDetails.ContactValue != null
@@ -238,7 +317,8 @@ namespace CMI.Processor
                                         PhoneNumberType = autmonPhoneNumberType,
 
                                         UpdatedBy = offenderDetails.UpdatedBy,
-                                    });
+                                    };
+                                    int automonPhoneNumberId = offenderPhoneService.SaveOffenderPhoneDetails(ProcessorConfig.CmiDbConnString, offenderPhoneDetails);
 
                                     //check if saving details to Automon was successsful
                                     if (automonPhoneNumberId == 0)
@@ -247,7 +327,23 @@ namespace CMI.Processor
                                     }
 
                                     //update integration id in Nexus
-                                    //commonService.UpdateId(contactDetails.ClientId, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Contact, CurrentIntegrationId = contactDetails.ContactId, NewIntegrationId = string.Format("{0}-{1}", contactDetails.ClientId, automonPhoneNumberId.ToString()) });
+                                    ReplaceIntegrationIdDetails replacePhoneContactIntegrationIdDetails = new ReplaceIntegrationIdDetails
+                                    {
+                                        ElementType = DataElementType.Contact,
+                                        CurrentIntegrationId = contactDetails.ContactId,
+                                        NewIntegrationId = string.Format("{0}-{1}", offenderDetails.Pin, automonPhoneNumberId.ToString())
+                                    };
+                                    if (commonService.UpdateId(offenderDetails.Pin, replacePhoneContactIntegrationIdDetails))
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Phone contact integration Id updated successfully in Nexus.",
+                                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                            NexusData = JsonConvert.SerializeObject(replacePhoneContactIntegrationIdDetails)
+                                        });
+                                    }
                                 }
                             }
                         }

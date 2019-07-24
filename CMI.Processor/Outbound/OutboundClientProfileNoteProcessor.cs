@@ -85,7 +85,23 @@ namespace CMI.Processor
                         //update integration identifier in Nexus if it is updated
                         if (isIntegrationIdUpdated)
                         {
-                            commonService.UpdateId(offenderNoteDetails.Pin, new ReplaceIntegrationIdDetails { ElementType = DataElementType.Note, CurrentIntegrationId = currentIntegrationId, NewIntegrationId = newIntegrationId });
+                            ReplaceIntegrationIdDetails replaceNoteIntegrationIdDetails = new ReplaceIntegrationIdDetails
+                            {
+                                ElementType = DataElementType.Note,
+                                CurrentIntegrationId = currentIntegrationId,
+                                NewIntegrationId = newIntegrationId
+                            };
+                            if(commonService.UpdateId(offenderNoteDetails.Pin, replaceNoteIntegrationIdDetails))
+                            {
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Client note integration Id updated successfully in Nexus.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderNoteDetails),
+                                    NexusData = JsonConvert.SerializeObject(replaceNoteIntegrationIdDetails)
+                                });
+                            }
                         }
 
                         //mark this message as successful

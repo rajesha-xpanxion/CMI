@@ -141,6 +141,13 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
+                            ParameterName = SqlParamName.Pin,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDetails.Pin,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
                             ParameterName = SqlParamName.FirstName,
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderDetails.FirstName,

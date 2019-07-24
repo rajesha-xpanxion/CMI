@@ -167,18 +167,33 @@ namespace CMI.Processor
                         //update integration identifier in Nexus if it is updated
                         if (isIntegrationIdUpdated)
                         {
-                            commonService.UpdateId(
-                                (offenderContactDetails.GetType() == typeof(OffenderEmail))
-                                    ? offenderEmailDetails.Pin
-                                    : offenderPhoneDetails.Pin
-                                , 
-                                new ReplaceIntegrationIdDetails
+                            ReplaceIntegrationIdDetails replaceContactIntegrationIdDetails = new ReplaceIntegrationIdDetails
+                            {
+                                ElementType = DataElementType.Contact,
+                                CurrentIntegrationId = currentIntegrationId,
+                                NewIntegrationId = newIntegrationId
+                            };
+                            if(
+                                commonService.UpdateId(
+                                    (offenderContactDetails.GetType() == typeof(OffenderEmail))
+                                        ? offenderEmailDetails.Pin
+                                        : offenderPhoneDetails.Pin
+                                    ,
+                                    replaceContactIntegrationIdDetails
+                                )
+                            )
+                            {
+                                Logger.LogDebug(new LogRequest
                                 {
-                                    ElementType = DataElementType.Contact,
-                                    CurrentIntegrationId = currentIntegrationId,
-                                    NewIntegrationId = newIntegrationId
-                                }
-                            );
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Client contact integration Id updated successfully in Nexus.",
+                                    AutomonData = (offenderContactDetails.GetType() == typeof(OffenderEmail))
+                                        ? JsonConvert.SerializeObject(offenderEmailDetails)
+                                        : JsonConvert.SerializeObject(offenderPhoneDetails),
+                                    NexusData = JsonConvert.SerializeObject(replaceContactIntegrationIdDetails)
+                                });
+                            }
                         }
 
                         //mark this message as successful
