@@ -30,7 +30,7 @@ BEGIN
 		(
 			SELECT
 				L.[Id],
-				L.[PermDesc]
+				L.[Description]
 			FROM
 				[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
 					ON L.[LookupTypeId] = LT.[Id]
@@ -62,7 +62,7 @@ BEGIN
 	
 			CT.[PermDesc] AS [ClientType],
 
-			RD.[PermDesc] AS [Race],
+			RD.[Description] AS [Race],
 
 			CL.[Name] As [CaseloadName],
 
