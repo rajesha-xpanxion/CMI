@@ -14,6 +14,7 @@ EXEC
 History:-
 Date			Author			Changes
 04-July-18		Rajesh Awate	Created.
+26-July-19		Rajesh Awate	Changes to return values from columns [Description] & [PermDesc] for Race.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -30,7 +31,8 @@ BEGIN
 		(
 			SELECT
 				L.[Id],
-				L.[Description]
+				L.[Description],
+				L.[PermDesc]
 			FROM
 				[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
 					ON L.[LookupTypeId] = LT.[Id]
@@ -62,7 +64,8 @@ BEGIN
 	
 			CT.[PermDesc] AS [ClientType],
 
-			RD.[Description] AS [Race],
+			RD.[Description] AS [RaceDescription],
+			RD.[PermDesc] AS [RacePermDesc],
 
 			CL.[Name] As [CaseloadName],
 
@@ -134,6 +137,7 @@ BEGIN
 		(
 			SELECT
 				L.[Id],
+				L.[Description],
 				L.[PermDesc]
 			FROM
 				[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
@@ -166,7 +170,8 @@ BEGIN
 	
 			CT.[PermDesc] AS [ClientType],
 
-			RD.[PermDesc] AS [Race],
+			RD.[Description] AS [RaceDescription],
+			RD.[PermDesc] AS [RacePermDesc],
 
 			CL.[Name] As [CaseloadName],
 

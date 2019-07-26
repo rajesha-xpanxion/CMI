@@ -14,6 +14,8 @@ namespace CMI.Automon.Model
         public string TimeZone { get; set; }
         public string Gender { get; set; }
         public string Race { get; set; }
+        public string RaceDescription { get; set; }
+        public string RacePermDesc { get; set; }
         public string CaseloadName { get; set; }
         public string OfficerLogon { get; set; }
         public string OfficerEmail { get; set; }

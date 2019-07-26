@@ -60,7 +60,7 @@ namespace CMI.Processor
                             ClientType = offenderDetails.ClientType,
                             TimeZone = offenderDetails.TimeZone,
                             Gender = offenderDetails.Gender,
-                            Ethnicity = MapEthnicity(offenderDetails.Race),
+                            Ethnicity = MapEthnicity(offenderDetails.RaceDescription, offenderDetails.RacePermDesc),
                             DateOfBirth = offenderDetails.DateOfBirth.ToShortDateString(),
 
                             CaseloadId = MapCaseload(offenderDetails.CaseloadName),
@@ -309,12 +309,23 @@ namespace CMI.Processor
             }
         }
 
-        private string MapEthnicity(string automonEthnicity)
+        private string MapEthnicity(string automonRaceDescription, string automonRacePermDesc)
         {
-            return
-                (LookupService.Ethnicities != null && LookupService.Ethnicities.Any(e => e.Equals(automonEthnicity, StringComparison.InvariantCultureIgnoreCase)))
-                ? automonEthnicity
-                : DAL.Constants.EthnicityUnknown;
+            string mappedEthnicity = DAL.Constants.EthnicityUnknown;
+
+            if(LookupService.Ethnicities != null && LookupService.Ethnicities.Any())
+            {
+                if(LookupService.Ethnicities.Any(e => e.Equals(automonRaceDescription, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    mappedEthnicity = automonRaceDescription;
+                }
+                else if (LookupService.Ethnicities.Any(e => e.Equals(automonRacePermDesc, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    mappedEthnicity = automonRacePermDesc;
+                }
+            }
+
+            return mappedEthnicity;
         }
 
         private string MapCaseload(string automonCaseloadName)

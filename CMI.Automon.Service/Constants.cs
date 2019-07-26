@@ -86,6 +86,8 @@ namespace CMI.Automon.Service
         public static string ClientType { get { return "ClientType"; } }
         public static string Gender { get { return "Gender"; } }
         public static string Race { get { return "Race"; } }
+        public static string RaceDescription { get { return "RaceDescription"; } }
+        public static string RacePermDesc { get { return "RacePermDesc"; } }
         public static string CaseloadName { get { return "CaseloadName"; } }
         public static string CaseloadType { get { return "CaseloadType"; } }
         public static string OfficerLogon { get { return "OfficerLogon"; } }
