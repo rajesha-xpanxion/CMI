@@ -9,5 +9,7 @@ namespace CMI.Automon.Interface
         IEnumerable<Offender> GetAllOffenderDetails(string CmiDbConnString, DateTime? lastExecutionDateTime);
 
         string SaveOffenderDetails(string CmiDbConnString, OffenderDetails offenderDetails);
+
+        string GetTimeZone();
     }
 }

@@ -1,4 +1,5 @@
-﻿using CMI.Automon.Model;
+﻿using CMI.Automon.Interface;
+using CMI.Automon.Model;
 using CMI.Automon.Service;
 using CMI.Common.Logging;
 using CMI.Common.Notification;
@@ -18,6 +19,8 @@ namespace CMI.Processor
         protected ILogger Logger { get; set; }
         protected IProcessorProvider ProcessorProvider { get; set; }
         protected ProcessorConfig ProcessorConfig { get; set; }
+        protected IOffenderService OffenderService { get; set; }
+        protected string AutomonTimeZone { get; set; }
 
         public OutboundBaseProcessor(
             IServiceProvider serviceProvider,
@@ -27,6 +30,9 @@ namespace CMI.Processor
             Logger = (ILogger)serviceProvider.GetService(typeof(ILogger));
             ProcessorProvider = (IProcessorProvider)serviceProvider.GetService(typeof(IProcessorProvider));
             ProcessorConfig = configuration.GetSection(ConfigKeys.ProcessorConfig).Get<ProcessorConfig>();
+            OffenderService = (IOffenderService)serviceProvider.GetService(typeof(IOffenderService));
+
+            AutomonTimeZone = OffenderService.GetTimeZone();
         }
 
         public abstract TaskExecutionStatus Execute(IEnumerable<OutboundMessageDetails> messages, DateTime messagesReceivedOn);
@@ -52,6 +58,12 @@ namespace CMI.Processor
             {
                 ClientProfileNoteActivityDetailsResponse noteActivityDetailsResponse = (ClientProfileNoteActivityDetailsResponse)(object)activityDetails;
 
+                //check if timezone information provided in given datetime, NO = specify it
+                if (noteActivityDetailsResponse.CreatedDate.Kind != DateTimeKind.Utc)
+                {
+                    noteActivityDetailsResponse.CreatedDate = DateTime.SpecifyKind(noteActivityDetailsResponse.CreatedDate, DateTimeKind.Utc);
+                }
+
                 return new OffenderNote()
                 {
                     Pin = clientIntegrationId,
@@ -59,7 +71,10 @@ namespace CMI.Processor
                     UpdatedBy = updatedBy,
                     Text = noteActivityDetailsResponse.NoteText,
                     AuthorEmail = noteActivityDetailsResponse.NoteAuthor,
-                    Date = noteActivityDetailsResponse.CreatedDate
+                    Date = 
+                        !string.IsNullOrEmpty(AutomonTimeZone) 
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(noteActivityDetailsResponse.CreatedDate, AutomonTimeZone)
+                            : noteActivityDetailsResponse.CreatedDate.ToLocalTime()
                 };
             }
             //Office Visit
@@ -67,14 +82,25 @@ namespace CMI.Processor
             {
                 ClientProfileOfficeVisitDetailsActivityResponse details = (ClientProfileOfficeVisitDetailsActivityResponse)(object)activityDetails;
 
+                //check if timezone information provided in given datetime, NO = specify it
+                if(details.DateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.DateTime = DateTime.SpecifyKind(details.DateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.DateTime, AutomonTimeZone)
+                            : details.DateTime.ToLocalTime();
+
                 return new OffenderOfficeVisit()
                 {
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    StartDate = details.DateTime,
+                    StartDate = convertedDateTime,
                     Comment = details.Notes,
-                    EndDate = details.DateTime,
+                    EndDate = convertedDateTime,
                     /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
@@ -102,13 +128,24 @@ namespace CMI.Processor
             {
                 ClientProfileDrugTestAppointmentDetailsActivityResponse details = (ClientProfileDrugTestAppointmentDetailsActivityResponse)(object)activityDetails;
 
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.AppointmentDateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.AppointmentDateTime = DateTime.SpecifyKind(details.AppointmentDateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.AppointmentDateTime, AutomonTimeZone)
+                            : details.AppointmentDateTime.ToLocalTime();
+
                 return new OffenderDrugTestAppointment()
                 {
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    StartDate = details.AppointmentDateTime,
-                    EndDate = details.AppointmentDateTime,
+                    StartDate = convertedDateTime,
+                    EndDate = convertedDateTime,
                     /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.AppointmentStatus != null
@@ -131,13 +168,24 @@ namespace CMI.Processor
             {
                 ClientProfileDrugTestResultDetailsActivityResponse details = (ClientProfileDrugTestResultDetailsActivityResponse)(object)activityDetails;
 
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.TestDateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.TestDateTime = DateTime.SpecifyKind(details.TestDateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.TestDateTime, AutomonTimeZone)
+                            : details.TestDateTime.ToLocalTime();
+
                 return new OffenderDrugTestResult()
                 {
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    StartDate = details.TestDateTime,
-                    EndDate = details.TestDateTime,
+                    StartDate = convertedDateTime,
+                    EndDate = convertedDateTime,
                     /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.ResultStatus != null
@@ -183,16 +231,25 @@ namespace CMI.Processor
                     searchResults = string.Join(", ", details.FoundContraband.Select(fc => fc.Type));
                 }
 
-                List<VisitedLocationDetails> visitedLocations = new List<VisitedLocationDetails>(details.VisitedLocations);
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.DateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.DateTime = DateTime.SpecifyKind(details.DateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.DateTime, AutomonTimeZone)
+                            : details.DateTime.ToLocalTime();
 
                 return new OffenderFieldVisit()
                 {
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    StartDate = details.DateTime,
+                    StartDate = convertedDateTime,
                     Comment = details.Note,
-                    EndDate = details.DateTime,
+                    EndDate = convertedDateTime,
                     /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null
@@ -433,13 +490,24 @@ namespace CMI.Processor
             {
                 ClientProfileTreatmentAppointmentDetailsActivityResponse details = (ClientProfileTreatmentAppointmentDetailsActivityResponse)(object)activityDetails;
 
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.AppointmentDateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.AppointmentDateTime = DateTime.SpecifyKind(details.AppointmentDateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.AppointmentDateTime, AutomonTimeZone)
+                            : details.AppointmentDateTime.ToLocalTime();
+
                 return new OffenderTreatmentAppointment()
                 {
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    StartDate = details.AppointmentDateTime,
-                    EndDate = details.AppointmentDateTime,
+                    StartDate = convertedDateTime,
+                    EndDate = convertedDateTime,
                     /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
                     Status =
                         details.Status != null

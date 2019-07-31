@@ -195,12 +195,12 @@ namespace CMI.Automon.Service
         #endregion
 
         #region Private Helper Methods
-        private string GetTimeZone()
+        public string GetTimeZone()
         {
             if (automonConfig.IsDevMode)
             {
                 //test data
-                return "Pacific Standard Time";
+                return TimeZoneInfo.Local.Id;
             }
             else
             {
