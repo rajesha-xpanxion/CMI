@@ -110,6 +110,7 @@ namespace CMI.Automon.Service
                                     offenderCase.SupervisionEndDate = (DateTime?)reader[DbColumnName.SupervisionEndDate];
                                 }
 
+                                //offense date
                                 if (Convert.IsDBNull(reader[DbColumnName.OffenseDate]))
                                 {
                                     offenderCase.OffenseDate = null;
