@@ -54,7 +54,7 @@ BEGIN
 						LEFT JOIN [$AutomonDatabaseName].[dbo].[AttributeDef] AD
 							ON CA.[AttributeId] = AD.[Id]
 		WHERE
-			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime)
+			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR CCI.[FromTime] >= @LastExecutionDateTime)
 			AND (CI.[PermDesc] = ''Formal'' OR CI.[PermDesc] = ''PRCS'' OR CI.[PermDesc] = ''MCS'' OR CI.[PermDesc] = ''Adult.Interstate'')
 			AND (AD.[PermDesc] = ''Case_SupervisionStart'' OR AD.[PermDesc] = ''Case_SupervisionEnd'' OR AD.[PermDesc] = ''Case_CaseStatus'' OR AD.[PermDesc] = ''Case_TerminationType'')
 		';
@@ -188,7 +188,7 @@ BEGIN
 							ON CA.[AttributeId] = AD.[Id]
 
 		WHERE
-			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR @LastExecutionDateTime IS NULL)
+			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR CCI.[FromTime] >= @LastExecutionDateTime OR @LastExecutionDateTime IS NULL)
 			AND (CI.[PermDesc] = ''Formal'' OR CI.[PermDesc] = ''PRCS'' OR CI.[PermDesc] = ''MCS'' OR CI.[PermDesc] = ''Adult.Interstate'')
 			AND (AD.[PermDesc] = ''Case_SupervisionStart'' OR AD.[PermDesc] = ''Case_SupervisionEnd'' OR AD.[PermDesc] = ''Case_CaseStatus'' OR AD.[PermDesc] = ''Case_TerminationType'')
 			AND EXISTS

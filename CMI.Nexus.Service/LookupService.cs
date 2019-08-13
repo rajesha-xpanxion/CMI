@@ -384,7 +384,7 @@ namespace CMI.Nexus.Service
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/OffenseCategory", nexusConfig.CaseIntegrationApiVersion)).Result;
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/offenseCategories", nexusConfig.CaseIntegrationApiVersion)).Result;
 
                 if (apiResponse.IsSuccessStatusCode)
                 {

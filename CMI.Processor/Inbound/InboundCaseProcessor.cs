@@ -67,12 +67,12 @@ namespace CMI.Processor
                             Status = offenderCaseDetails.CaseStatus,
                             EndReason = string.IsNullOrEmpty(offenderCaseDetails.ClosureReason) ? null : offenderCaseDetails.ClosureReason,
                             Offenses = allOffenderCaseDetails
-                                .Where(z => z.Pin == offenderCaseDetails.Pin && z.CaseNumber == offenderCaseDetails.CaseNumber && z.OffenseDate.HasValue && !string.IsNullOrEmpty(z.OffenseLabel))
+                                .Where(z => z.Pin == offenderCaseDetails.Pin && z.CaseNumber == offenderCaseDetails.CaseNumber && !string.IsNullOrEmpty(z.OffenseLabel))
                                 .Select(p => new Offense
                                 {
                                     Label = p.OffenseLabel,
                                     Statute = p.OffenseStatute,
-                                    Date = p.OffenseDate.HasValue ? p.OffenseDate.Value.ToShortDateString() : string.Empty,
+                                    Date = p.OffenseDate.HasValue ? p.OffenseDate.Value.ToShortDateString() : null,
                                     Category = MapOffenseCategory(p.OffenseCategory),
                                     IsPrimary = p.IsPrimary
                                 }).ToList()
