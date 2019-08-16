@@ -109,6 +109,13 @@ namespace CMI.Automon.Service
                             Value = offenderDrugTestAppointmentDetails.Status,
                             IsNullable = false
                         });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.IsOffenderPresent,
+                            SqlDbType = System.Data.SqlDbType.Bit,
+                            Value = offenderDrugTestAppointmentDetails.IsOffenderPresent,
+                            IsNullable = false
+                        });
 
 
                         cmd.Connection = conn;

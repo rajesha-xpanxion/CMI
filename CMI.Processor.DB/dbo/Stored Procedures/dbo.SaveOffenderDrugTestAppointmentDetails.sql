@@ -1,5 +1,6 @@
 ﻿
 
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	08-May-19
@@ -15,6 +16,7 @@ EXEC
 		@StartDate = @CurrentDate,
 		@EndDate = @CurrentDate,
 		@Status = 2, --Pending = 0, Missed = 16, Cancelled = 10, Complete = 2
+		@IsOffenderPresent BIT = 0,
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -22,6 +24,7 @@ Date			Author			Changes
 08-May-19		Rajesh Awate	Created.
 27-May-19		Rajesh Awate	Updated event type.
 08-July-19		Rajesh Awate	Changes to handle update scenario.
+14-Aug-19		Rajesh Awate	Changes for saving is offender present flag
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestAppointmentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -30,6 +33,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderDrugTestAppointmentDetails]
 	@StartDate DATETIME,
 	@EndDate DATETIME,
 	@Status INT = 0, --Pending = 0, Missed = 16, Cancelled = 10, Complete = 2
+	@IsOffenderPresent BIT = 0,
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -70,6 +74,19 @@ BEGIN
 					@EventId;
 		END
 
+		--Offender Present
+		SET @Value = CASE WHEN @IsOffenderPresent = 1 THEN ''True'' ELSE ''False'' END;
+		EXEC 
+			[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
+				@EventId, 
+				@EnteredByPId, 
+				@Value, 
+				NULL, 
+				''SupvContactOPresent'', 
+				NULL, 
+				NULL, 
+				NULL;
+
 		--Contact Type
 		SET @Value = 
 			(
@@ -107,9 +124,10 @@ BEGIN
 		@StartDate DATETIME,
 		@EndDate DATETIME,
 		@Status INT,
+		@IsOffenderPresent BIT,
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 
@@ -119,5 +137,6 @@ PRINT @SQLString;
 				@StartDate = @StartDate,
 				@EndDate = @EndDate,
 				@Status = @Status,
+				@IsOffenderPresent = @IsOffenderPresent,
 				@UpdatedBy = @UpdatedBy;
 END

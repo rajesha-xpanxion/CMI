@@ -160,7 +160,13 @@ namespace CMI.Processor
                                     : (int)EventStatus.Pending
                         :
                             (int)EventStatus.Pending,
-                    Location = details.Location
+                    Location = details.Location,
+                    IsOffenderPresent =
+                        details.AppointmentStatus != null
+                        ?
+                            details.AppointmentStatus.Equals(Status.Completed, StringComparison.InvariantCultureIgnoreCase)
+                        :
+                            false
                 };
             }
             //Drug Test Result

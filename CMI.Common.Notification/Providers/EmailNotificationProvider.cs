@@ -45,7 +45,7 @@ namespace CMI.Common.Notification
                         string.Empty,
                         request.Subject,
                         emailBody,
-                        MailPriority.Normal,
+                        request.TaskExecutionStatuses.Any(x => x.AutomonReceivedRecordCount > 0 || x.NexusReceivedMessageCount > 0) ? MailPriority.High : MailPriority.Normal,
                         null
                     );
                 }
