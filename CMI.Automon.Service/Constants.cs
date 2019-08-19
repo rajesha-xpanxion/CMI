@@ -67,6 +67,7 @@ namespace CMI.Automon.Service
         public static string TestResult { get { return "@TestResult"; } }
         public static string Validities { get { return "@Validities"; } }
         public static string Id { get { return "@Id"; } }
+        public static string IsSaveFinalTestResult { get { return "@IsSaveFinalTestResult"; } }
     }
 
     public static class DbColumnName

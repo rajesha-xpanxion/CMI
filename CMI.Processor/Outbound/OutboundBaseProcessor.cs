@@ -165,6 +165,7 @@ namespace CMI.Processor
                         details.AppointmentStatus != null
                         ?
                             details.AppointmentStatus.Equals(Status.Completed, StringComparison.InvariantCultureIgnoreCase)
+                            || details.AppointmentStatus.Equals(Status.Tampered, StringComparison.InvariantCultureIgnoreCase)
                         :
                             false
                 };
@@ -214,7 +215,13 @@ namespace CMI.Processor
                             ? "Diluted"
                             : string.Empty
                         :
-                            string.Empty
+                            string.Empty,
+                    IsSaveFinalTestResult =
+                        !string.IsNullOrEmpty(details.SentToLab)
+                        ?
+                            details.SentToLab.Equals("Yes", StringComparison.InvariantCultureIgnoreCase)
+                        :
+                            false
                 };
             }
             //Field Visit

@@ -1,5 +1,6 @@
 ﻿
 
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	08-Apr-19
@@ -19,12 +20,14 @@ EXEC
 		@DeviceType = 'Test',
 		@TestResult = 'Failed',
 		@Validities = 'Diluted',
+		@IsSaveFinalTestResult = 0,
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
 08-Apr-19		Rajesh Awate	Created.
 08-July-19		Rajesh Awate	Changes to handle update scenario.
+19-Aug-19		Rajesh Awate	Changes to save Final Test Result based on condition
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -37,6 +40,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@DeviceType VARCHAR(255) = NULL,
 	@TestResult VARCHAR(255) = 'Failed',
 	@Validities VARCHAR(255) = NULL,
+	@IsSaveFinalTestResult BIT = 0,
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -78,7 +82,10 @@ BEGIN
 		EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @TestResult, NULL, ''CeDrugTest.InitialOutcome'', NULL, NULL, NULL;
 
 		--Final Test Result
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @TestResult, NULL, ''CeDrugTest.FinalTestResult'', NULL, NULL, NULL;
+		IF(@IsSaveFinalTestResult = 1)
+		BEGIN
+			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @TestResult, NULL, ''CeDrugTest.FinalTestResult'', NULL, NULL, NULL;
+		END
 
 		--Validities
 		IF(@Validities IS NOT NULL)
@@ -102,6 +109,7 @@ BEGIN
 		@DeviceType VARCHAR(255),
 		@TestResult VARCHAR(255),
 		@Validities VARCHAR(255),
+		@IsSaveFinalTestResult BIT,
 		@UpdatedBy VARCHAR(255)';
 
 PRINT @SQLString;
@@ -118,5 +126,6 @@ PRINT @SQLString;
 				@DeviceType = @DeviceType,
 				@TestResult = @TestResult,
 				@Validities = @Validities,
+				@IsSaveFinalTestResult = @IsSaveFinalTestResult,
 				@UpdatedBy = @UpdatedBy;
 END

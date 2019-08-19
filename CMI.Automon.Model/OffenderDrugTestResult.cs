@@ -11,5 +11,6 @@ namespace CMI.Automon.Model
         public string DeviceType { get; set; }
         public string TestResult { get; set; }
         public string Validities { get; set; }
+        public bool IsSaveFinalTestResult { get; set; }
     }
 }

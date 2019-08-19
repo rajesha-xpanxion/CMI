@@ -138,6 +138,13 @@ namespace CMI.Automon.Service
                                 IsNullable = true
                             });
                         }
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.IsSaveFinalTestResult,
+                            SqlDbType = System.Data.SqlDbType.Bit,
+                            Value = offenderDrugTestResultDetails.IsSaveFinalTestResult,
+                            IsNullable = false
+                        });
 
                         cmd.Connection = conn;
 
