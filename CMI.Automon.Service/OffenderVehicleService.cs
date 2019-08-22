@@ -189,5 +189,67 @@ namespace CMI.Automon.Service
                 }
             }
         }
+
+        public IEnumerable<OffenderVehicle> GetAllOffenderVehicles(string CmiDbConnString, DateTime? lastExecutionDateTime)
+        {
+            if (automonConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderVehicleDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<OffenderVehicle>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderVehicle>();
+            }
+            else
+            {
+                List<OffenderVehicle> offenderVehicles = new List<OffenderVehicle>();
+
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = StoredProc.GetAllOffenderVehicleDetails;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.AutomonDatabaseName,
+                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            Value = new SqlConnectionStringBuilder(automonConfig.AutomonDbConnString).InitialCatalog
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.LastExecutionDateTime,
+                            SqlDbType = System.Data.SqlDbType.DateTime,
+                            Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
+                            IsNullable = true
+                        });
+                        cmd.Connection = conn;
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                offenderVehicles.Add(new OffenderVehicle()
+                                {
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    Id = Convert.ToInt32(reader[DbColumnName.Id]),
+                                    Make = Convert.ToString(reader[DbColumnName.Make]),
+                                    BodyStyle = Convert.ToString(reader[DbColumnName.BodyStyle]),
+                                    VehicleYear = Convert.ToInt32(reader[DbColumnName.Vyear]),
+                                    LicensePlate = Convert.ToString(reader[DbColumnName.LicensePlate]),
+                                    Color = Convert.ToString(reader[DbColumnName.Color]),
+                                    IsActive = Convert.ToBoolean(reader[DbColumnName.IsActive])
+                                });
+                            }
+                        }
+                    }
+                }
+
+                return offenderVehicles;
+            }
+        }
     }
 }

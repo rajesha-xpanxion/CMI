@@ -115,5 +115,17 @@ namespace CMI.Automon.Service
         public static string AuthorEmail { get { return "AuthorEmail"; } }
         public static string IsActive { get { return "IsActive"; } }
         public static string NoteType { get { return "NoteType"; } }
+        public static string Make { get { return "Make"; } }
+        public static string BodyStyle { get { return "BodyStyle"; } }
+        public static string Vyear { get { return "Vyear"; } }
+        public static string LicensePlate { get { return "LicensePlate"; } }
+        public static string Color { get { return "Color"; } }
+    }
+
+    public static class TestResult
+    {
+        public static string Positive { get { return "Positive"; } }
+        public static string Negative { get { return "Negative"; } }
+        public static string Tampered { get { return "Tampered"; } }
     }
 }

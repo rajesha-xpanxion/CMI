@@ -186,6 +186,24 @@ namespace CMI.Processor
                             ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.TestDateTime, AutomonTimeZone)
                             : details.TestDateTime.ToLocalTime();
 
+                //derive automon test result value
+                string automonTestResult = string.Empty;
+                if(details.ResultStatus != null)
+                {
+                    if(details.ResultStatus.Equals(Status.Passed, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        automonTestResult = TestResult.Positive;
+                    }
+                    else if(details.ResultStatus.Equals(Status.Failed, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        automonTestResult = TestResult.Negative;
+                    }
+                    else
+                    {
+                        automonTestResult = details.ResultStatus;
+                    }
+                }
+
                 return new OffenderDrugTestResult()
                 {
                     Pin = clientIntegrationId,
@@ -207,7 +225,7 @@ namespace CMI.Processor
                         :
                             (int)EventStatus.Pending,
                     DeviceType = details.DrugTestType,
-                    TestResult = details.ResultStatus,
+                    TestResult = automonTestResult,
                     Validities =
                         details.Dilute != null
                         ?

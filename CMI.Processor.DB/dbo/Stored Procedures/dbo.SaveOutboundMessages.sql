@@ -166,7 +166,6 @@ BEGIN
 	OUTPUT
 		$action, inserted.* INTO @OutboundMessageOutput;
 
-
 	SELECT DISTINCT
 		[OutboundMessageId] AS [Id],
 		[ActivityTypeId],
@@ -219,6 +218,8 @@ BEGIN
 					[dbo].[vw_AllOutboundMessageDetails] VWOM 
 				WHERE 
 					VWOM.[ActivityIdentifier] = OMO.[ActivityIdentifier]
+					AND VWOM.[ActivityTypeId] = OMO.[ActivityTypeId]
+					AND ISNULL(VWOM.[ActivitySubTypeId], '') = ISNULL(OMO.[ActivitySubTypeId], '')
 					AND VWOM.[AutomonIdentifier] IS NOT NULL
 				ORDER BY 
 					VWOM.[ReceivedOn] DESC

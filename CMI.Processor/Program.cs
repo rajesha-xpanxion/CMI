@@ -190,6 +190,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<ILookupService, LookupService>();
             serviceCollection.AddSingleton<IAuthService, AuthService>();
             serviceCollection.AddSingleton<ICommonService, CommonService>();
+            serviceCollection.AddSingleton<IVehicleService, VehicleService>();
         }
 
         private static void ConfigureCommonServices(IServiceCollection serviceCollection)
@@ -208,6 +209,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<InboundEmailContactProcessor>();
             serviceCollection.AddSingleton<InboundCaseProcessor>();
             serviceCollection.AddSingleton<InboundNoteProcessor>();
+            serviceCollection.AddSingleton<InboundVehicleProcessor>();
         }
 
         private static void ConfigureOutboundProcessorServices(IServiceCollection serviceCollection)

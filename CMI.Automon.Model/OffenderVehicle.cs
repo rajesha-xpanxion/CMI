@@ -11,5 +11,6 @@ namespace CMI.Automon.Model
         public string BodyStyle { get; set; }
         public string Color { get; set; }
         public string LicensePlate { get; set; }
+        public bool IsActive { get; set; }
     }
 }

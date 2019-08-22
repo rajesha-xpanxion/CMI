@@ -8,5 +8,6 @@ namespace CMI.Automon.Interface
     {
         int SaveOffenderVehicleDetails(string CmiDbConnString, OffenderVehicle offenderVehicleDetails);
         void DeleteOffenderVehicleDetails(string CmiDbConnString, OffenderVehicle offenderVehicleDetails);
+        IEnumerable<OffenderVehicle> GetAllOffenderVehicles(string CmiDbConnString, DateTime? lastExecutionDateTime);
     }
 }

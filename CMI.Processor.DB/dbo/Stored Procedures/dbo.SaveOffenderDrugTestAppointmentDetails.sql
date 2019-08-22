@@ -25,6 +25,7 @@ Date			Author			Changes
 27-May-19		Rajesh Awate	Updated event type.
 08-July-19		Rajesh Awate	Changes to handle update scenario.
 14-Aug-19		Rajesh Awate	Changes for saving is offender present flag
+22-Aug-19		Rajesh Awate	Changes for updated contact type attribute for event type
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestAppointmentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -99,7 +100,7 @@ BEGIN
 					LT.[IsActive] = 1 
 					AND LT.[Description] = ''Contact Type'' 
 					AND L.[IsActive] = 1 
-					AND L.[PermDesc] = ''InPersonTreatmentFacility''
+					AND L.[PermDesc] = ''InpersonNexusDrugTest''
 			);
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 

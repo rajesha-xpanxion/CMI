@@ -73,6 +73,7 @@
         public static string EmailContacts { get { return "EmailContacts"; } }
         public static string Cases { get { return "Cases"; } }
         public static string Notes { get { return "Notes"; } }
+        public static string Vehicles { get { return "Vehicles"; } }
     }
 
     public static class OutboundProcessorActivityType

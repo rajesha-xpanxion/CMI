@@ -1,5 +1,6 @@
 ﻿
 
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	03-Oct-18
@@ -71,6 +72,7 @@ BEGIN
 			OR @LastExecutionDateTime IS NULL
 		';
 	END
+	ELSE
 	BEGIN
 		SET @SQLString = 
 		'
