@@ -86,6 +86,12 @@ namespace CMI.Processor
                 UpdateExecutionStatus(((InboundVehicleProcessor)serviceProvider.GetService(typeof(InboundVehicleProcessor))).Execute(lastExecutionDateTime));
             }
 
+            //process client employments
+            if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.Employments, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                UpdateExecutionStatus(((InboundEmploymentProcessor)serviceProvider.GetService(typeof(InboundEmploymentProcessor))).Execute(lastExecutionDateTime));
+            }
+
             //derive final processor execution status and save it to database
             ProcessorExecutionStatus.ExecutionStatusMessage = ProcessorExecutionStatus.IsSuccessful
                 ? "Inbound Processor execution completed successfully."

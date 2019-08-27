@@ -74,6 +74,7 @@
         public static string Cases { get { return "Cases"; } }
         public static string Notes { get { return "Notes"; } }
         public static string Vehicles { get { return "Vehicles"; } }
+        public static string Employments { get { return "Employments"; } }
     }
 
     public static class OutboundProcessorActivityType

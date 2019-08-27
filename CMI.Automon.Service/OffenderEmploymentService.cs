@@ -203,5 +203,69 @@ namespace CMI.Automon.Service
                 }
             }
         }
+
+        public IEnumerable<OffenderEmployment> GetAllOffenderEmployments(string CmiDbConnString, DateTime? lastExecutionDateTime)
+        {
+            if (automonConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderEmploymentDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<IEnumerable<OffenderEmployment>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<OffenderEmployment>();
+            }
+            else
+            {
+                List<OffenderEmployment> offenderEmployments = new List<OffenderEmployment>();
+
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = StoredProc.GetAllOffenderEmploymentDetails;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.AutomonDatabaseName,
+                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            Value = new SqlConnectionStringBuilder(automonConfig.AutomonDbConnString).InitialCatalog
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.LastExecutionDateTime,
+                            SqlDbType = System.Data.SqlDbType.DateTime,
+                            Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
+                            IsNullable = true
+                        });
+                        cmd.Connection = conn;
+
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                offenderEmployments.Add(new OffenderEmployment()
+                                {
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    Id = Convert.ToInt32(reader[DbColumnName.Id]),
+                                    OrganizationName = Convert.ToString(reader[DbColumnName.Name]),
+                                    OrganizationAddress = Convert.ToString(reader[DbColumnName.FullAddress]),
+                                    OrganizationPhone = Convert.ToString(reader[DbColumnName.FullPhoneNumber]),
+                                    PayFrequency = Convert.ToString(reader[DbColumnName.PayFrequency]),
+                                    PayRate = Convert.ToString(reader[DbColumnName.PayRate]),
+                                    WorkType = Convert.ToString(reader[DbColumnName.WorkType]),
+                                    JobTitle = Convert.ToString(reader[DbColumnName.JobTitle]),
+                                    IsActive = Convert.ToBoolean(reader[DbColumnName.IsActive])
+                                });
+                            }
+                        }
+                    }
+                }
+
+                return offenderEmployments;
+            }
+        }
     }
 }

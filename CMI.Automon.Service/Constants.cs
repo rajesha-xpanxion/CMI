@@ -120,6 +120,13 @@ namespace CMI.Automon.Service
         public static string Vyear { get { return "Vyear"; } }
         public static string LicensePlate { get { return "LicensePlate"; } }
         public static string Color { get { return "Color"; } }
+        public static string Name { get { return "Name"; } }
+        public static string FullAddress { get { return "FullAddress"; } }
+        public static string FullPhoneNumber { get { return "FullPhoneNumber"; } }
+        public static string PayFrequency { get { return "PayFrequency"; } }
+        public static string PayRate { get { return "PayRate"; } }
+        public static string WorkType { get { return "WorkType"; } }
+        public static string JobTitle { get { return "JobTitle"; } }
     }
 
     public static class TestResult

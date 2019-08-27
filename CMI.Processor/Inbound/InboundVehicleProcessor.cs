@@ -79,7 +79,7 @@ namespace CMI.Processor
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "New Client Phone Vehicle details added successfully.",
+                                        Message = "New Client Vehicle details added successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
                                         NexusData = JsonConvert.SerializeObject(vehicle)
                                     });
@@ -99,7 +99,7 @@ namespace CMI.Processor
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "Existing Client Vehicle Contact details deleted successfully.",
+                                        Message = "Existing Client Vehicle details deleted successfully.",
                                         AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
                                         NexusData = JsonConvert.SerializeObject(vehicle)
                                     });

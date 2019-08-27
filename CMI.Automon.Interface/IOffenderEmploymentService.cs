@@ -1,4 +1,6 @@
 ﻿using CMI.Automon.Model;
+using System;
+using System.Collections.Generic;
 
 namespace CMI.Automon.Interface
 {
@@ -6,5 +8,6 @@ namespace CMI.Automon.Interface
     {
         int SaveOffenderEmploymentDetails(string CmiDbConnString, OffenderEmployment offenderEmploymentDetails);
         void DeleteOffenderEmploymentDetails(string CmiDbConnString, OffenderEmployment offenderEmploymentDetails);
+        IEnumerable<OffenderEmployment> GetAllOffenderEmployments(string CmiDbConnString, DateTime? lastExecutionDateTime);
     }
 }
