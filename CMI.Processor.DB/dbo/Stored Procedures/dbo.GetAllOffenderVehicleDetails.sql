@@ -1,6 +1,4 @@
 ﻿
-
-
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	20-Aug-18
@@ -15,6 +13,7 @@ EXEC
 History:-
 Date			Author			Changes
 20-Aug-18		Rajesh Awate	Created.
+27-Aug-18		Rajesh Awate	Changes to skip records having Vyear as NULL and return Unknown for NULL for columns Make, BodyStyle & Color
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderVehicleDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -30,33 +29,35 @@ BEGIN
 		SELECT DISTINCT
 			OI.[Pin],
 			VI.[Id],
-			VI.[Make],
-			VI.[BodyStyle],
+			ISNULL(VI.[Make], ''Unknown'') AS [Make],
+			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
-			VI.[Color],
-			1 AS [IsActive]
+			ISNULL(VI.[Color], ''Unknown'') AS [Color],
+			0 AS [IsDeleted]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
 		WHERE
-			VI.[FromTime] >= @LastExecutionDateTime
+			VI.[Vyear] IS NOT NULL
+			AND VI.[FromTime] >= @LastExecutionDateTime
 			AND VI.[ToTime] IS NULL
 		UNION
 		SELECT DISTINCT
 			OI.[Pin],
 			VI.[Id],
-			VI.[Make],
-			VI.[BodyStyle],
+			ISNULL(VI.[Make], ''Unknown'') AS [Make],
+			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
-			VI.[Color],
-			0 AS [IsActive]
+			ISNULL(VI.[Color], ''Unknown'') AS [Color],
+			1 AS [IsDeleted]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
 		WHERE
-			VI.[ChainId] IS NULL
+			VI.[Vyear] IS NOT NULL
+			AND VI.[ChainId] IS NULL
 			AND VI.[ToTime] IS NOT NULL
 			AND VI.[ToTime] >= @LastExecutionDateTime
 		';
@@ -68,32 +69,34 @@ BEGIN
 		SELECT DISTINCT
 			OI.[Pin],
 			VI.[Id],
-			VI.[Make],
-			VI.[BodyStyle],
+			ISNULL(VI.[Make], ''Unknown'') AS [Make],
+			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
-			VI.[Color],
-			1 AS [IsActive]
+			ISNULL(VI.[Color], ''Unknown'') AS [Color],
+			0 AS [IsDeleted]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
 		WHERE
-			VI.[ToTime] IS NULL
+			VI.[Vyear] IS NOT NULL
+			AND VI.[ToTime] IS NULL
 		UNION
 		SELECT DISTINCT
 			OI.[Pin],
 			VI.[Id],
-			VI.[Make],
-			VI.[BodyStyle],
+			ISNULL(VI.[Make], ''Unknown'') AS [Make],
+			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
-			VI.[Color],
-			0 AS [IsActive]
+			ISNULL(VI.[Color], ''Unknown'') AS [Color],
+			1 AS [IsDeleted]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
 		WHERE
-			VI.[ChainId] IS NULL
+			VI.[Vyear] IS NOT NULL
+			AND VI.[ChainId] IS NULL
 			AND VI.[ToTime] IS NOT NULL
 		';
 	END
