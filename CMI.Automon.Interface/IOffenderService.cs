@@ -11,5 +11,7 @@ namespace CMI.Automon.Interface
         string SaveOffenderDetails(string CmiDbConnString, OffenderDetails offenderDetails);
 
         string GetTimeZone();
+
+        OffenderMugshot GetOffenderMugshotPhoto(string CmiDbConnString, string pin);
     }
 }

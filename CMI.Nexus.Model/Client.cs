@@ -15,4 +15,9 @@ namespace CMI.Nexus.Model
         public string SupervisingOfficerEmailId { get; set; }
         public string CaseloadId { get; set; }
     }
+
+    public class ClientProfilePicture : Client
+    {
+        public string ImageBase64String { get; set; }
+    }
 }

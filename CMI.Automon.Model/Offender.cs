@@ -23,4 +23,9 @@ namespace CMI.Automon.Model
         public string OfficerLastName { get; set; }
         public string UpdatedBy { get; set; }
     }
+
+    public class OffenderMugshot : Offender
+    {
+        public byte[] ImagesBytes { get; set; }
+    }
 }

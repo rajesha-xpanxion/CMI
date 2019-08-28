@@ -126,6 +126,108 @@ namespace CMI.Nexus.Service
                 }
             }
         }
+
+
+        public bool AddNewClientProfilePicture(ClientProfilePicture clientProfilePicture)
+        {
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.PostAsJsonAsync<Client>(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientProfilePicture.IntegrationId), clientProfilePicture).Result;
+                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new CmiException(string.Format("Error occurred while adding new client profile picture. API Response: {0}", responseString));
+                }
+            }
+        }
+
+        public ClientProfilePicture GetClientProfilePicture(string clientId)
+        {
+            ClientProfilePicture clientProfilePicture = null;
+
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    clientProfilePicture = apiResponse.Content.ReadAsAsync<ClientProfilePicture>().Result;
+                }
+                else
+                {
+                    clientProfilePicture = null;
+                }
+            }
+
+            return clientProfilePicture;
+        }
+
+        public bool UpdateClientProfilePicture(ClientProfilePicture clientProfilePicture)
+        {
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.PutAsJsonAsync<Client>(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientProfilePicture.IntegrationId), clientProfilePicture).Result;
+
+                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new CmiException(string.Format("Error occurred while updating existing client profile picture. API Response: {0}", responseString));
+                }
+            }
+        }
+
+        public bool DeleteClientProfilePicture(string clientId)
+        {
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.DeleteAsync(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new CmiException(string.Format("Error occurred while deleting existing client profile picture. API Response: {0}", responseString));
+                }
+            }
+        }
         #endregion
     }
 }

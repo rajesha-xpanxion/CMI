@@ -9,6 +9,7 @@ namespace CMI.Automon.Service
     public static class StoredProc
     {
         public static string GetAllOffenderDetails { get { return "[dbo].[GetAllOffenderDetails]"; } }
+        public static string GetOffenderMugshotPhoto { get { return "[dbo].[GetOffenderMugshotPhoto]"; } }
         public static string GetAllOffenderAddressDetails { get { return "[dbo].[GetAllOffenderAddressDetails]"; } }
         public static string GetAllOffenderPhoneDetails { get { return "[dbo].[GetAllOffenderPhoneDetails]"; } }
         public static string GetAllOffenderEmailDetails { get { return "[dbo].[GetAllOffenderEmailDetails]"; } }

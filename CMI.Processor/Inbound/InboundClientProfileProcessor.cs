@@ -67,10 +67,13 @@ namespace CMI.Processor
                             SupervisingOfficerEmailId = MapSupervisingOfficer(offenderDetails.OfficerFirstName, offenderDetails.OfficerLastName, offenderDetails.OfficerEmail)
                         };
 
+                        //check if client already exists
                         if (ClientService.GetClientDetails(client.IntegrationId) == null)
                         {
+                            //add new client profile details to Nexus
                             if (ClientService.AddNewClientDetails(client))
                             {
+                                //increase add record count
                                 taskExecutionStatus.NexusAddRecordCount++;
 
                                 Logger.LogDebug(new LogRequest
@@ -81,6 +84,31 @@ namespace CMI.Processor
                                     AutomonData = JsonConvert.SerializeObject(offenderDetails),
                                     NexusData = JsonConvert.SerializeObject(client)
                                 });
+
+                                //get offender mugshot photo details
+                                OffenderMugshot offenderMugshot = offenderService.GetOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderDetails.Pin);
+                                ClientProfilePicture clientProfilePicture = null;
+
+                                //check if there is any mugshot photo set for given offender
+                                if (offenderMugshot != null && offenderMugshot.ImagesBytes != null)
+                                {
+                                    clientProfilePicture = new ClientProfilePicture
+                                    {
+                                        IntegrationId = FormatId(offenderMugshot.Pin),
+                                        ImageBase64String = Convert.ToBase64String(offenderMugshot.ImagesBytes)
+                                    };
+                                    if (ClientService.AddNewClientProfilePicture(clientProfilePicture))
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "New Client Profile Picture added successfully.",
+                                            AutomonData = JsonConvert.SerializeObject(offenderMugshot),
+                                            NexusData = JsonConvert.SerializeObject(clientProfilePicture)
+                                        });
+                                    }
+                                }
                             }
                         }
                         else

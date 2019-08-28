@@ -104,6 +104,7 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderTreatmentAppointmentDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderVehicleDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.GetAllOffenderEmploymentDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.GetOffenderMugshotPhoto.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">
