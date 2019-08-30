@@ -221,38 +221,6 @@ namespace CMI.Automon.Service
                 return timeZone;
             }
         }
-
-        public OffenderMugshot GetOffenderMugshotPhoto(string CmiDbConnString, string pin)
-        {
-            if (automonConfig.IsDevMode)
-            {
-                //test data
-                return new OffenderMugshot { Pin = pin };
-            }
-            else
-            {
-                using (SqlConnection conn = new SqlConnection(automonConfig.AutomonDbConnString))
-                {
-                    conn.Open();
-
-                    using (SqlCommand cmd = new SqlCommand())
-                    {
-                        cmd.CommandText = StoredProc.GetOffenderMugshotPhoto;
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.Pin,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = pin
-                        });
-
-                        cmd.Connection = conn;
-
-                        return new OffenderMugshot { Pin = pin, ImagesBytes = (byte[])(cmd.ExecuteScalar()) };
-                    }
-                }
-            }
-        }
         #endregion
     }
 }

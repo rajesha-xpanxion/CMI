@@ -14,15 +14,18 @@ namespace CMI.Processor
     public class InboundClientProfileProcessor : InboundBaseProcessor
     {
         private readonly IOffenderService offenderService;
+        private readonly IOffenderProfilePictureService offenderProfilePictureService;
 
         public InboundClientProfileProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
-            IOffenderService offenderService
+            IOffenderService offenderService,
+            IOffenderProfilePictureService offenderProfilePictureService
         )
             : base(serviceProvider, configuration)
         {
             this.offenderService = offenderService;
+            this.offenderProfilePictureService = offenderProfilePictureService;
         }
 
         public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
@@ -86,16 +89,16 @@ namespace CMI.Processor
                                 });
 
                                 //get offender mugshot photo details
-                                OffenderMugshot offenderMugshot = offenderService.GetOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderDetails.Pin);
+                                OffenderMugshot offenderMugshot = offenderProfilePictureService.GetOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderDetails.Pin);
                                 ClientProfilePicture clientProfilePicture = null;
 
                                 //check if there is any mugshot photo set for given offender
-                                if (offenderMugshot != null && offenderMugshot.ImagesBytes != null)
+                                if (offenderMugshot != null && offenderMugshot.DocumentData!= null)
                                 {
                                     clientProfilePicture = new ClientProfilePicture
                                     {
                                         IntegrationId = FormatId(offenderMugshot.Pin),
-                                        ImageBase64String = Convert.ToBase64String(offenderMugshot.ImagesBytes)
+                                        ImageBase64String = Convert.ToBase64String(offenderMugshot.DocumentData)
                                     };
                                     if (ClientService.AddNewClientProfilePicture(clientProfilePicture))
                                     {

@@ -18,6 +18,7 @@ namespace CMI.Automon.Service
         public static string TestDataJsonFileNameAllOffenderPhoneDetails { get { return "AllOffenderPhoneDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderTreatmentAppointmentDetails { get { return "AllOffenderTreatmentAppointmentDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderVehicleDetails { get { return "AllOffenderVehicleDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderMugshotDetails { get { return "AllOffenderMugshotDetails.json"; } }
     }
 
     public static class SqlParamName
@@ -68,6 +69,10 @@ namespace CMI.Automon.Service
         public static string Validities { get { return "@Validities"; } }
         public static string Id { get { return "@Id"; } }
         public static string IsSaveFinalTestResult { get { return "@IsSaveFinalTestResult"; } }
+
+        public static string DocumentData { get { return "@DocumentData"; } }
+        public static string DocumentId { get { return "@DocumentId"; } }
+        public static string DocumentDate { get { return "@DocumentDate"; } }
     }
 
     public static class DbColumnName

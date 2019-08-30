@@ -254,6 +254,25 @@ namespace CMI.Processor
                     //update required identifiers in all outbound message details
                     UpdateIdentifiers(clientProfileMessages);
                 }
+
+                //profile picture
+                if (
+                    ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess != null
+                    && ProcessorConfig.OutboundProcessorConfig.ActivitySubTypesToProcess.Any(a => a.Equals(OutboundProcessorClientProfileActivitySubType.ProfilePicture, StringComparison.InvariantCultureIgnoreCase))
+                )
+                {
+                    UpdateExecutionStatus(
+                        ((OutboundClientProfilePictureProcessor)serviceProvider.GetService(typeof(OutboundClientProfilePictureProcessor))).Execute(
+                            clientProfileMessages.Where(
+                                a => a.ActivitySubTypeName.Equals(OutboundProcessorClientProfileActivitySubType.ProfilePicture, StringComparison.InvariantCultureIgnoreCase)
+                            ),
+                            messagesReceivedOn
+                        )
+                    );
+
+                    //update required identifiers in all outbound message details
+                    UpdateIdentifiers(clientProfileMessages);
+                }
             }
 
             //general notes

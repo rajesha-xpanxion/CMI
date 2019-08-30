@@ -97,6 +97,7 @@
         public static string ContactDetails { get { return "Contact Details"; } }
         public static string VehicleDetails { get { return "Vehicle Details"; } }
         public static string EmploymentDetails { get { return "Employment Details"; } }
+        public static string ProfilePicture { get { return "Profile Picture"; } }
     }
 
     public static class OutboundProcessorActionReason

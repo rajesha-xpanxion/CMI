@@ -178,6 +178,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<IOffenderOfficeVisitService, OffenderOfficeVisitService>();
             serviceCollection.AddSingleton<IOffenderFieldVisitService, OffenderFieldVisitService>();
             serviceCollection.AddSingleton<IOffenderTreatmentAppointmentService, OffenderTreatmentAppointmentService>();
+            serviceCollection.AddSingleton<IOffenderProfilePictureService, OffenderProfilePictureService>();
         }
 
         private static void ConfigureNexusServices(IServiceCollection serviceCollection)
@@ -230,6 +231,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<OutboundClientProfileDrugTestResultProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileFieldVisitProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileTreatmentAppointmentProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfilePictureProcessor>();
         }
 
         private static void ConfigureMessageRetrieverService(IServiceCollection serviceCollection, IConfiguration configuration)

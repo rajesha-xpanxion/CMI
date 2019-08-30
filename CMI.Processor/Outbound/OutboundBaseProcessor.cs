@@ -555,6 +555,20 @@ namespace CMI.Processor
                     Comment = details.Notes
                 };
             }
+            //Client Profile - Picture Details
+            else if (typeof(T) == typeof(ClientProfilePictureDetailsActivityResponse))
+            {
+                ClientProfilePictureDetailsActivityResponse details = (ClientProfilePictureDetailsActivityResponse)(object)activityDetails;
+
+
+                return new OffenderMugshot
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    DocumentData = Convert.FromBase64String(details.ImageBase64String)
+                };
+            }
 
             return null;
         }
