@@ -569,6 +569,103 @@ namespace CMI.Processor
                     DocumentData = Convert.FromBase64String(details.ImageBase64String)
                 };
             }
+            //CAM Alert
+            else if (typeof(T) == typeof(ClientProfileCAMAlertDetailsActivityResponse))
+            {
+                ClientProfileCAMAlertDetailsActivityResponse details = (ClientProfileCAMAlertDetailsActivityResponse)(object)activityDetails;
+
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.AlertDateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.AlertDateTime = DateTime.SpecifyKind(details.AlertDateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.AlertDateTime, AutomonTimeZone)
+                            : details.AlertDateTime.ToLocalTime();
+
+                return new OffenderCAMViolation()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    ViolationDateTime = convertedDateTime
+                };
+            }
+            //CAM Supervision
+            else if (typeof(T) == typeof(ClientProfileCAMSupervisionDetailsActivityResponse))
+            {
+                ClientProfileCAMSupervisionDetailsActivityResponse details = (ClientProfileCAMSupervisionDetailsActivityResponse)(object)activityDetails;
+
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.MonitorDate.Kind != DateTimeKind.Utc)
+                {
+                    details.MonitorDate = DateTime.SpecifyKind(details.MonitorDate, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.MonitorDate, AutomonTimeZone)
+                            : details.MonitorDate.ToLocalTime();
+
+                return new OffenderCAMViolation()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    ViolationDateTime = convertedDateTime
+                };
+            }
+            //GPS Alert
+            else if (typeof(T) == typeof(ClientProfileGPSAlertDetailsActivityResponse))
+            {
+                ClientProfileGPSAlertDetailsActivityResponse details = (ClientProfileGPSAlertDetailsActivityResponse)(object)activityDetails;
+
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.AlertDateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.AlertDateTime = DateTime.SpecifyKind(details.AlertDateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.AlertDateTime, AutomonTimeZone)
+                            : details.AlertDateTime.ToLocalTime();
+
+                return new OffenderGPSViolation()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    ViolationDateTime = convertedDateTime
+                };
+            }
+            //GPS Supervision
+            else if (typeof(T) == typeof(ClientProfileGPSSupervisionDetailsActivityResponse))
+            {
+                ClientProfileGPSSupervisionDetailsActivityResponse details = (ClientProfileGPSSupervisionDetailsActivityResponse)(object)activityDetails;
+
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.MonitorDate.Kind != DateTimeKind.Utc)
+                {
+                    details.MonitorDate = DateTime.SpecifyKind(details.MonitorDate, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.MonitorDate, AutomonTimeZone)
+                            : details.MonitorDate.ToLocalTime();
+
+                return new OffenderGPSViolation()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    ViolationDateTime = convertedDateTime
+                };
+            }
+
 
             return null;
         }

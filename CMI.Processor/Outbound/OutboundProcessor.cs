@@ -371,6 +371,70 @@ namespace CMI.Processor
                 UpdateIdentifiers(toBeProcessedOutboundMessages);
             }
 
+            //CAM Alert
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.CAMAlert, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundClientProfileCAMAlertProcessor)serviceProvider.GetService(typeof(OutboundClientProfileCAMAlertProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.CAMAlert, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
+            }
+
+            //CAM Supervision
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.CAMSupervision, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundClientProfileCAMSupervisionProcessor)serviceProvider.GetService(typeof(OutboundClientProfileCAMSupervisionProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.CAMSupervision, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
+            }
+
+            //GPS Alert
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.GPSAlert, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundClientProfileGPSAlertProcessor)serviceProvider.GetService(typeof(OutboundClientProfileGPSAlertProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.GPSAlert, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
+            }
+
+            //GPS Supervision
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.GPSSupervision, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundClientProfileGPSSupervisionProcessor)serviceProvider.GetService(typeof(OutboundClientProfileGPSSupervisionProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.GPSSupervision, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
+            }
+
             //update message wise processing status
             if (toBeProcessedOutboundMessages != null && toBeProcessedOutboundMessages.Any())
             {

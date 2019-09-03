@@ -87,6 +87,10 @@
         public static string DrugTestResult { get { return "Drug Test Result"; } }
         public static string FieldVisit { get { return "FieldVisit"; } }
         public static string TreatmentAppointment { get { return "Treatment Appointment"; } }
+        public static string CAMAlert { get { return "CAM Alert"; } }
+        public static string CAMSupervision { get { return "CAM Supervision"; } }
+        public static string GPSAlert { get { return "GPS Alert"; } }
+        public static string GPSSupervision { get { return "GPS Supervision"; } }
     }
 
     public static class OutboundProcessorClientProfileActivitySubType
