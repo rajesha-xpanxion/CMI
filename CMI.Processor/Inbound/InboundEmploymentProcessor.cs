@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CMI.Processor
 {
@@ -62,16 +63,16 @@ namespace CMI.Processor
                             Occupation = offenderEmploymentDetails.JobTitle,
                             WorkAddress = offenderEmploymentDetails.OrganizationAddress,
                             WorkPhone = offenderEmploymentDetails.OrganizationPhone,
-                            Wage = offenderEmploymentDetails.PayRate,
+                            Wage = string.IsNullOrEmpty(offenderEmploymentDetails.PayRate) ? null : string.Concat(offenderEmploymentDetails.PayRate.Where(y => y.Equals('.') || Char.IsDigit(y))),
                             WageUnit = MapWageUnit(offenderEmploymentDetails.PayFrequency),
-                            WorkEnvironment = offenderEmploymentDetails.WorkType
+                            WorkEnvironment = offenderEmploymentDetails.WorkType,
+                            IsActive = offenderEmploymentDetails.IsActive
                         };
 
                         if (ClientService.GetClientDetails(employment.ClientId) != null)
                         {
                             if (employmentService.GetEmploymentDetails(employment.ClientId, employment.EmployerId) == null)
                             {
-
                                 if (employment.IsActive && employmentService.AddNewEmploymentDetails(employment))
                                 {
                                     taskExecutionStatus.NexusAddRecordCount++;
