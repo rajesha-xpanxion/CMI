@@ -85,7 +85,7 @@ BEGIN
 		@AuthorEmail VARCHAR(200),
 		@Date DATETIME';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

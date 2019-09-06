@@ -34,7 +34,7 @@ BEGIN
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],
-			0 AS [IsDeleted]
+			1 AS [IsActive]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
@@ -51,7 +51,7 @@ BEGIN
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],
-			1 AS [IsDeleted]
+			0 AS [IsActive]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
@@ -78,9 +78,20 @@ BEGIN
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
+				--officer wise data
+				LEFT JOIN [$AutomonDatabaseName].[dbo].[OffenderCaseloadInfo] OCLI
+					ON OI.[Id] = OCLI.[OffenderId]
+					LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseloadInfo] CLI
+						ON OCLI.[CaseloadId] = CLI.[Id]
+						LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerCaseloadInfo] OFCCLI
+							ON CLI.[Id] = OFCCLI.[CaseloadId]
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerInfo] OFCI
+								ON OFCCLI.[OfficerId] = OFCI.[Id]
 		WHERE
 			VI.[Vyear] IS NOT NULL
 			AND VI.[ToTime] IS NULL
+
+			--AND OFCI.[Logon] IN (''kplunkett'')
 		UNION
 		SELECT DISTINCT
 			OI.[Pin],
@@ -94,10 +105,21 @@ BEGIN
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
+				--officer wise data
+				LEFT JOIN [$AutomonDatabaseName].[dbo].[OffenderCaseloadInfo] OCLI
+					ON OI.[Id] = OCLI.[OffenderId]
+					LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseloadInfo] CLI
+						ON OCLI.[CaseloadId] = CLI.[Id]
+						LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerCaseloadInfo] OFCCLI
+							ON CLI.[Id] = OFCCLI.[CaseloadId]
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerInfo] OFCI
+								ON OFCCLI.[OfficerId] = OFCI.[Id]
 		WHERE
 			VI.[Vyear] IS NOT NULL
 			AND VI.[ChainId] IS NULL
 			AND VI.[ToTime] IS NOT NULL
+
+			--AND OFCI.[Logon] IN (''kplunkett'')
 		';
 	END
 

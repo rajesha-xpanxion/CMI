@@ -162,7 +162,7 @@ BEGIN
 		@Race VARCHAR(150),
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

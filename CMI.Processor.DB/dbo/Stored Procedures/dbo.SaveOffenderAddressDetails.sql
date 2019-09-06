@@ -76,7 +76,7 @@ BEGIN
 		@AddressType VARCHAR(100),
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

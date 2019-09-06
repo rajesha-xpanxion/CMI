@@ -85,7 +85,7 @@ BEGIN
 		@LicensePlate VARCHAR(10),
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

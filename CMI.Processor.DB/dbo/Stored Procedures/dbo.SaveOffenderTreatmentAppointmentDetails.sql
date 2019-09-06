@@ -71,7 +71,7 @@ BEGIN
 		@Status INT,
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

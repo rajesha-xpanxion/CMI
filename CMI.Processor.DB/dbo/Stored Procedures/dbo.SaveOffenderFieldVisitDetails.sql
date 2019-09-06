@@ -103,7 +103,7 @@ BEGIN
 		@SearchResults VARCHAR(255),
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

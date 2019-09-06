@@ -48,13 +48,11 @@ BEGIN
 			@EnteredByPId				INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId					INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@OrganizationTypeId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OrganizationType] WHERE [Description] = ''Other'' AND [IsActive] = 1),
-			@OrganizationId				INT	= @Id,
-			@PersonAssociationId		INT	= 0,
+			@OrganizationId				INT	= 0,
+			@PersonAssociationId		INT	= @Id,
 			@PersonAssociationRoleId	INT	= 0,
-			@AddressId					INT = ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[AddressInfo] WHERE [Line1] = @OrganizationAddress ORDER BY [FromTime] DESC), 0),
-			@PhoneNumberId				INT	= ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[PhoneNumberInfo] WHERE [Phone] = @OrganizationPhone ORDER BY [FromTime] DESC), 0);
-
-		SET @PersonAssociationId = ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[PersonAssociationInfo] WHERE [PersonId] = @PersonId AND [OrganizationId] = @OrganizationId ORDER BY [FromTime] DESC), 0);
+			@AddressId					INT = (SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[AddressInfo] WHERE [Line1] = @OrganizationAddress ORDER BY [FromTime] DESC),
+			@PhoneNumberId				INT	= (SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[PhoneNumberInfo] WHERE [Phone] = @OrganizationPhone ORDER BY [FromTime] DESC);
 
 		--organization address
 		IF(@OrganizationAddress IS NOT NULL)
@@ -85,6 +83,24 @@ BEGIN
 					@PhoneNumberId OUTPUT;
 		END
 		
+		SET @OrganizationId = ISNULL(
+			(
+				SELECT TOP 1 
+					[Id] 
+				FROM 
+					[$AutomonDatabaseName].[dbo].[Organization] 
+				WHERE 
+					[Name] = @OrganizationName 
+					AND [AddressId] = @AddressId 
+					AND [PhoneId] = @PhoneNumberId 
+					AND [IsActive] = 1 
+					AND [OrganizationTypeId] = @OrganizationTypeId 
+				ORDER BY 
+					[EnteredDateTime] DESC
+			),
+			0
+		);
+
 		--organization
 		EXEC 
 			[$AutomonDatabaseName].[dbo].[UpdateOrganization]
@@ -195,7 +211,7 @@ BEGIN
 					NULL;
 		END
 		
-		SELECT @OrganizationId;
+		SELECT @PersonAssociationId;
 		';
 
 
@@ -213,7 +229,7 @@ BEGIN
 		@JobTitle varchar(255),
 		@UpdatedBy VARCHAR(255)';
 
-PRINT @SQLString;
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

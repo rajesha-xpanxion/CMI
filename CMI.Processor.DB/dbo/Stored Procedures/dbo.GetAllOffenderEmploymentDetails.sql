@@ -105,9 +105,20 @@ BEGIN
 						ON PARI.[AssociationRoleId] = ARI.[Id]
 						LEFT JOIN [$AutomonDatabaseName].[dbo].[OrganizationInfo] ORGI
 							ON PAI.[OrganizationId] = ORGI.[Id]
+							--officer wise data
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[OffenderCaseloadInfo] OCLI
+								ON OI.[Id] = OCLI.[OffenderId]
+								LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseloadInfo] CLI
+									ON OCLI.[CaseloadId] = CLI.[Id]
+									LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerCaseloadInfo] OFCCLI
+										ON CLI.[Id] = OFCCLI.[CaseloadId]
+										LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerInfo] OFCI
+											ON OFCCLI.[OfficerId] = OFCI.[Id]
 		WHERE
 			ARI.[PermDesc] = ''Employer''
 			AND (PAI.[ToTime] IS NULL AND [PARI].[ToTime] IS NULL)
+
+			--AND OFCI.[Logon] IN (''kplunkett'')
 		UNION
 		SELECT DISTINCT
 			OI.[Pin],
@@ -129,6 +140,15 @@ BEGIN
 						ON PARI.[AssociationRoleId] = ARI.[Id]
 						LEFT JOIN [$AutomonDatabaseName].[dbo].[OrganizationInfo] ORGI
 							ON PAI.[OrganizationId] = ORGI.[Id]
+							--officer wise data
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[OffenderCaseloadInfo] OCLI
+								ON OI.[Id] = OCLI.[OffenderId]
+								LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseloadInfo] CLI
+									ON OCLI.[CaseloadId] = CLI.[Id]
+									LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerCaseloadInfo] OFCCLI
+										ON CLI.[Id] = OFCCLI.[CaseloadId]
+										LEFT JOIN [$AutomonDatabaseName].[dbo].[OfficerInfo] OFCI
+											ON OFCCLI.[OfficerId] = OFCI.[Id]
 		WHERE
 			ARI.[PermDesc] = ''Employer''
 			AND 
@@ -137,6 +157,8 @@ BEGIN
 				OR 
 				([PARI].[ToTime] IS NOT NULL AND PARI.[DeletedByPId] IS NOT NULL)
 			)
+
+			--AND OFCI.[Logon] IN (''kplunkett'')
 		';
 	END
 

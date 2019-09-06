@@ -1,7 +1,6 @@
 ﻿
 
 
-
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	03-Oct-18
@@ -162,6 +161,8 @@ BEGIN
 				AND CSD.[PermDesc] = ''Active''
 				AND CSCT.[PermDesc] = ''Service''
 				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+
+				--AND OFC.[Logon] IN (''kplunkett'')
 		)
 		SELECT DISTINCT
 			CI.[Pin],

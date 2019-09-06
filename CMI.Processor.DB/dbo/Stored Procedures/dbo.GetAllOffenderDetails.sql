@@ -1,6 +1,4 @@
-﻿
-
-/*==========================================================================================
+﻿/*==========================================================================================
 Author:			Rajesh Awate
 Create date:	03-Oct-18
 Description:	To get all offender details from given automon database
@@ -233,6 +231,8 @@ BEGIN
 			AND CSD.[PermDesc] = ''Active''
 			AND CSCT.[PermDesc] = ''Service''
 			AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+
+			--AND OFC.[Logon] IN (''kplunkett'')
 		';
 	END
 
@@ -240,6 +240,8 @@ BEGIN
 	SET @SQLString = REPLACE(@SQLString, '$AutomonDatabaseName', @AutomonDatabaseName);
 
 	SET @ParmDefinition = '@LastExecutionDateTime DATETIME';
+
+--PRINT @SQLString;
 
 	EXECUTE sp_executesql 
 				@SQLString, 

@@ -149,6 +149,8 @@ BEGIN
 				AND CSD.[PermDesc] = ''Active''
 				AND CSCT.[PermDesc] = ''Service''
 				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+
+				--AND OFC.[Logon] IN (''kplunkett'')
 		)
 		SELECT DISTINCT
 			O.[Pin],
@@ -187,6 +189,8 @@ BEGIN
 
 	SET @ParmDefinition = '@LastExecutionDateTime DATETIME';
 
+--PRINT @SQLString;
+	
 	EXECUTE sp_executesql 
 				@SQLString, 
 				@ParmDefinition,  

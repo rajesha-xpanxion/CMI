@@ -10,7 +10,7 @@ EXEC
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5115',
 		@Id = 0,
-		@ViolationDateTime = '09/01/2019 12:00 AM',
+		@ViolationDateTime = '09/01/2019 12:10 AM',
 		@UpdatedBy = 'edcuser@scramtest.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -31,16 +31,18 @@ BEGIN
 		'
 		--declare required variables and assign it with values
 		DECLARE 
-			@EnteredByPId		INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@PersonId			INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[Offender] WHERE [Pin] = @Pin),
-			@PersonAttributeId	INT				= @Id,
-			@PermDesc			VARCHAR(50)		= ''GPSViolation'',
-			@Value				VARCHAR(255)	= CONVERT(VARCHAR(255), @ViolationDateTime, 22);
+			@EnteredByPId						INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
+			@PersonId							INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[Offender] WHERE [Pin] = @Pin),
+			@PersonAttributeId					INT				= @Id,
+			@PermDesc							VARCHAR(50)		= ''GPSViolation'',
+			@Value								VARCHAR(255)	= CONVERT(VARCHAR(255), @ViolationDateTime, 22),
+			@ExistingGPSViolationDateTime		DATETIME		= NULL;
 
-		
+		SELECT
+			@ExistingGPSViolationDateTime = CONVERT(DATETIME, [$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](@PersonId, NULL, ''GPSViolation''));
 
 		--check if valid offender pin is passed
-		IF(@PersonId IS NOT NULL)
+		IF(@PersonId IS NOT NULL AND @ExistingGPSViolationDateTime < @ViolationDateTime)
 		BEGIN
 			--update GPS Violation attribute
 			EXEC 
