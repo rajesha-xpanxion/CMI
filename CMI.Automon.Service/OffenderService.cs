@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.Extensions.Options;
 using CMI.Automon.Interface;
 using CMI.Automon.Model;
+using System.Data;
 
 namespace CMI.Automon.Service
 {
@@ -25,7 +26,7 @@ namespace CMI.Automon.Service
         #endregion
 
         #region Public Methods
-        public IEnumerable<Offender> GetAllOffenderDetails(string CmiDbConnString, DateTime? lastExecutionDateTime)
+        public IEnumerable<Offender> GetAllOffenderDetails(string CmiDbConnString, DateTime? lastExecutionDateTime, DataTable officerLogonsToFilterTbl)
         {
             string timeZone = GetTimeZone();
 
@@ -49,19 +50,26 @@ namespace CMI.Automon.Service
                     using (SqlCommand cmd = new SqlCommand())
                     {
                         cmd.CommandText = StoredProc.GetAllOffenderDetails;
-                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.AutomonDatabaseName,
-                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            SqlDbType = SqlDbType.NVarChar,
                             Value = new SqlConnectionStringBuilder(automonConfig.AutomonDbConnString).InitialCatalog
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.LastExecutionDateTime,
-                            SqlDbType = System.Data.SqlDbType.DateTime,
+                            SqlDbType = SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.OfficerLogonsToFilterTbl,
+                            SqlDbType = SqlDbType.Structured,
+                            Value = officerLogonsToFilterTbl,
+                            Direction = ParameterDirection.Input
                         });
                         cmd.Connection = conn;
 

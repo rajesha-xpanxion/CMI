@@ -41,7 +41,9 @@ namespace CMI.Nexus.Service
                         Buffer.BlockCopy(iv, 0, result, 0, iv.Length);
                         Buffer.BlockCopy(decryptedContent, 0, result, iv.Length, decryptedContent.Length);
 
-                        return Convert.ToBase64String(result);
+                        var str = Convert.ToBase64String(result);
+                        var fullCipher = Convert.FromBase64String(str);
+                        return str;
                     }
                 }
             }
@@ -55,13 +57,14 @@ namespace CMI.Nexus.Service
         /// <returns>Decrypted plain text</returns>
         public static string DecryptString(string cipherText, string keyString)
         {
+            cipherText = cipherText.Replace(" ", "+");
             var fullCipher = Convert.FromBase64String(cipherText);
 
             var iv = new byte[16];
-            var cipher = new byte[16];
+            var cipher = new byte[fullCipher.Length - iv.Length];
 
             Buffer.BlockCopy(fullCipher, 0, iv, 0, iv.Length);
-            Buffer.BlockCopy(fullCipher, iv.Length, cipher, 0, iv.Length);
+            Buffer.BlockCopy(fullCipher, iv.Length, cipher, 0, fullCipher.Length - iv.Length);
             var key = Encoding.UTF8.GetBytes(keyString);
 
             using (var aesAlg = Aes.Create())

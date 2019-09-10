@@ -6,21 +6,35 @@ Create date:	03-Oct-18
 Description:	To get all offender phone details from given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
+DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
+INSERT INTO @OfficerLogonsToFilterTbl
+	([Item])
+VALUES
+	('kplunkett')
 EXEC	
 	[dbo].[GetAllOffenderPhoneDetails]
 		@AutomonDatabaseName = 'CX',
-		@LastExecutionDateTime = NULL
+		@LastExecutionDateTime = NULL,
+		@OfficerLogonsToFilterTbl = @OfficerLogonsToFilterTbl
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
 04-July-18		Rajesh Awate	Created.
+10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderPhoneDetails]
 	@AutomonDatabaseName NVARCHAR(128),
-	@LastExecutionDateTime DATETIME = NULL
+	@LastExecutionDateTime DATETIME = NULL,
+	@OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl] READONLY
 AS
 BEGIN
 	DECLARE @SQLString NVARCHAR(MAX), @ParmDefinition NVARCHAR(1000);
+
+	--check if any ooficer logon filter passed
+	IF(EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl))
+	BEGIN
+		SET @LastExecutionDateTime = NULL;
+	END
 	
 	IF(@LastExecutionDateTime IS NOT NULL)
 	BEGIN
@@ -174,7 +188,12 @@ BEGIN
 				AND CSCT.[PermDesc] = ''Service''
 				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
 
-				--AND OFC.[Logon] IN (''kplunkett'')
+				--apply officer logon filter if any passed
+				AND
+				(
+					NOT EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF) 
+					OR EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF WHERE OLTF.[Item] = OFC.[Logon])
+				)
 		), PhoneNumberTypeLookupData AS
 		(
 			SELECT
@@ -234,12 +253,15 @@ BEGIN
 
 	SET @SQLString = REPLACE(@SQLString, '$AutomonDatabaseName', @AutomonDatabaseName);
 
-	SET @ParmDefinition = '@LastExecutionDateTime DATETIME';
+	SET @ParmDefinition = '
+		@LastExecutionDateTime DATETIME,
+		@OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl] READONLY';
 
 --PRINT @SQLString;
 	
 	EXECUTE sp_executesql 
 				@SQLString, 
 				@ParmDefinition,  
-                @LastExecutionDateTime = @LastExecutionDateTime;
+                @LastExecutionDateTime = @LastExecutionDateTime,
+				@OfficerLogonsToFilterTbl = @OfficerLogonsToFilterTbl;
 END

@@ -41,6 +41,7 @@
     public static class UserDefinedTableType
     {
         public static string OutboundMessageTbl { get { return "OutboundMessageTbl"; } }
+        public static string Varchar50Tbl { get { return "Varchar50Tbl"; } }
     }
 
     public static class TableColumnName
@@ -63,6 +64,7 @@
         public static string IsProcessed { get { return "IsProcessed"; } }
         public static string ReceivedOn { get { return "ReceivedOn"; } }
         public static string AutomonIdentifier { get { return "AutomonIdentifier"; } }
+        public static string Item { get { return "Item"; } }
     }
 
     public static class InboundProcessorStage

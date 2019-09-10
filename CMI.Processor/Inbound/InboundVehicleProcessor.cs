@@ -28,7 +28,7 @@ namespace CMI.Processor
             this.vehicleService = vehicleService;
         }
 
-        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -45,7 +45,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderVehicles = offenderVehicleService.GetAllOffenderVehicles(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
+                allOffenderVehicles = offenderVehicleService.GetAllOffenderVehicles(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
                 foreach (var offenderVehicleDetails in allOffenderVehicles)
                 {

@@ -5,6 +5,9 @@ using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.Linq;
 
 namespace CMI.Processor
@@ -31,7 +34,7 @@ namespace CMI.Processor
             ProcessorConfig = configuration.GetSection(ConfigKeys.ProcessorConfig).Get<ProcessorConfig>();
         }
 
-        public abstract Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime);
+        public abstract Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter);
 
         protected abstract void LoadLookupData();
 
@@ -63,6 +66,27 @@ namespace CMI.Processor
             }
 
             return newId;
+        }
+
+        protected DataTable GetOfficerLogonToFilterDataTable(IEnumerable<string> officerLogonsToFilter)
+        {
+            var dataTable = new DataTable(UserDefinedTableType.Varchar50Tbl)
+            {
+                Locale = CultureInfo.InvariantCulture
+            };
+
+            dataTable.Columns.Add(TableColumnName.Item, typeof(string));
+
+            //check for null & check if any record to process
+            if (officerLogonsToFilter != null && officerLogonsToFilter.Any())
+            {
+                foreach (var officerLogon in officerLogonsToFilter)
+                {
+                    dataTable.Rows.Add(officerLogon);
+                }
+            }
+
+            return dataTable;
         }
     }
 }

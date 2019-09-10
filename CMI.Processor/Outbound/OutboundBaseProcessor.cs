@@ -192,11 +192,11 @@ namespace CMI.Processor
                 {
                     if(details.ResultStatus.Equals(Status.Passed, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        automonTestResult = TestResult.Positive;
+                        automonTestResult = TestResult.Negative;
                     }
                     else if(details.ResultStatus.Equals(Status.Failed, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        automonTestResult = TestResult.Negative;
+                        automonTestResult = TestResult.Positive;
                     }
                     else
                     {

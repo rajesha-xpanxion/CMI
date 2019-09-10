@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.Extensions.Options;
 using CMI.Automon.Interface;
 using CMI.Automon.Model;
+using System.Data;
 
 namespace CMI.Automon.Service
 {
@@ -25,7 +26,7 @@ namespace CMI.Automon.Service
         #endregion
 
         #region Public Methods
-        public IEnumerable<OffenderEmail> GetAllOffenderEmails(string CmiDbConnString, DateTime? lastExecutionDateTime)
+        public IEnumerable<OffenderEmail> GetAllOffenderEmails(string CmiDbConnString, DateTime? lastExecutionDateTime, DataTable officerLogonsToFilterTbl)
         {
             if (automonConfig.IsDevMode)
             {
@@ -60,6 +61,13 @@ namespace CMI.Automon.Service
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.OfficerLogonsToFilterTbl,
+                            SqlDbType = SqlDbType.Structured,
+                            Value = officerLogonsToFilterTbl,
+                            Direction = ParameterDirection.Input
                         });
                         cmd.Connection = conn;
 

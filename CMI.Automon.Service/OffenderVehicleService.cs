@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using System;
+using System.Data;
 
 namespace CMI.Automon.Service
 {
@@ -190,7 +191,7 @@ namespace CMI.Automon.Service
             }
         }
 
-        public IEnumerable<OffenderVehicle> GetAllOffenderVehicles(string CmiDbConnString, DateTime? lastExecutionDateTime)
+        public IEnumerable<OffenderVehicle> GetAllOffenderVehicles(string CmiDbConnString, DateTime? lastExecutionDateTime, DataTable officerLogonsToFilterTbl)
         {
             if (automonConfig.IsDevMode)
             {
@@ -225,6 +226,13 @@ namespace CMI.Automon.Service
                             SqlDbType = System.Data.SqlDbType.DateTime,
                             Value = lastExecutionDateTime.HasValue ? lastExecutionDateTime.Value : (object)DBNull.Value,
                             IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.OfficerLogonsToFilterTbl,
+                            SqlDbType = SqlDbType.Structured,
+                            Value = officerLogonsToFilterTbl,
+                            Direction = ParameterDirection.Input
                         });
                         cmd.Connection = conn;
 

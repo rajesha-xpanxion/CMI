@@ -28,7 +28,7 @@ namespace CMI.Processor
             this.contactService = contactService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
+        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -45,7 +45,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderEmails = offenderEmailService.GetAllOffenderEmails(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
+                allOffenderEmails = offenderEmailService.GetAllOffenderEmails(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
                 foreach (var offenderEmailDetails in allOffenderEmails)
                 {

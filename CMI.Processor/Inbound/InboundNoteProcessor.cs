@@ -28,7 +28,7 @@ namespace CMI.Processor
             this.noteService = noteService;
         }
 
-        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -42,7 +42,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
+                allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
                 foreach (var offenderNoteDetails in allOffenderNoteDetails)
                 {

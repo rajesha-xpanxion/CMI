@@ -29,7 +29,7 @@ namespace CMI.Processor
             this.employmentService = employmentService;
         }
 
-        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -46,7 +46,7 @@ namespace CMI.Processor
 
             try
             {
-                allOffenderEmployments = offenderEmploymentService.GetAllOffenderEmployments(ProcessorConfig.CmiDbConnString, lastExecutionDateTime);
+                allOffenderEmployments = offenderEmploymentService.GetAllOffenderEmployments(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
                 foreach (var offenderEmploymentDetails in allOffenderEmployments)
                 {

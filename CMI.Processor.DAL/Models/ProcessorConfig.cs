@@ -17,6 +17,7 @@ namespace CMI.Processor.DAL
     public class InboundProcessorConfig
     {
         public IEnumerable<string> StagesToProcess { get; set; }
+        public IEnumerable<string> OfficerLogonsToFilter { get; set; }
     }
 
     public class OutboundProcessorConfig
