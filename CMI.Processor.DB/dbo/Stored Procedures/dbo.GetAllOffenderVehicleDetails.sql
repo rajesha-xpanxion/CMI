@@ -9,7 +9,7 @@ DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
 INSERT INTO @OfficerLogonsToFilterTbl
 	([Item])
 VALUES
-	('kplunkett')
+	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt')
 EXEC	
 	[dbo].[GetAllOffenderVehicleDetails]
 		@AutomonDatabaseName = 'CX',

@@ -10,7 +10,7 @@ DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
 INSERT INTO @OfficerLogonsToFilterTbl
 	([Item])
 VALUES
-	('kplunkett')
+	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt')
 EXEC	
 	[dbo].[GetAllOffenderPhoneDetails]
 		@AutomonDatabaseName = 'CX',
@@ -40,47 +40,30 @@ BEGIN
 	BEGIN
 		SET @SQLString = 
 		'
-		;WITH PhoneNumberTypeLookupData AS
-		(
-			SELECT
-				L.[Id],
-				L.[Description]
-			FROM
-				[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
-					ON L.[LookupTypeId] = LT.[Id]
-			WHERE
-				LT.[Description] = ''PhoneNumberTypes''
-		)
 		SELECT DISTINCT
-			O.[Pin],
-
-			PP.[Id],
-			PNTLD.[Description] AS [PhoneNumberType],
-
-			PN.[Phone],
-
-			N.[Value] AS [Comment],
-
-			PP.[IsPrimary],
+			OI.[Pin],
+			PPI.[Id],
+			PPI.[PhoneType] AS [PhoneNumberType],
+			PPI.[Phone],
+			NI.[Value] AS [Comment],
+			CASE
+				WHEN PPI.[IsPrimary] = ''Yes'' THEN 1
+				ELSE 0
+			END AS [IsPrimary],
 			CASE 
-				WHEN PN.[ToTime] IS NULL THEN 1
+				WHEN PPI.[ToTime] IS NULL THEN 1
 				ELSE 0
 			END AS [IsActive]
 		FROM
-			[$AutomonDatabaseName].[dbo].[Person] P JOIN [$AutomonDatabaseName].[dbo].[Offender] O
-				ON P.[Id] = O.[PersonId]
-				JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] PP
-					ON P.[Id] = PP.[PersonId]
-					JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] PN
-						ON PP.[PhoneNumberId] = PN.[Id] 
-
-						JOIN PhoneNumberTypeLookupData PNTLD
-							ON PP.[PhoneTypeLId] = PNTLD.[Id]
-
-							LEFT JOIN [$AutomonDatabaseName].[dbo].[Note] N
-								ON PN.[NoteId] = N.[Id]
+			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[PersonPhoneInfo] PPI
+				ON OI.[PersonId] = PPI.[PersonId]
+				JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] PN
+					ON PPI.[PhoneNumberId] = PN.[Id]
+					LEFT JOIN [$AutomonDatabaseName].[dbo].[NoteInfo] NI
+						ON PN.[NoteId] = NI.[Id]
 		WHERE
-			PN.[FromTime] > @LastExecutionDateTime
+			PPI.[FromTime] > @LastExecutionDateTime
+			OR PN.[FromTime] > @LastExecutionDateTime
 			OR @LastExecutionDateTime IS NULL
 		';
 	END
@@ -98,20 +81,6 @@ BEGIN
 					ON L.[LookupTypeId] = LT.[Id]
 			WHERE
 				LT.[Description] = ''Race''
-		), CaseStatusData AS
-		(
-			SELECT
-				CA.[CaseId],
-				L.[PermDesc],
-				CA.[FromTime],
-				CA.[ToTime]
-			FROM
-				[$AutomonDatabaseName].[dbo].[CaseAttribute] CA JOIN [$AutomonDatabaseName].[dbo].[AttributeDef] AD
-					ON CA.[AttributeId] = AD.[Id]
-					JOIN [$AutomonDatabaseName].[dbo].[Lookup] L
-						ON CA.[Value] = L.[Id]
-			WHERE
-				AD.[PermDesc] = ''Case_CaseStatus''
 		), ClientProfilesData AS
 		(
 			SELECT DISTINCT
@@ -163,9 +132,6 @@ BEGIN
 															ON CC.[CaseTypeId] = CT.[Id]
 															LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseCategory] CSCT
 																ON CT.[CaseCategoryId] = CSCT.[Id]
-
-																LEFT JOIN CaseStatusData CSD
-																	ON CC.[Id] = CSD.[CaseId]
 			WHERE
 				AN.[Firstname] IS NOT NULL
 				AND P.[DOB] IS NOT NULL
@@ -174,19 +140,31 @@ BEGIN
 				AND P.[FromTime] IS NOT NULL AND P.[ToTime] IS NULL
 				AND OFCL.[FromTime] IS NOT NULL AND OFCL.[ToTime] IS NULL AND OFCL.[IsPrimary] = 1
 				AND CC.[FromTime] IS NOT NULL AND CC.[CloseDateTime] IS NULL AND CT.[IsActive] = 1
-				AND CSD.[FromTime] IS NOT NULL AND CSD.[ToTime] IS NULL
 				AND 
 				(
 					AN.[FromTime] > @LastExecutionDateTime 
 					OR OCL.[FromTime] > @LastExecutionDateTime 
 					OR P.[LastModified] > @LastExecutionDateTime 
 					OR OFCL.[FromTime] > @LastExecutionDateTime 
-					OR CSD.[FromTime] > @LastExecutionDateTime
 					OR @LastExecutionDateTime IS NULL
 				)
-				AND CSD.[PermDesc] = ''Active''
+				AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
 				AND CSCT.[PermDesc] = ''Service''
 				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+				AND CL.[Name] NOT LIKE ''%bench warrant%''
+				AND EXISTS
+				(
+					SELECT
+						1
+					FROM 
+						[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI
+							ON OI.[Id] = CI.[OffenderId]
+					WHERE
+						OI.[Id] = O.[Id]
+						AND CI.[Status] = ''Active''
+						AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
+						AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
+				)
 
 				--apply officer logon filter if any passed
 				AND
@@ -194,48 +172,31 @@ BEGIN
 					NOT EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF) 
 					OR EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF WHERE OLTF.[Item] = OFC.[Logon])
 				)
-		), PhoneNumberTypeLookupData AS
-		(
-			SELECT
-				L.[Id],
-				L.[Description]
-			FROM
-				[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT
-					ON L.[LookupTypeId] = LT.[Id]
-			WHERE
-				LT.[Description] = ''PhoneNumberTypes''
 		)
 		SELECT DISTINCT
-			O.[Pin],
-
-			PP.[Id],
-			PNTLD.[Description] AS [PhoneNumberType],
-
-			PN.[Phone],
-
-			N.[Value] AS [Comment],
-
-			PP.[IsPrimary],
+			OI.[Pin],
+			PPI.[Id],
+			PPI.[PhoneType] AS [PhoneNumberType],
+			PPI.[Phone],
+			NI.[Value] AS [Comment],
+			CASE
+				WHEN PPI.[IsPrimary] = ''Yes'' THEN 1
+				ELSE 0
+			END AS [IsPrimary],
 			CASE 
-				WHEN PN.[ToTime] IS NULL THEN 1
+				WHEN PPI.[ToTime] IS NULL THEN 1
 				ELSE 0
 			END AS [IsActive]
 		FROM
-			[$AutomonDatabaseName].[dbo].[Person] P JOIN [$AutomonDatabaseName].[dbo].[Offender] O
-				ON P.[Id] = O.[PersonId]
-				JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] PP
-					ON P.[Id] = PP.[PersonId]
-					JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] PN
-						ON PP.[PhoneNumberId] = PN.[Id] 
-
-						JOIN PhoneNumberTypeLookupData PNTLD
-							ON PP.[PhoneTypeLId] = PNTLD.[Id]
-
-							LEFT JOIN [$AutomonDatabaseName].[dbo].[Note] N
-								ON PN.[NoteId] = N.[Id]
+			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[PersonPhoneInfo] PPI
+				ON OI.[PersonId] = PPI.[PersonId]
+				JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] PN
+					ON PPI.[PhoneNumberId] = PN.[Id]
+					LEFT JOIN [$AutomonDatabaseName].[dbo].[NoteInfo] NI
+						ON PN.[NoteId] = NI.[Id]
 		WHERE
 			(
-				PN.[FromTime] > @LastExecutionDateTime
+				PPI.[FromTime] > @LastExecutionDateTime OR PN.[FromTime] > @LastExecutionDateTime
 				OR @LastExecutionDateTime IS NULL
 			)
 			AND EXISTS
@@ -245,7 +206,7 @@ BEGIN
 				FROM
 					ClientProfilesData CPD
 				WHERE
-					CPD.[Pin] = O.[Pin]
+					CPD.[Pin] = OI.[Pin]
 			)
 		';
 	END

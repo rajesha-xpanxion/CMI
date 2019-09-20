@@ -9,7 +9,7 @@ DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
 INSERT INTO @OfficerLogonsToFilterTbl
 	([Item])
 VALUES
-	('kplunkett')
+	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt')
 EXEC	
 	[dbo].[GetAllOffenderCaseDetails]
 		@AutomonDatabaseName = 'CX',
@@ -22,6 +22,8 @@ Date			Author			Changes
 04-Oct-18		Rajesh Awate	Fix for type casting issue in application
 12-Aug-19		Rajesh Awate	Fix for issue in getting case data
 10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
+19-Sept-19		Rajesh Awate	Changes to map Conviction Date -> Sentencing Date to Offense Date
+19-Sept-19		Rajesh Awate	Changes to map Sentencing Date to Case Date. If found NULL skip whole record.
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderCaseDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -50,8 +52,13 @@ BEGIN
 			SI.[OffenseCode] AS [OffenseStatute],
 			[$AutomonDatabaseName].[dbo].[GetCaseOffenseLevel](CI.[Id]) AS [OffenseCategory],
 			ISNULL(CCI.[MostSeriousCharge], 0) AS [IsPrimary],
-			CCI.[ViolationDate] AS [OffenseDate],
-			CAST(COALESCE(CI.[SupervisionStartDate], CI.[SupervisionEndDate]) AS DATE) AS [CaseDate],
+			CAST(
+				COALESCE(
+					[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''ConvictionDate''),
+					[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')
+				)
+			AS DATE) AS [OffenseDate],
+			CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) AS [CaseDate],
 			CAST(CI.[SupervisionStartDate] AS DATE) AS [SupervisionStartDate],
 			CAST(CI.[SupervisionEndDate] AS DATE) AS [SupervisionEndDate],
 			[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''Case_TerminationType'') AS [ClosureReason]
@@ -67,7 +74,18 @@ BEGIN
 		WHERE
 			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR CCI.[FromTime] >= @LastExecutionDateTime)
 			AND (CI.[PermDesc] = ''Formal'' OR CI.[PermDesc] = ''PRCS'' OR CI.[PermDesc] = ''MCS'' OR CI.[PermDesc] = ''Adult.Interstate'')
-			AND (AD.[PermDesc] = ''Case_SupervisionStart'' OR AD.[PermDesc] = ''Case_SupervisionEnd'' OR AD.[PermDesc] = ''Case_CaseStatus'' OR AD.[PermDesc] = ''Case_TerminationType'')
+			AND 
+			(
+				AD.[PermDesc] = ''Case_SupervisionStart'' 
+				OR AD.[PermDesc] = ''Case_SupervisionEnd'' 
+				OR AD.[PermDesc] = ''Case_CaseStatus'' 
+				OR AD.[PermDesc] = ''Case_TerminationType''
+				OR AD.[PermDesc] = ''ConvictionDate''
+				OR AD.[PermDesc] = ''SentencingDate''
+			)
+			AND [$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'') IS NOT NULL
+			AND CAST(CI.[SupervisionStartDate] AS DATE) <= CAST(CI.[SupervisionEndDate] AS DATE)
+			AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 		';
 	END
 	ELSE
@@ -84,20 +102,6 @@ BEGIN
 					ON L.[LookupTypeId] = LT.[Id]
 			WHERE
 				LT.[Description] = ''Race''
-		), CaseStatusData AS
-		(
-			SELECT
-				CA.[CaseId],
-				L.[PermDesc],
-				CA.[FromTime],
-				CA.[ToTime]
-			FROM
-				[$AutomonDatabaseName].[dbo].[CaseAttribute] CA JOIN [$AutomonDatabaseName].[dbo].[AttributeDef] AD
-					ON CA.[AttributeId] = AD.[Id]
-					JOIN [$AutomonDatabaseName].[dbo].[Lookup] L
-						ON CA.[Value] = L.[Id]
-			WHERE
-				AD.[PermDesc] = ''Case_CaseStatus''
 		), ClientProfilesData AS
 		(
 			SELECT DISTINCT
@@ -149,9 +153,6 @@ BEGIN
 															ON CC.[CaseTypeId] = CT.[Id]
 															LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseCategory] CSCT
 																ON CT.[CaseCategoryId] = CSCT.[Id]
-
-																LEFT JOIN CaseStatusData CSD
-																	ON CC.[Id] = CSD.[CaseId]
 			WHERE
 				AN.[Firstname] IS NOT NULL
 				AND P.[DOB] IS NOT NULL
@@ -160,19 +161,31 @@ BEGIN
 				AND P.[FromTime] IS NOT NULL AND P.[ToTime] IS NULL
 				AND OFCL.[FromTime] IS NOT NULL AND OFCL.[ToTime] IS NULL AND OFCL.[IsPrimary] = 1
 				AND CC.[FromTime] IS NOT NULL AND CC.[CloseDateTime] IS NULL AND CT.[IsActive] = 1
-				AND CSD.[FromTime] IS NOT NULL AND CSD.[ToTime] IS NULL
 				AND 
 				(
 					AN.[FromTime] > @LastExecutionDateTime 
 					OR OCL.[FromTime] > @LastExecutionDateTime 
 					OR P.[LastModified] > @LastExecutionDateTime 
 					OR OFCL.[FromTime] > @LastExecutionDateTime 
-					OR CSD.[FromTime] > @LastExecutionDateTime
 					OR @LastExecutionDateTime IS NULL
 				)
-				AND CSD.[PermDesc] = ''Active''
+				AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
 				AND CSCT.[PermDesc] = ''Service''
 				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+				AND CL.[Name] NOT LIKE ''%bench warrant%''
+				AND EXISTS
+				(
+					SELECT
+						1
+					FROM 
+						[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI
+							ON OI.[Id] = CI.[OffenderId]
+					WHERE
+						OI.[Id] = O.[Id]
+						AND CI.[Status] = ''Active''
+						AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
+						AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
+				)
 
 				--apply officer logon filter if any passed
 				AND
@@ -190,8 +203,13 @@ BEGIN
 			SI.[OffenseCode] AS [OffenseStatute],
 			[$AutomonDatabaseName].[dbo].[GetCaseOffenseLevel](CI.[Id]) AS [OffenseCategory],
 			ISNULL(CCI.[MostSeriousCharge], 0) AS [IsPrimary],
-			CCI.[ViolationDate] AS [OffenseDate],
-			CAST(COALESCE(CI.[SupervisionStartDate], CI.[SupervisionEndDate]) AS DATE) AS [CaseDate],
+			CAST(
+				COALESCE(
+					[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''ConvictionDate''),
+					[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')
+				)
+			AS DATE) AS [OffenseDate],
+			CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) AS [CaseDate],
 			CAST(CI.[SupervisionStartDate] AS DATE) AS [SupervisionStartDate],
 			CAST(CI.[SupervisionEndDate] AS DATE) AS [SupervisionEndDate],
 			[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''Case_TerminationType'') AS [ClosureReason]
@@ -208,7 +226,18 @@ BEGIN
 		WHERE
 			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR CCI.[FromTime] >= @LastExecutionDateTime OR @LastExecutionDateTime IS NULL)
 			AND (CI.[PermDesc] = ''Formal'' OR CI.[PermDesc] = ''PRCS'' OR CI.[PermDesc] = ''MCS'' OR CI.[PermDesc] = ''Adult.Interstate'')
-			AND (AD.[PermDesc] = ''Case_SupervisionStart'' OR AD.[PermDesc] = ''Case_SupervisionEnd'' OR AD.[PermDesc] = ''Case_CaseStatus'' OR AD.[PermDesc] = ''Case_TerminationType'')
+			AND 
+			(
+				AD.[PermDesc] = ''Case_SupervisionStart'' 
+				OR AD.[PermDesc] = ''Case_SupervisionEnd'' 
+				OR AD.[PermDesc] = ''Case_CaseStatus'' 
+				OR AD.[PermDesc] = ''Case_TerminationType''
+				OR AD.[PermDesc] = ''ConvictionDate''
+				OR AD.[PermDesc] = ''SentencingDate''
+			)
+			AND [$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'') IS NOT NULL
+			AND CAST(CI.[SupervisionStartDate] AS DATE) <= CAST(CI.[SupervisionEndDate] AS DATE)
+			AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 			AND EXISTS
 			(
 				SELECT
