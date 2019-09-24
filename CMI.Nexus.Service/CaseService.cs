@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 using CMI.Nexus.Interface;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CMI.Nexus.Service
 {
@@ -67,6 +69,34 @@ namespace CMI.Nexus.Service
                 if (apiResponse.IsSuccessStatusCode)
                 {
                     caseDetails = apiResponse.Content.ReadAsAsync<Case>().Result;
+                }
+                else
+                {
+                    caseDetails = null;
+                }
+            }
+
+            return caseDetails;
+        }
+
+        public Case GetCaseDetailsUsingAllEndPoint(string clientId, string caseNumber)
+        {
+            Case caseDetails = null;
+
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/cases", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    IEnumerable<Case> cases = apiResponse.Content.ReadAsAsync<IEnumerable<Case>>().Result;
+                    caseDetails = cases.Where(c => c.CaseNumber.Equals(caseNumber, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
                 }
                 else
                 {

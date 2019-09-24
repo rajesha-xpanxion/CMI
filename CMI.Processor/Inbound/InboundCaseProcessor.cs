@@ -50,6 +50,15 @@ namespace CMI.Processor
             {
                 allOffenderCaseDetails = offenderCaseService.GetAllOffenderCases(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
+                //log number of records received from Automon
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Offender Case records received from Automon.",
+                    CustomParams = allOffenderCaseDetails.Count().ToString()
+                });
+
                 foreach (var offenderCaseDetails in allOffenderCaseDetails.GroupBy(x => new { x.Pin, x.CaseNumber }).Select(y => y.First()))
                 {
                     taskExecutionStatus.AutomonReceivedRecordCount++;
@@ -80,7 +89,7 @@ namespace CMI.Processor
 
                         if (ClientService.GetClientDetails(@case.ClientId) != null)
                         {
-                            if (caseService.GetCaseDetails(@case.ClientId, @case.CaseNumber) == null)
+                            if (caseService.GetCaseDetailsUsingAllEndPoint(@case.ClientId, @case.CaseNumber) == null)
                             {
                                 if (caseService.AddNewCaseDetails(@case))
                                 {

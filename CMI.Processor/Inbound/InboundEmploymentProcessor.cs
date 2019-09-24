@@ -48,6 +48,15 @@ namespace CMI.Processor
             {
                 allOffenderEmployments = offenderEmploymentService.GetAllOffenderEmployments(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
+                //log number of records received from Automon
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Offender Employment records received from Automon.",
+                    CustomParams = allOffenderEmployments.Count().ToString()
+                });
+
                 foreach (var offenderEmploymentDetails in allOffenderEmployments)
                 {
                     taskExecutionStatus.AutomonReceivedRecordCount++;

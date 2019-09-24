@@ -181,6 +181,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<IOffenderProfilePictureService, OffenderProfilePictureService>();
             serviceCollection.AddSingleton<IOffenderCAMViolationService, OffenderCAMViolationService>();
             serviceCollection.AddSingleton<IOffenderGPSViolationService, OffenderGPSViolationService>();
+            serviceCollection.AddSingleton<IOffenderIncentiveService, OffenderIncentiveService>();
         }
 
         private static void ConfigureNexusServices(IServiceCollection serviceCollection)
@@ -238,6 +239,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<OutboundClientProfileCAMSupervisionProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileGPSAlertProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileGPSSupervisionProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileIncentiveProcessor>();
         }
 
         private static void ConfigureMessageRetrieverService(IServiceCollection serviceCollection, IConfiguration configuration)

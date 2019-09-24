@@ -47,6 +47,15 @@ namespace CMI.Processor
             {
                 allOffenderDetails = offenderService.GetAllOffenderDetails(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
+                //log number of records received from Automon
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Offender records received from Automon.",
+                    CustomParams = allOffenderDetails.Count().ToString()
+                });
+
                 foreach (var offenderDetails in allOffenderDetails)
                 {
                     taskExecutionStatus.AutomonReceivedRecordCount++;
@@ -371,9 +380,20 @@ namespace CMI.Processor
 
         private string MapSupervisingOfficer(string automonFirstName, string automonLastName, string automonEmailAddress)
         {
-            if (LookupService.SupervisingOfficers != null && LookupService.SupervisingOfficers.Any(s => s.FirstName.Equals(automonFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(automonLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(automonEmailAddress, StringComparison.InvariantCultureIgnoreCase)))
+            if (
+                LookupService.SupervisingOfficers != null 
+                && LookupService.SupervisingOfficers.Any(s => 
+                    s.FirstName.Equals(automonFirstName, StringComparison.InvariantCultureIgnoreCase) 
+                    && s.LastName.Equals(automonLastName, StringComparison.InvariantCultureIgnoreCase) 
+                    && s.Email.Equals(automonEmailAddress, StringComparison.InvariantCultureIgnoreCase)
+                )
+            )
             {
-                return LookupService.SupervisingOfficers.FirstOrDefault(s => s.FirstName.Equals(automonFirstName, StringComparison.InvariantCultureIgnoreCase) && s.LastName.Equals(automonLastName, StringComparison.InvariantCultureIgnoreCase) && s.Email.Equals(automonEmailAddress, StringComparison.InvariantCultureIgnoreCase)).Email;
+                return LookupService.SupervisingOfficers.FirstOrDefault(s => 
+                    s.FirstName.Equals(automonFirstName, StringComparison.InvariantCultureIgnoreCase) 
+                    && s.LastName.Equals(automonLastName, StringComparison.InvariantCultureIgnoreCase) 
+                    && s.Email.Equals(automonEmailAddress, StringComparison.InvariantCultureIgnoreCase)
+                ).Email;
             }
 
             return null;

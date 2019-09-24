@@ -435,6 +435,22 @@ namespace CMI.Processor
                 UpdateIdentifiers(toBeProcessedOutboundMessages);
             }
 
+            //Incentive
+            if (
+                ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess != null
+                && ProcessorConfig.OutboundProcessorConfig.ActivityTypesToProcess.Any(a => a.Equals(OutboundProcessorActivityType.Incentive, StringComparison.InvariantCultureIgnoreCase))
+            )
+            {
+                UpdateExecutionStatus(((OutboundClientProfileIncentiveProcessor)serviceProvider.GetService(typeof(OutboundClientProfileIncentiveProcessor))).Execute(
+                    toBeProcessedOutboundMessages.Where(a => a.ActivityTypeName.Equals(OutboundProcessorActivityType.Incentive, StringComparison.InvariantCultureIgnoreCase)),
+                    messagesReceivedOn
+                    )
+                );
+
+                //update required identifiers in all outbound message details
+                UpdateIdentifiers(toBeProcessedOutboundMessages);
+            }
+
             //update message wise processing status
             if (toBeProcessedOutboundMessages != null && toBeProcessedOutboundMessages.Any())
             {

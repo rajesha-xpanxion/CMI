@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace CMI.Processor
@@ -47,6 +48,15 @@ namespace CMI.Processor
             try
             {
                 allOffenderPhones = offenderPhoneService.GetAllOffenderPhones(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
+
+                //log number of records received from Automon
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Offender Phone records received from Automon.",
+                    CustomParams = allOffenderPhones.Count().ToString()
+                });
 
                 foreach (var offenderPhoneDetails in allOffenderPhones)
                 {

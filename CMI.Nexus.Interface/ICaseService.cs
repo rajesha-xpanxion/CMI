@@ -9,6 +9,8 @@ namespace CMI.Nexus.Interface
 
         Case GetCaseDetails(string clientId, string caseNumber);
 
+        Case GetCaseDetailsUsingAllEndPoint(string clientId, string caseNumber);
+
         bool UpdateCaseDetails(Case @case);
     }
 }

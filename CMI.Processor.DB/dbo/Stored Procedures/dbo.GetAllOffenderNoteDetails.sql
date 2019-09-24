@@ -229,6 +229,7 @@ BEGIN
 						AND CI.[Status] = ''Active''
 						AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 						AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
+						AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
 				)
 
 				--apply officer logon filter if any passed

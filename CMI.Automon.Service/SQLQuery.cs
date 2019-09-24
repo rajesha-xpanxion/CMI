@@ -36,5 +36,6 @@ namespace CMI.Automon.Service
         public static string DeleteOffenderMushotPhoto { get { return "[dbo].[DeleteOffenderMushotPhoto]"; } }
         public static string SaveOffenderCAMViolationDetails { get { return "[dbo].[SaveOffenderCAMViolationDetails]"; } }
         public static string SaveOffenderGPSViolationDetails { get { return "[dbo].[SaveOffenderGPSViolationDetails]"; } }
+        public static string SaveOffenderIncentiveDetails { get { return "[dbo].[SaveOffenderIncentiveDetails]"; } }
     }
 }

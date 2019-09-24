@@ -34,7 +34,7 @@ namespace CMI.Automon.Service
             }
             else
             {
-                using (SqlConnection conn = new SqlConnection(automonConfig.AutomonDbConnString))
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
                 {
                     conn.Open();
 
@@ -42,6 +42,12 @@ namespace CMI.Automon.Service
                     {
                         cmd.CommandText = StoredProc.GetOffenderMugshotPhoto;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.AutomonDatabaseName,
+                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            Value = new SqlConnectionStringBuilder(automonConfig.AutomonDbConnString).InitialCatalog
+                        });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.Pin,

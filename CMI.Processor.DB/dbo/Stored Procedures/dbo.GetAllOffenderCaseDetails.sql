@@ -86,6 +86,7 @@ BEGIN
 			AND [$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'') IS NOT NULL
 			AND CAST(CI.[SupervisionStartDate] AS DATE) <= CAST(CI.[SupervisionEndDate] AS DATE)
 			AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
+			AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
 		';
 	END
 	ELSE
@@ -185,6 +186,7 @@ BEGIN
 						AND CI.[Status] = ''Active''
 						AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 						AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
+						AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
 				)
 
 				--apply officer logon filter if any passed
@@ -238,6 +240,7 @@ BEGIN
 			AND [$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'') IS NOT NULL
 			AND CAST(CI.[SupervisionStartDate] AS DATE) <= CAST(CI.[SupervisionEndDate] AS DATE)
 			AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
+			AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
 			AND EXISTS
 			(
 				SELECT

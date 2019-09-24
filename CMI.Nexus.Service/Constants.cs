@@ -41,6 +41,7 @@ namespace CMI.Nexus.Service
         public static string Failed { get { return "Failed"; } }
 
         public static string Attempted { get { return "Attempted"; } }
+        public static string Skipped { get { return "Skipped"; } }
     }
 
     public static class DataElementType

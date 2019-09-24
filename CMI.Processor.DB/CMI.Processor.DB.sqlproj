@@ -110,6 +110,8 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderGPSViolationDetails.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderCAMViolationDetails.sql" />
     <Build Include="dbo\User Defined Types\dbo.Varchar50Tbl.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.SaveOffenderIncentiveDetails.sql" />
+    <Build Include="dbo\User Defined Types\dbo.IncentedActivityDetailsTbl.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">

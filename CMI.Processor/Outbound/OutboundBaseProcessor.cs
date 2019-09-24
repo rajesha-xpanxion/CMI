@@ -665,6 +665,46 @@ namespace CMI.Processor
                     ViolationDateTime = convertedDateTime
                 };
             }
+            //Incentive
+            else if (typeof(T) == typeof(ClientProfileIncentiveDetailsActivityResponse))
+            {
+                ClientProfileIncentiveDetailsActivityResponse details = (ClientProfileIncentiveDetailsActivityResponse)(object)activityDetails;
+
+                DateTime convertedDateTime = DateTime.Now;
+
+                DateTime dateAssigned = DateTime.UtcNow;
+                if (details.AssignedIncentive != null && DateTime.TryParse(details.AssignedIncentive.DateAssigned, out dateAssigned))
+                {
+                    //check if timezone information provided in given datetime, NO = specify it
+                    if (dateAssigned.Kind != DateTimeKind.Utc)
+                    {
+                        dateAssigned = DateTime.SpecifyKind(dateAssigned, DateTimeKind.Utc);
+                    }
+
+                    //convert in required timezone
+                    convertedDateTime =
+                        !string.IsNullOrEmpty(AutomonTimeZone)
+                                ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(dateAssigned, AutomonTimeZone)
+                                : dateAssigned.ToLocalTime();
+                }
+
+                return new OffenderIncentive()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    EventDateTime = convertedDateTime,
+                    Magnitude = details.AssignedIncentive != null ? details.AssignedIncentive.Magnitude : null,
+                    Response = details.AssignedIncentive != null ? details.AssignedIncentive.Description : null,
+                    DateIssued = details.AssignedIncentive != null ? details.AssignedIncentive.DateAssigned : null,
+                    IsBundled = details.IncentedActivities != null && details.IncentedActivities.Any(),
+                    IsSkipped = details.Status.Equals(Status.Skipped, StringComparison.InvariantCultureIgnoreCase),
+                    IncentedActivities =
+                        details.IncentedActivities != null && details.IncentedActivities.Any()
+                        ? details.IncentedActivities.Select(x => new Automon.Model.IncentedActivityDetails { ActivityTypeName = x.Activity, ActivityIdentifier = x.ActivityIdentifier })
+                        : null
+                };
+            }
 
 
             return null;
