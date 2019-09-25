@@ -88,7 +88,7 @@ BEGIN
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],
-			0 AS [IsActive]
+			1 AS [IsActive]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
@@ -120,7 +120,7 @@ BEGIN
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],
-			1 AS [IsActive]
+			0 AS [IsActive]
 		FROM
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[VehicleInfo] VI
 				ON OI.[PersonId] = VI.[PersonId]
