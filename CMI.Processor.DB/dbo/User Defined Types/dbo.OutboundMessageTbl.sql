@@ -6,7 +6,7 @@
     [ClientIntegrationId] NVARCHAR (200) NOT NULL,
     [ActivityIdentifier]  NVARCHAR (200) NOT NULL,
     [ActionOccurredOn]    DATETIME       NOT NULL,
-    [ActionUpdatedBy]     NVARCHAR (200) NOT NULL,
+    [ActionUpdatedBy]     NVARCHAR (200) NULL,
     [Details]             NVARCHAR (MAX) NULL,
     [IsSuccessful]        BIT            NULL,
     [ErrorDetails]        NVARCHAR (MAX) NULL,

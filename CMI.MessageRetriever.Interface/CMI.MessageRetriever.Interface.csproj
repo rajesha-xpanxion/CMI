@@ -8,8 +8,4 @@
     <ProjectReference Include="..\CMI.MessageRetriever.Model\CMI.MessageRetriever.Model.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="MessageRepository\" />
-  </ItemGroup>
-
 </Project>

@@ -6,7 +6,7 @@
     [ClientIntegrationId] NVARCHAR (200) NOT NULL,
     [ActivityIdentifier]  NVARCHAR (200) NOT NULL,
     [ActionOccurredOn]    DATETIME       NOT NULL,
-    [ActionUpdatedBy]     NVARCHAR (200) NOT NULL,
+    [ActionUpdatedBy]     NVARCHAR (200) NULL,
     [Details]             NVARCHAR (MAX) NULL,
     [ReceivedOn]          DATETIME       CONSTRAINT [DF_OutboundMessage_ReceivedOn] DEFAULT (getdate()) NOT NULL,
     [IsSuccessful]        BIT            CONSTRAINT [DF_OutboundMessage_IsSuccessful] DEFAULT ((0)) NOT NULL,

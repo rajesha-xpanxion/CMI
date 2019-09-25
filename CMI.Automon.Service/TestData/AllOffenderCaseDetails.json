@@ -1,16 +1,1 @@
-﻿[
-  {
-    "CaseNumber": "FOR-ISC-NV-1",
-    "CaseStatus": "Closed",
-    "CaseDate": "2009-03-05T00:00:00",
-    "SupervisionStartDate": "2009-03-05T00:00:00",
-    "SupervisionEndDate": "2012-03-04T00:00:00",
-    "ClosureReason": "",
-    "OffenseLabel": "Out Of State PC  F ",
-    "OffenseStatute": "Out Of State",
-    "OffenseCategory": "F",
-    "IsPrimary": false,
-    "OffenseDate": null,
-    "Pin": "5115"
-  }
-]
+﻿[]
