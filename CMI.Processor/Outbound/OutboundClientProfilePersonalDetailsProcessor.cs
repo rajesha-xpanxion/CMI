@@ -73,6 +73,15 @@ namespace CMI.Processor
                         //save new identifier in message details
                         message.AutomonIdentifier = offenderPersonalDetails.Pin;
 
+                        //update automon identifier for rest of messages having same activity identifier
+                        messages.Where(
+                            x =>
+                                string.IsNullOrEmpty(x.AutomonIdentifier)
+                                && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                        ).
+                        ToList().
+                        ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
+
                         //update counter
                         taskExecutionStatus.AutomonUpdateMessageCount++;
 

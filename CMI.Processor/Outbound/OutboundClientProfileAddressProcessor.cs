@@ -73,11 +73,10 @@ namespace CMI.Processor
                             throw new CmiException("Offender - Address details could not be saved in Automon.");
                         }
 
-                        //save new identifier in message details
-                        message.AutomonIdentifier = offenderAddressDetails.Id.ToString();
-
                         //derive current integration id & new integration id & flag whether integration id has been changed or not
-                        string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderAddressDetails.Pin, offenderAddressDetails.Id.ToString());
+                        string 
+                            currentIntegrationId = string.IsNullOrEmpty(message.AutomonIdentifier) ? message.ActivityIdentifier : string.Format("{0}-{1}", offenderAddressDetails.Pin, message.AutomonIdentifier),
+                            newIntegrationId = string.Format("{0}-{1}", offenderAddressDetails.Pin, offenderAddressDetails.Id.ToString());
                         bool isIntegrationIdUpdated = !currentIntegrationId.Equals(newIntegrationId, StringComparison.InvariantCultureIgnoreCase);
 
                         //update integration identifier in Nexus if it is updated
@@ -101,6 +100,18 @@ namespace CMI.Processor
                                 });
                             }
                         }
+
+                        //save new identifier in message details
+                        message.AutomonIdentifier = offenderAddressDetails.Id.ToString();
+
+                        //update automon identifier for rest of messages having same activity identifier
+                        messages.Where(
+                            x =>
+                                string.IsNullOrEmpty(x.AutomonIdentifier)
+                                && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                        ).
+                        ToList().
+                        ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
 
                         //mark this message as successful
                         message.IsSuccessful = true;

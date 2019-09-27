@@ -78,8 +78,7 @@ namespace CMI.Processor
                                 throw new CmiException("Offender - Vehicle details could not be saved in Automon.");
                             }
 
-                            //save new identifier in message details
-                            message.AutomonIdentifier = offenderVehicleDetails.Id.ToString();
+                            
 
                             //derive current integration id & new integration id & flag whether integration id has been changed or not
                             string currentIntegrationId = message.ActivityIdentifier, newIntegrationId = string.Format("{0}-{1}", offenderVehicleDetails.Pin, offenderVehicleDetails.Id.ToString());
@@ -106,6 +105,18 @@ namespace CMI.Processor
                                     });
                                 }
                             }
+
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderVehicleDetails.Id.ToString();
+
+                            //update automon identifier for rest of messages having same activity identifier
+                            messages.Where(
+                                x =>
+                                    string.IsNullOrEmpty(x.AutomonIdentifier)
+                                    && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                            ).
+                            ToList().
+                            ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
 
                             //check if it was add or update operation and update Automon message counter accordingly
                             if (isIntegrationIdUpdated)

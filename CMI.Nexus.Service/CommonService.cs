@@ -28,25 +28,32 @@ namespace CMI.Nexus.Service
         #region Public Methods
         public bool UpdateId(string clientId, ReplaceIntegrationIdDetails replaceIntegrationIdDetails)
         {
-            using (HttpClient apiHost = new HttpClient())
+            if (nexusConfig.IsDevMode)
             {
-                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
-
-                apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
-
-                var apiResponse = apiHost.PutAsJsonAsync<ReplaceIntegrationIdDetails>(string.Format("api/{0}/clients/{1}/replaceIntegrationId", nexusConfig.CaseIntegrationApiVersion, clientId), replaceIntegrationIdDetails).Result;
-
-                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
-
-                if (apiResponse.IsSuccessStatusCode)
+                return !replaceIntegrationIdDetails.CurrentIntegrationId.Equals(replaceIntegrationIdDetails.NewIntegrationId, StringComparison.InvariantCultureIgnoreCase);
+            }
+            else
+            {
+                using (HttpClient apiHost = new HttpClient())
                 {
-                    return true;
-                }
-                else
-                {
-                    throw new CmiException(string.Format("Error occurred while updating existing integration Id for element type: {0}. API Response: {1}", replaceIntegrationIdDetails.ElementType, responseString));
+                    apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                    apiHost.DefaultRequestHeaders.Accept.Clear();
+                    apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                    apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                    var apiResponse = apiHost.PutAsJsonAsync<ReplaceIntegrationIdDetails>(string.Format("api/{0}/clients/{1}/replaceIntegrationId", nexusConfig.CaseIntegrationApiVersion, clientId), replaceIntegrationIdDetails).Result;
+
+                    var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+
+                    if (apiResponse.IsSuccessStatusCode)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        throw new CmiException(string.Format("Error occurred while updating existing integration Id for element type: {0}. API Response: {1}", replaceIntegrationIdDetails.ElementType, responseString));
+                    }
                 }
             }
         }

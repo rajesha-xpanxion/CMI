@@ -83,6 +83,15 @@ namespace CMI.Processor
                             //save new identifier in message details
                             message.AutomonIdentifier = offenderMugshotDetails.Id.ToString();
 
+                            //update automon identifier for rest of messages having same activity identifier
+                            messages.Where(
+                                x =>
+                                    string.IsNullOrEmpty(x.AutomonIdentifier)
+                                    && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                            ).
+                            ToList().
+                            ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
+
                             //check if it was add or update operation and update Automon message counter accordingly
                             if (isDetailsAddedInAutomon)
                             {
