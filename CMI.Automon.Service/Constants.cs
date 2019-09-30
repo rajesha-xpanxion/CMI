@@ -22,6 +22,7 @@ namespace CMI.Automon.Service
         public static string TestDataJsonFileNameAllOffenderCAMViolationDetails { get { return "AllOffenderCAMViolationDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderGPSViolationDetails { get { return "AllOffenderGPSViolationDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderIncentiveDetails { get { return "AllOffenderIncentiveDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderSanctionDetails { get { return "AllOffenderSanctionDetails.json"; } }
     }
 
     public static class SqlParamName
@@ -85,6 +86,7 @@ namespace CMI.Automon.Service
         public static string DateIssued { get { return "@DateIssued"; } }
         public static string IsBundled { get { return "@IsBundled"; } }
         public static string IncentedActivityDetailsTbl { get { return "@IncentedActivityDetailsTbl"; } }
+        public static string SanctionedActivityDetailsTbl { get { return "@SanctionedActivityDetailsTbl"; } }
         public static string IsSkipped { get { return "@IsSkipped"; } }
         public static string EventDateTime { get { return "@EventDateTime"; } }
     }
@@ -158,6 +160,7 @@ namespace CMI.Automon.Service
     public static class UserDefinedTableType
     {
         public static string IncentedActivityDetailsTbl { get { return "IncentedActivityDetailsTbl"; } }
+        public static string SanctionedActivityDetailsTbl { get { return "SanctionedActivityDetailsTbl"; } }
     }
 
     public static class TableColumnName

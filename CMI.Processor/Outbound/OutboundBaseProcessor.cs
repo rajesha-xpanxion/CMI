@@ -697,7 +697,7 @@ namespace CMI.Processor
                     Magnitude = details.AssignedIncentive != null ? details.AssignedIncentive.Magnitude : null,
                     Response = details.AssignedIncentive != null ? details.AssignedIncentive.Description : null,
                     DateIssued = details.AssignedIncentive != null ? details.AssignedIncentive.DateAssigned : null,
-                    IsBundled = details.IncentedActivities != null && details.IncentedActivities.Any(),
+                    IsBundled = details.IncentedActivities != null && details.IncentedActivities.Count() > 1,
                     IsSkipped = details.Status.Equals(Status.Skipped, StringComparison.InvariantCultureIgnoreCase),
                     IncentedActivities =
                         details.IncentedActivities != null && details.IncentedActivities.Any()
@@ -705,7 +705,46 @@ namespace CMI.Processor
                         : null
                 };
             }
+            //Sanction
+            else if (typeof(T) == typeof(ClientProfileSanctionDetailsActivityResponse))
+            {
+                ClientProfileSanctionDetailsActivityResponse details = (ClientProfileSanctionDetailsActivityResponse)(object)activityDetails;
 
+                DateTime convertedDateTime = DateTime.Now;
+
+                DateTime dateAssigned = DateTime.UtcNow;
+                if (details.AssignedSanction != null && DateTime.TryParse(details.AssignedSanction.DateAssigned, out dateAssigned))
+                {
+                    //check if timezone information provided in given datetime, NO = specify it
+                    if (dateAssigned.Kind != DateTimeKind.Utc)
+                    {
+                        dateAssigned = DateTime.SpecifyKind(dateAssigned, DateTimeKind.Utc);
+                    }
+
+                    //convert in required timezone
+                    convertedDateTime =
+                        !string.IsNullOrEmpty(AutomonTimeZone)
+                                ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(dateAssigned, AutomonTimeZone)
+                                : dateAssigned.ToLocalTime();
+                }
+
+                return new OffenderSanction()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    EventDateTime = convertedDateTime,
+                    Magnitude = details.AssignedSanction != null ? details.AssignedSanction.Magnitude : null,
+                    Response = details.AssignedSanction != null ? details.AssignedSanction.Description : null,
+                    DateIssued = details.AssignedSanction != null ? details.AssignedSanction.DateAssigned : null,
+                    IsBundled = details.SanctionedActivities != null && details.SanctionedActivities.Count() > 1,
+                    IsSkipped = details.Status.Equals(Status.Skipped, StringComparison.InvariantCultureIgnoreCase),
+                    SanctionedActivities =
+                        details.SanctionedActivities != null && details.SanctionedActivities.Any()
+                        ? details.SanctionedActivities.Select(x => new Automon.Model.SanctionedActivityDetails { ActivityTypeName = x.Activity, ActivityIdentifier = x.ActivityIdentifier })
+                        : null
+                };
+            }
 
             return null;
         }

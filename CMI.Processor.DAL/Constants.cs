@@ -94,6 +94,7 @@
         public static string GPSAlert { get { return "GPS Alert"; } }
         public static string GPSSupervision { get { return "GPS Supervision"; } }
         public static string Incentive { get { return "Incentive"; } }
+        public static string Sanction { get { return "Sanction"; } }
     }
 
     public static class OutboundProcessorClientProfileActivitySubType
