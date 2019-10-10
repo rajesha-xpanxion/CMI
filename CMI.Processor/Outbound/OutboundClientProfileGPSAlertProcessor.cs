@@ -65,59 +65,76 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
-                        //save details to Automon and get Id
-                        int automonId = offenderGPSViolationService.SaveOffenderGPSViolationDetails(ProcessorConfig.CmiDbConnString, offenderGPSViolationDetails);
-
-                        //check if saving details to Automon was successsful
-                        if (automonId == 0)
+                        //check if compliant message is received. Yes = ignore message, No = process message
+                        if (!offenderGPSViolationDetails.ViolationStatus.Equals(Nexus.Service.Status.Compliant, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            throw new CmiException("Offender - GPS Violation details could not be saved in Automon.");
-                        }
 
-                        //check if details got newly added in Automon
-                        bool isDetailsAddedInAutomon = offenderGPSViolationDetails.Id == 0 && automonId > 0 && offenderGPSViolationDetails.Id != automonId;
+                            //save details to Automon and get Id
+                            int automonId = offenderGPSViolationService.SaveOffenderGPSViolationDetails(ProcessorConfig.CmiDbConnString, offenderGPSViolationDetails);
 
-                        offenderGPSViolationDetails.Id = automonId;
-
-                        //mark this message as successful
-                        message.IsSuccessful = true;
-
-                        //save new identifier in message details
-                        message.AutomonIdentifier = offenderGPSViolationDetails.Id.ToString();
-
-                        //update automon identifier for rest of messages having same activity identifier
-                        messages.Where(
-                            x =>
-                                string.IsNullOrEmpty(x.AutomonIdentifier)
-                                && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
-                        ).
-                        ToList().
-                        ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
-
-                        //check if it was add or update operation and update Automon message counter accordingly
-                        if (isDetailsAddedInAutomon)
-                        {
-                            taskExecutionStatus.AutomonAddMessageCount++;
-                            Logger.LogDebug(new LogRequest
+                            //check if saving details to Automon was successsful
+                            if (automonId == 0)
                             {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "New Offender - GPS Violation details added successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderGPSViolationDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
+                                throw new CmiException("Offender - GPS Violation details could not be saved in Automon.");
+                            }
+
+                            //check if details got newly added in Automon
+                            bool isDetailsAddedInAutomon = offenderGPSViolationDetails.Id == 0 && automonId > 0 && offenderGPSViolationDetails.Id != automonId;
+
+                            offenderGPSViolationDetails.Id = automonId;
+
+                            //mark this message as successful
+                            message.IsSuccessful = true;
+
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderGPSViolationDetails.Id.ToString();
+
+                            //update automon identifier for rest of messages having same activity identifier
+                            messages.Where(
+                                x =>
+                                    string.IsNullOrEmpty(x.AutomonIdentifier)
+                                    && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                            ).
+                            ToList().
+                            ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
+
+                            //check if it was add or update operation and update Automon message counter accordingly
+                            if (isDetailsAddedInAutomon)
+                            {
+                                taskExecutionStatus.AutomonAddMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "New Offender - GPS Violation details added successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderGPSViolationDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
+                            else
+                            {
+                                taskExecutionStatus.AutomonUpdateMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Existing Offender - GPS Violation details updated successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderGPSViolationDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
                         }
                         else
                         {
-                            taskExecutionStatus.AutomonUpdateMessageCount++;
                             Logger.LogDebug(new LogRequest
                             {
                                 OperationName = this.GetType().Name,
                                 MethodName = "Execute",
-                                Message = "Existing Offender - GPS Violation details updated successfully.",
+                                Message = "Compliant GPS Alert message received.",
                                 AutomonData = JsonConvert.SerializeObject(offenderGPSViolationDetails),
                                 NexusData = JsonConvert.SerializeObject(message)
                             });
+                            message.IsSuccessful = true;
                         }
                     }
                     catch (CmiException ce)

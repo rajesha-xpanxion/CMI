@@ -42,7 +42,7 @@ BEGIN
 			@ExistingGPSViolationDateTime = CONVERT(DATETIME, [$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](@PersonId, NULL, ''GPSViolation''));
 
 		--check if valid offender pin is passed
-		IF(@PersonId IS NOT NULL AND @ExistingGPSViolationDateTime < @ViolationDateTime)
+		IF(@PersonId IS NOT NULL AND (@ExistingGPSViolationDateTime IS NULL OR @ExistingGPSViolationDateTime < @ViolationDateTime))
 		BEGIN
 			--update GPS Violation attribute
 			EXEC 

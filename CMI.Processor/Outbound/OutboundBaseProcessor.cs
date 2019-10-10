@@ -555,18 +555,17 @@ namespace CMI.Processor
                     Comment = details.Notes
                 };
             }
-            //Client Profile - Picture Details
+            //Client Profile - Profile Picture
             else if (typeof(T) == typeof(ClientProfilePictureDetailsActivityResponse))
             {
                 ClientProfilePictureDetailsActivityResponse details = (ClientProfilePictureDetailsActivityResponse)(object)activityDetails;
-
 
                 return new OffenderMugshot
                 {
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    DocumentData = Convert.FromBase64String(details.ImageBase64String)
+                    DocumentData = Convert.FromBase64String(details.Image)
                 };
             }
             //CAM Alert
@@ -590,7 +589,8 @@ namespace CMI.Processor
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    ViolationDateTime = convertedDateTime
+                    ViolationDateTime = convertedDateTime,
+                    ViolationStatus = details.Status
                 };
             }
             //CAM Supervision
@@ -614,7 +614,8 @@ namespace CMI.Processor
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    ViolationDateTime = convertedDateTime
+                    ViolationDateTime = convertedDateTime,
+                    ViolationStatus = details.Status
                 };
             }
             //GPS Alert
@@ -638,7 +639,8 @@ namespace CMI.Processor
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    ViolationDateTime = convertedDateTime
+                    ViolationDateTime = convertedDateTime,
+                    ViolationStatus = details.Status
                 };
             }
             //GPS Supervision
@@ -662,7 +664,8 @@ namespace CMI.Processor
                     Pin = clientIntegrationId,
                     Id = id,
                     UpdatedBy = updatedBy,
-                    ViolationDateTime = convertedDateTime
+                    ViolationDateTime = convertedDateTime,
+                    ViolationStatus = details.Status
                 };
             }
             //Incentive

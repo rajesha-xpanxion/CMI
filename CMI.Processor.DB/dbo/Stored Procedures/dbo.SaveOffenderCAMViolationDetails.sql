@@ -42,7 +42,7 @@ BEGIN
 			@ExistingCAMViolationDateTime = CONVERT(DATETIME, [$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](@PersonId, NULL, ''CAMViolation''));
 
 		--check if valid offender pin is passed
-		IF(@PersonId IS NOT NULL AND @ExistingCAMViolationDateTime < @ViolationDateTime)
+		IF(@PersonId IS NOT NULL AND (@ExistingCAMViolationDateTime IS NULL OR @ExistingCAMViolationDateTime < @ViolationDateTime))
 		BEGIN
 			--update CAM violation attribute
 			EXEC 
