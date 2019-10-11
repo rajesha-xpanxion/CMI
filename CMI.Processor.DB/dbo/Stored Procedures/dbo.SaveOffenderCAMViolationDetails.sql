@@ -10,8 +10,8 @@ EXEC
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5115',
 		@Id = 0,
-		@ViolationDateTime = '09/03/2019 12:10 AM',
-		@UpdatedBy = 'edcuser@scramtest.com';
+		@ViolationDateTime = '2019-10-04',
+		@UpdatedBy = '';
 ---------------------------------------------------------------------------------
 History:-
 Date			Author			Changes
@@ -29,6 +29,11 @@ BEGIN
 	
 		SET @SQLString = 
 		'
+		IF(@UpdatedBy = '''')
+		BEGIN
+			SET @UpdatedBy = NULL;
+		END
+
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId					INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
@@ -38,8 +43,27 @@ BEGIN
 			@Value							VARCHAR(255)	= CONVERT(VARCHAR(255), @ViolationDateTime, 22),
 			@ExistingCAMViolationDateTime	DATETIME		= NULL;
 
-		SELECT
-			@ExistingCAMViolationDateTime = CONVERT(DATETIME, [$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](@PersonId, NULL, ''CAMViolation''));
+		--check if any record exists for given person attribute id, YES = retrieve details, NO = try to get details by person id
+		IF(EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc) WHERE [Id] = @PersonAttributeId))
+		BEGIN
+			SELECT
+				@PersonAttributeId = [Id],
+				@ExistingCAMViolationDateTime = CONVERT(DATETIME, [Value])
+			FROM
+				[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
+			WHERE
+				[Id] = @PersonAttributeId;
+		END
+		ELSE
+		BEGIN
+			SELECT
+				@PersonAttributeId = [Id],
+				@ExistingCAMViolationDateTime = CONVERT(DATETIME, [Value])
+			FROM
+				[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
+			WHERE
+				[PersonId] = @PersonId;
+		END
 
 		--check if valid offender pin is passed
 		IF(@PersonId IS NOT NULL AND (@ExistingCAMViolationDateTime IS NULL OR @ExistingCAMViolationDateTime < @ViolationDateTime))
