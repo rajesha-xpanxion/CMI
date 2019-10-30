@@ -117,23 +117,15 @@ namespace CMI.Processor
                                     NexusData = JsonConvert.SerializeObject(message)
                                 });
                             }
+
+                            //mark this message as successful
+                            message.IsSuccessful = true;
                         }
                         else if (message.ActionReasonName.Equals(OutboundProcessorActionReason.Removed, StringComparison.InvariantCultureIgnoreCase))
                         {
-                            offenderProfilePictureService.DeleteOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderMugshotDetails);
-                            taskExecutionStatus.AutomonDeleteMessageCount++;
-                            Logger.LogDebug(new LogRequest
-                            {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "Offender - Mugshot Photo removed successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderMugshotDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
+                            //do nothing
+                            message.IsProcessed = false;
                         }
-
-                        //mark this message as successful
-                        message.IsSuccessful = true;
                     }
                     catch (CmiException ce)
                     {

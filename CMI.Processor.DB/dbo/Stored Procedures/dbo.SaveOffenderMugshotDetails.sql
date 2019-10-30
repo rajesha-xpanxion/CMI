@@ -1,13 +1,14 @@
 ﻿
 
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	30-Aug-19
-Description:	To save given offender mugshot photo to given automon database
+Description:	To save given offender mugshot details to given automon database
 ---------------------------------------------------------------------------------
 Test execution:-
 EXEC	
-	[dbo].[SaveOffenderMugshotPhoto]
+	[dbo].[SaveOffenderMugshotDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5115',
 		@DocumentData = NULL,
@@ -19,7 +20,7 @@ History:-
 Date			Author			Changes
 30-Aug-19		Rajesh Awate	Created.
 ==========================================================================================*/
-CREATE PROCEDURE [dbo].[SaveOffenderMugshotPhoto]
+CREATE PROCEDURE [dbo].[SaveOffenderMugshotDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
 	@DocumentData IMAGE = NULL,
@@ -43,13 +44,13 @@ BEGIN
 		SELECT
 			@DocumentTypeId = [Id]
 		FROM
-			[dbo].[DocumentType]
+			[$AutomonDatabaseName].[dbo].[DocumentType]
 		WHERE
 			[Description] = ''Photo-Mugshot'';
 		
 		--update document
 		EXEC 
-			[dbo].[UpdateDocument]
+			[$AutomonDatabaseName].[dbo].[UpdateDocument]
 				@PersonId = @PersonId,
 				@DocumentFormat = 0 ,
 				@EnteredByPId = @EnteredByPId,
@@ -83,7 +84,7 @@ BEGIN
 
 		--re-update document for correct document data id
 		EXEC 
-			[dbo].[UpdateDocument]
+			[$AutomonDatabaseName].[dbo].[UpdateDocument]
 				@PersonId = @PersonId,
 				@DocumentFormat = 0 ,
 				@EnteredByPId = @EnteredByPId,
