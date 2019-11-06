@@ -23,6 +23,7 @@ Date			Author			Changes
 10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
 20-Sept-19		Rajesh Awate	Changes to select 1 client type for an offender based on order of PRCS > MS (MCS) > Formal
 20-Sept-19		Rajesh Awate	Changes to exclude records having word "bench warrant" in its caseload name
+31-Oct-19		Rajesh Awate	Changes for consideration of Mugshot Photo while fetching differential data
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -109,6 +110,9 @@ BEGIN
 														ON CC.[CaseTypeId] = CT.[Id]
 														LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseCategory] CSCT
 															ON CT.[CaseCategoryId] = CSCT.[Id]
+
+															LEFT JOIN [$AutomonDatabaseName].[dbo].[DocumentInfo] DI
+																ON P.[Id] = DI.[PersonId]
 		WHERE
 			AN.[Firstname] IS NOT NULL
 			AND P.[DOB] IS NOT NULL
@@ -123,11 +127,13 @@ BEGIN
 				OR OCL.[FromTime] > @LastExecutionDateTime 
 				OR P.[LastModified] > @LastExecutionDateTime 
 				OR OFCL.[FromTime] > @LastExecutionDateTime 
+				OR DI.[EnteredDateTime] > @LastExecutionDateTime 
 				OR @LastExecutionDateTime IS NULL
 			)
 			AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
 			AND CSCT.[PermDesc] = ''Service''
 			AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+			AND DI.[DocumentTypeDescription] = ''Photo-Mugshot''
 			AND CL.[Name] NOT LIKE ''%bench warrant%''
 			AND EXISTS
 			(

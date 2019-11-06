@@ -138,7 +138,7 @@ namespace CMI.Nexus.Service
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PostAsJsonAsync<Client>(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientProfilePicture.IntegrationId), clientProfilePicture).Result;
+                var apiResponse = apiHost.PostAsJsonAsync<ClientProfilePicture>(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientProfilePicture.IntegrationId), clientProfilePicture).Result;
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 
                 if (apiResponse.IsSuccessStatusCode)
@@ -168,7 +168,15 @@ namespace CMI.Nexus.Service
 
                 if (apiResponse.IsSuccessStatusCode)
                 {
-                    clientProfilePicture = apiResponse.Content.ReadAsAsync<ClientProfilePicture>().Result;
+                    string imageBase64String = apiResponse.Content.ReadAsAsync<string>().Result;
+                    if(!string.IsNullOrEmpty(imageBase64String))
+                    {
+                        clientProfilePicture = new ClientProfilePicture { IntegrationId = clientId, ImageBase64String = imageBase64String };
+                    }
+                    else
+                    {
+                        clientProfilePicture = null;
+                    }
                 }
                 else
                 {
@@ -189,7 +197,7 @@ namespace CMI.Nexus.Service
                 apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                 apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
 
-                var apiResponse = apiHost.PutAsJsonAsync<Client>(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientProfilePicture.IntegrationId), clientProfilePicture).Result;
+                var apiResponse = apiHost.PutAsJsonAsync<ClientProfilePicture>(string.Format("api/{0}/clients/{1}/profilePictures", nexusConfig.CaseIntegrationApiVersion, clientProfilePicture.IntegrationId), clientProfilePicture).Result;
 
                 var responseString = apiResponse.Content.ReadAsStringAsync().Result;
 

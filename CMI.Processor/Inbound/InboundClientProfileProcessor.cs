@@ -99,6 +99,18 @@ namespace CMI.Processor
 
                                 //get offender mugshot photo details
                                 OffenderMugshot offenderMugshot = offenderProfilePictureService.GetOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderDetails.Pin);
+
+                                if (offenderMugshot != null)
+                                {
+                                    Logger.LogDebug(new LogRequest
+                                    {
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
+                                        Message = "Offender MugShot-Photo found in Automon.",
+                                        AutomonData = JsonConvert.SerializeObject(offenderMugshot)
+                                    });
+                                }
+
                                 ClientProfilePicture clientProfilePicture = null;
 
                                 //check if there is any mugshot photo set for given offender
@@ -109,6 +121,19 @@ namespace CMI.Processor
                                         IntegrationId = FormatId(offenderMugshot.Pin),
                                         ImageBase64String = Convert.ToBase64String(offenderMugshot.DocumentData)
                                     };
+
+                                    if (clientProfilePicture != null)
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Offender MugShot-Photo object transformed successfully.",
+                                            AutomonData = JsonConvert.SerializeObject(offenderMugshot),
+                                            NexusData = JsonConvert.SerializeObject(clientProfilePicture)
+                                        });
+                                    }
+
                                     if (ClientService.AddNewClientProfilePicture(clientProfilePicture))
                                     {
                                         Logger.LogDebug(new LogRequest
@@ -137,6 +162,62 @@ namespace CMI.Processor
                                     AutomonData = JsonConvert.SerializeObject(offenderDetails),
                                     NexusData = JsonConvert.SerializeObject(client)
                                 });
+
+                                //check if any profile picture exists in Nexus
+                                if(ClientService.GetClientProfilePicture(client.IntegrationId) == null)
+                                {
+                                    //profile picture does not exist in Nexus. Try to get it from Automon and set in Nexus.
+
+                                    //get offender mugshot photo details
+                                    OffenderMugshot offenderMugshot = offenderProfilePictureService.GetOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderDetails.Pin);
+
+                                    if (offenderMugshot != null)
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Offender MugShot-Photo found in Automon.",
+                                            AutomonData = JsonConvert.SerializeObject(offenderMugshot)
+                                        });
+                                    }
+
+                                    ClientProfilePicture clientProfilePicture = null;
+
+                                    //check if there is any mugshot photo set for given offender
+                                    if (offenderMugshot != null && offenderMugshot.DocumentData != null)
+                                    {
+                                        clientProfilePicture = new ClientProfilePicture
+                                        {
+                                            IntegrationId = FormatId(offenderMugshot.Pin),
+                                            ImageBase64String = Convert.ToBase64String(offenderMugshot.DocumentData)
+                                        };
+
+                                        if (clientProfilePicture != null)
+                                        {
+                                            Logger.LogDebug(new LogRequest
+                                            {
+                                                OperationName = this.GetType().Name,
+                                                MethodName = "Execute",
+                                                Message = "Offender MugShot-Photo object transformed successfully.",
+                                                AutomonData = JsonConvert.SerializeObject(offenderMugshot),
+                                                NexusData = JsonConvert.SerializeObject(clientProfilePicture)
+                                            });
+                                        }
+
+                                        if (ClientService.AddNewClientProfilePicture(clientProfilePicture))
+                                        {
+                                            Logger.LogDebug(new LogRequest
+                                            {
+                                                OperationName = this.GetType().Name,
+                                                MethodName = "Execute",
+                                                Message = "New Client Profile Picture added successfully.",
+                                                AutomonData = JsonConvert.SerializeObject(offenderMugshot),
+                                                NexusData = JsonConvert.SerializeObject(clientProfilePicture)
+                                            });
+                                        }
+                                    }
+                                }
                             }
                         }
                     }

@@ -23,6 +23,7 @@ namespace CMI.Automon.Service
         public static string TestDataJsonFileNameAllOffenderGPSViolationDetails { get { return "AllOffenderGPSViolationDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderIncentiveDetails { get { return "AllOffenderIncentiveDetails.json"; } }
         public static string TestDataJsonFileNameAllOffenderSanctionDetails { get { return "AllOffenderSanctionDetails.json"; } }
+        public static string TestDataJsonFileNameAllOffenderOnDemandSanctionDetails { get { return "AllOffenderOnDemandSanctionDetails.json"; } }
     }
 
     public static class SqlParamName

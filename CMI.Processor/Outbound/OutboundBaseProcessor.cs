@@ -748,6 +748,18 @@ namespace CMI.Processor
                         : null
                 };
             }
+            //OnDemand Sanction
+            else if (typeof(T) == typeof(ClientProfileOnDemandSanctionDetailsActivityResponse))
+            {
+                ClientProfileOnDemandSanctionDetailsActivityResponse details = (ClientProfileOnDemandSanctionDetailsActivityResponse)(object)activityDetails;
+
+                return new OffenderOnDemandSanction()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy
+                };
+            }
 
             return null;
         }
