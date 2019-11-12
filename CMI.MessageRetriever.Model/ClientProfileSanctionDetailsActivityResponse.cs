@@ -4,7 +4,7 @@ namespace CMI.MessageRetriever.Model
 {
     public class ClientProfileSanctionDetailsActivityResponse
     {
-        public SanctionedActivityDetails[] SanctionedActivities { get; set; }
+        public SanctionedActivityDetails[] SanctionActivities { get; set; }
         public AssignedSanctionDetails AssignedSanction { get; set; }
         public string Status { get; set; }
         public string Notes { get; set; }

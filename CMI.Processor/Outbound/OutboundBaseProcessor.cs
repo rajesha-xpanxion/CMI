@@ -740,11 +740,11 @@ namespace CMI.Processor
                     Magnitude = details.AssignedSanction != null ? details.AssignedSanction.Magnitude : null,
                     Response = details.AssignedSanction != null ? details.AssignedSanction.Description : null,
                     DateIssued = details.AssignedSanction != null ? details.AssignedSanction.DateAssigned : null,
-                    IsBundled = details.SanctionedActivities != null && details.SanctionedActivities.Count() > 1,
+                    IsBundled = details.SanctionActivities != null && details.SanctionActivities.Count() > 1,
                     IsSkipped = details.Status.Equals(Status.Skipped, StringComparison.InvariantCultureIgnoreCase),
                     SanctionedActivities =
-                        details.SanctionedActivities != null && details.SanctionedActivities.Any()
-                        ? details.SanctionedActivities.Select(x => new Automon.Model.SanctionedActivityDetails { ActivityTypeName = x.Activity, ActivityIdentifier = x.ActivityIdentifier })
+                        details.SanctionActivities != null && details.SanctionActivities.Any()
+                        ? details.SanctionActivities.Select(x => new Automon.Model.SanctionedActivityDetails { ActivityTypeName = x.Activity, ActivityIdentifier = x.ActivityIdentifier })
                         : null
                 };
             }
@@ -755,9 +755,9 @@ namespace CMI.Processor
 
                 List<Automon.Model.OnDemandSanctionedActivityDetails> onDemandSanctionedActivities = new List<Automon.Model.OnDemandSanctionedActivityDetails>();
 
-                if(details.SanctionedActivities != null && details.SanctionedActivities.Any())
+                if(details.SanctionActivities != null && details.SanctionActivities.Any())
                 {
-                    foreach(var sanctionedActivity in details.SanctionedActivities)
+                    foreach(var sanctionedActivity in details.SanctionActivities)
                     {
                         //check if timezone information provided in given datetime, NO = specify it
                         if (sanctionedActivity.ViolationDateTime.Kind != DateTimeKind.Utc)

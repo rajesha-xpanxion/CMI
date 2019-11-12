@@ -27,7 +27,7 @@ namespace CMI.Automon.Service
         }
         #endregion
 
-        public int SaveOffenderOnDemandSanctionDetails(string CmiDbConnString, OffenderOnDemandSanction offenderOnDemandSanctionDetails)
+        public void SaveOffenderOnDemandSanctionDetails(string CmiDbConnString, OffenderOnDemandSanction offenderOnDemandSanctionDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -49,8 +49,6 @@ namespace CMI.Automon.Service
 
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderOnDemandSanctionDetailsList));
-
-                return offenderOnDemandSanctionDetails.Id == 0 ? new Random().Next(0, 10000) : offenderOnDemandSanctionDetails.Id;
             }
             else
             {
@@ -134,7 +132,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        return Convert.ToInt32(cmd.ExecuteScalar());
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }
