@@ -88,6 +88,7 @@ namespace CMI.Automon.Service
         public static string IsBundled { get { return "@IsBundled"; } }
         public static string IncentedActivityDetailsTbl { get { return "@IncentedActivityDetailsTbl"; } }
         public static string SanctionedActivityDetailsTbl { get { return "@SanctionedActivityDetailsTbl"; } }
+        public static string OnDemandSanctionedActivityDetailsTbl { get { return "@OnDemandSanctionedActivityDetailsTbl"; } }
         public static string IsSkipped { get { return "@IsSkipped"; } }
         public static string EventDateTime { get { return "@EventDateTime"; } }
     }
@@ -162,11 +163,16 @@ namespace CMI.Automon.Service
     {
         public static string IncentedActivityDetailsTbl { get { return "IncentedActivityDetailsTbl"; } }
         public static string SanctionedActivityDetailsTbl { get { return "SanctionedActivityDetailsTbl"; } }
+        public static string OnDemandSanctionedActivityDetailsTbl { get { return "OnDemandSanctionedActivityDetailsTbl"; } }
     }
 
     public static class TableColumnName
     {
         public static string ActivityTypeName { get { return "ActivityTypeName"; } }
         public static string ActivityIdentifier { get { return "ActivityIdentifier"; } }
+
+        public static string TermOfSupervision { get { return "TermOfSupervision"; } }
+        public static string Description { get { return "Description"; } }
+        public static string EventDateTime { get { return "EventDateTime"; } }
     }
 }

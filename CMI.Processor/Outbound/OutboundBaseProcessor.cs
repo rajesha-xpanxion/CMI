@@ -753,11 +753,44 @@ namespace CMI.Processor
             {
                 ClientProfileOnDemandSanctionDetailsActivityResponse details = (ClientProfileOnDemandSanctionDetailsActivityResponse)(object)activityDetails;
 
+                List<Automon.Model.OnDemandSanctionedActivityDetails> onDemandSanctionedActivities = new List<Automon.Model.OnDemandSanctionedActivityDetails>();
+
+                if(details.SanctionedActivities != null && details.SanctionedActivities.Any())
+                {
+                    foreach(var sanctionedActivity in details.SanctionedActivities)
+                    {
+                        //check if timezone information provided in given datetime, NO = specify it
+                        if (sanctionedActivity.ViolationDateTime.Kind != DateTimeKind.Utc)
+                        {
+                            sanctionedActivity.ViolationDateTime = DateTime.SpecifyKind(sanctionedActivity.ViolationDateTime, DateTimeKind.Utc);
+                        }
+
+                        DateTime convertedDateTime =
+                            !string.IsNullOrEmpty(AutomonTimeZone)
+                                    ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(sanctionedActivity.ViolationDateTime, AutomonTimeZone)
+                                    : sanctionedActivity.ViolationDateTime.ToLocalTime();
+
+
+                        Automon.Model.OnDemandSanctionedActivityDetails onDemandSanctionedActivityDetails = new Automon.Model.OnDemandSanctionedActivityDetails
+                        {
+                            TermOfSupervision = sanctionedActivity.TermOfSupervision,
+                            Description = sanctionedActivity.Description,
+                            EventDateTime = convertedDateTime
+                        };
+
+                        onDemandSanctionedActivities.Add(onDemandSanctionedActivityDetails);
+                    }
+                }
+
                 return new OffenderOnDemandSanction()
                 {
                     Pin = clientIntegrationId,
                     Id = id,
-                    UpdatedBy = updatedBy
+                    UpdatedBy = updatedBy,
+                    Magnitude = details.AssignedSanction != null ? details.AssignedSanction.Magnitude : null,
+                    Response = details.AssignedSanction != null ? details.AssignedSanction.Description : null,
+                    IsSkipped = details.Status.Equals(Status.Skipped, StringComparison.InvariantCultureIgnoreCase),
+                    OnDemandSanctionedActivities = onDemandSanctionedActivities
                 };
             }
 

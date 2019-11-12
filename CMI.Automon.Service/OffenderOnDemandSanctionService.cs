@@ -78,23 +78,9 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SqlParamName.Id,
-                            SqlDbType = SqlDbType.Int,
-                            Value = offenderOnDemandSanctionDetails.Id,
-                            IsNullable = true
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
                             ParameterName = SqlParamName.UpdatedBy,
                             SqlDbType = SqlDbType.VarChar,
                             Value = offenderOnDemandSanctionDetails.UpdatedBy,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.EventDateTime,
-                            SqlDbType = SqlDbType.DateTime,
-                            Value = offenderOnDemandSanctionDetails.EventDateTime,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
@@ -111,21 +97,6 @@ namespace CMI.Automon.Service
                             Value = offenderOnDemandSanctionDetails.Response,
                             IsNullable = true
                         });
-                        /*
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.DateIssued,
-                            SqlDbType = SqlDbType.VarChar,
-                            Value = offenderOnDemandSanctionDetails.DateIssued,
-                            IsNullable = true
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.IsBundled,
-                            SqlDbType = SqlDbType.Bit,
-                            Value = offenderOnDemandSanctionDetails.IsBundled,
-                            IsNullable = false
-                        });
                         cmd.Parameters.Add(new SqlParameter()
                         {
                             ParameterName = SqlParamName.IsSkipped,
@@ -134,31 +105,32 @@ namespace CMI.Automon.Service
                             IsNullable = false
                         });
 
-                        var dataTable = new DataTable(UserDefinedTableType.SanctionedActivityDetailsTbl)
+                        var dataTable = new DataTable(UserDefinedTableType.OnDemandSanctionedActivityDetailsTbl)
                         {
                             Locale = CultureInfo.InvariantCulture
                         };
-                        dataTable.Columns.Add(TableColumnName.ActivityTypeName, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.ActivityIdentifier, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.TermOfSupervision, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.Description, typeof(string));
+                        dataTable.Columns.Add(TableColumnName.EventDateTime, typeof(DateTime));
                         //check for null & check if any record to process
-                        if (offenderSanctionDetails.SanctionedActivities != null && offenderSanctionDetails.SanctionedActivities.Any())
+                        if (offenderOnDemandSanctionDetails.OnDemandSanctionedActivities != null && offenderOnDemandSanctionDetails.OnDemandSanctionedActivities.Any())
                         {
-                            foreach (var sanctionedActivityDetails in offenderSanctionDetails.SanctionedActivities)
+                            foreach (var onDemandsanctionedActivityDetails in offenderOnDemandSanctionDetails.OnDemandSanctionedActivities)
                             {
                                 dataTable.Rows.Add(
-                                    sanctionedActivityDetails.ActivityTypeName,
-                                    sanctionedActivityDetails.ActivityIdentifier
+                                    onDemandsanctionedActivityDetails.TermOfSupervision,
+                                    onDemandsanctionedActivityDetails.Description,
+                                    onDemandsanctionedActivityDetails.EventDateTime
                                 );
                             }
                         }
                         cmd.Parameters.Add(new SqlParameter
                         {
-                            ParameterName = SqlParamName.SanctionedActivityDetailsTbl,
+                            ParameterName = SqlParamName.OnDemandSanctionedActivityDetailsTbl,
                             Value = dataTable,
                             SqlDbType = SqlDbType.Structured,
                             Direction = ParameterDirection.Input
                         });
-                        */
 
                         cmd.Connection = conn;
 
