@@ -27,7 +27,7 @@ namespace CMI.Automon.Service
         }
         #endregion
 
-        public int SaveOffenderSanctionDetails(string CmiDbConnString, OffenderSanction offenderSanctionDetails)
+        public void SaveOffenderSanctionDetails(string CmiDbConnString, OffenderSanction offenderSanctionDetails)
         {
             if (automonConfig.IsDevMode)
             {
@@ -50,7 +50,6 @@ namespace CMI.Automon.Service
                 //write back
                 File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderSanctionDetailsList));
 
-                return offenderSanctionDetails.Id == 0 ? new Random().Next(0, 10000) : offenderSanctionDetails.Id;
             }
             else
             {
@@ -78,23 +77,9 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SqlParamName.Id,
-                            SqlDbType = SqlDbType.Int,
-                            Value = offenderSanctionDetails.Id,
-                            IsNullable = true
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
                             ParameterName = SqlParamName.UpdatedBy,
                             SqlDbType = SqlDbType.VarChar,
                             Value = offenderSanctionDetails.UpdatedBy,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
-                            ParameterName = SqlParamName.EventDateTime,
-                            SqlDbType = SqlDbType.DateTime,
-                            Value = offenderSanctionDetails.EventDateTime,
                             IsNullable = false
                         });
                         cmd.Parameters.Add(new SqlParameter()
@@ -160,7 +145,7 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        return Convert.ToInt32(cmd.ExecuteScalar());
+                        cmd.ExecuteNonQuery();
                     }
                 }
             }

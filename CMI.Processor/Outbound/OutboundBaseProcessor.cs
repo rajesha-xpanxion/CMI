@@ -790,6 +790,7 @@ namespace CMI.Processor
                     Magnitude = details.AssignedSanction != null ? details.AssignedSanction.Magnitude : null,
                     Response = details.AssignedSanction != null ? details.AssignedSanction.Description : null,
                     IsSkipped = details.Status.Equals(Status.Skipped, StringComparison.InvariantCultureIgnoreCase),
+                    Notes = details.Notes,
                     OnDemandSanctionedActivities = onDemandSanctionedActivities
                 };
             }

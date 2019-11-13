@@ -65,60 +65,21 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
-                        //save details to Automon and get Id
-                        int automonId = offenderIncentiveService.SaveOffenderIncentiveDetails(ProcessorConfig.CmiDbConnString, offenderIncentiveDetails);
-
-                        //check if saving details to Automon was successsful
-                        if (automonId == 0)
-                        {
-                            throw new CmiException("Offender - Incentive details could not be saved in Automon.");
-                        }
-
-                        //check if details got newly added in Automon
-                        bool isDetailsAddedInAutomon = offenderIncentiveDetails.Id == 0 && automonId > 0 && offenderIncentiveDetails.Id != automonId;
-
-                        offenderIncentiveDetails.Id = automonId;
+                        //save details to Automon
+                        offenderIncentiveService.SaveOffenderIncentiveDetails(ProcessorConfig.CmiDbConnString, offenderIncentiveDetails);
 
                         //mark this message as successful
                         message.IsSuccessful = true;
 
-                        //save new identifier in message details
-                        message.AutomonIdentifier = offenderIncentiveDetails.Id.ToString();
-
-                        //update automon identifier for rest of messages having same activity identifier
-                        messages.Where(
-                            x =>
-                                string.IsNullOrEmpty(x.AutomonIdentifier)
-                                && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
-                        ).
-                        ToList().
-                        ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
-
-                        //check if it was add or update operation and update Automon message counter accordingly
-                        if (isDetailsAddedInAutomon)
+                        taskExecutionStatus.AutomonUpdateMessageCount++;
+                        Logger.LogDebug(new LogRequest
                         {
-                            taskExecutionStatus.AutomonAddMessageCount++;
-                            Logger.LogDebug(new LogRequest
-                            {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "New Offender - Incentive details added successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderIncentiveDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
-                        }
-                        else
-                        {
-                            taskExecutionStatus.AutomonUpdateMessageCount++;
-                            Logger.LogDebug(new LogRequest
-                            {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "Existing Offender - Incentive details updated successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderIncentiveDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
-                        }
+                            OperationName = this.GetType().Name,
+                            MethodName = "Execute",
+                            Message = "Offender - Incentive details saved successfully.",
+                            AutomonData = JsonConvert.SerializeObject(offenderIncentiveDetails),
+                            NexusData = JsonConvert.SerializeObject(message)
+                        });
                     }
                     catch (CmiException ce)
                     {

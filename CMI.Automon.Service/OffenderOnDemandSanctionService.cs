@@ -102,6 +102,13 @@ namespace CMI.Automon.Service
                             Value = offenderOnDemandSanctionDetails.IsSkipped,
                             IsNullable = false
                         });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Comment,
+                            SqlDbType = SqlDbType.VarChar,
+                            Value = offenderOnDemandSanctionDetails.Notes,
+                            IsNullable = true
+                        });
 
                         var dataTable = new DataTable(UserDefinedTableType.OnDemandSanctionedActivityDetailsTbl)
                         {

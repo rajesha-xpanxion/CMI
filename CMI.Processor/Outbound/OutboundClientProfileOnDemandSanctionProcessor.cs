@@ -72,12 +72,11 @@ namespace CMI.Processor
                         message.IsSuccessful = true;
 
                         taskExecutionStatus.AutomonAddMessageCount++;
-
                         Logger.LogDebug(new LogRequest
                         {
                             OperationName = this.GetType().Name,
                             MethodName = "Execute",
-                            Message = "New Offender - OnDemand Sanction details added successfully.",
+                            Message = "Offender - OnDemand Sanction details saved successfully.",
                             AutomonData = JsonConvert.SerializeObject(offenderOnDemandSanctionDetails),
                             NexusData = JsonConvert.SerializeObject(message)
                         });

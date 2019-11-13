@@ -17,8 +17,6 @@ EXEC
 	[dbo].[SaveOffenderSanctionDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
-		@Id = 0,
-		@EventDateTime = '2019-09-24'
 		@Magnitude  = 'Low',
 		@Response = 'Fish Bowl Drawing',
 		@DateIssued = '2019-08-03',
@@ -34,8 +32,6 @@ Date			Author			Changes
 CREATE PROCEDURE [dbo].[SaveOffenderSanctionDetails]
 	@AutomonDatabaseName NVARCHAR(128),
 	@Pin VARCHAR(20),
-	@Id INT = 0,
-	@EventDateTime DATETIME,
 	@Magnitude VARCHAR(255) = NULL,
 	@Response VARCHAR(255) = NULL,
 	@DateIssued VARCHAR(255) = NULL,
@@ -52,63 +48,9 @@ BEGIN
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId		INT			= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@OffenderId			INT			= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin), 0),
-			@EventTypeId		INT			= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''NexusContact''),
-			@EventId			INT			= @Id,
 			@CurrentId			INT			= 1,
 			@MaxId				INT,
 			@Value				VARCHAR(255);
-
-		--add or update event for sanction
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEvent] 
-				@EventTypeId, 
-				@EventDateTime, 
-				@EnteredByPId, 
-				NULL, 
-				0, 
-				NULL, 
-				NULL, 
-				0, 
-				@EventDateTime, 
-				NULL, 
-				2, --mark event status as completed
-				NULL, 
-				@Id = @EventId OUTPUT;
-
-		--Contact Type
-		SET @Value = 
-			(
-				SELECT TOP 1 
-					CAST(L.[Id] AS VARCHAR(255)) 
-				FROM 
-					[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT 
-						ON L.[LookupTypeId] = LT.[Id] 
-				WHERE 
-					LT.[IsActive] = 1 
-					AND LT.[Description] = ''Contact Type'' 
-					AND L.[IsActive] = 1 
-					AND L.[PermDesc] = ''InpersonNexusSanction''
-			);
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
-				@EventId, 
-				@EnteredByPId, 
-				@Value, 
-				NULL, 
-				''CaseEventInv_ContactType'', 
-				NULL, 
-				NULL, 
-				NULL;
-
-		--link event to offender
-		IF(@OffenderId IS NOT NULL AND @OffenderId > 0)
-		BEGIN
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
-					@OffenderId, 
-					@EventId;
-		END
 
 		--retrieve records for setting sanction attributes
 		DECLARE @SanctionedEventDetails AS TABLE
@@ -188,7 +130,6 @@ BEGIN
 			END
 		END
 
-		SELECT @EventId;
 		';
 
 
@@ -196,8 +137,6 @@ BEGIN
 
 	SET @ParmDefinition = '
 		@Pin VARCHAR(20),
-		@Id INT,
-		@EventDateTime DATETIME,
 		@Magnitude VARCHAR(255),
 		@Response VARCHAR(255),
 		@DateIssued VARCHAR(255),
@@ -213,8 +152,6 @@ BEGIN
 			@SQLString, 
 			@ParmDefinition,  
 			@Pin = @Pin,
-			@Id = @Id,
-			@EventDateTime = @EventDateTime,
 			@Magnitude = @Magnitude,
 			@Response = @Response,
 			@DateIssued = @DateIssued,

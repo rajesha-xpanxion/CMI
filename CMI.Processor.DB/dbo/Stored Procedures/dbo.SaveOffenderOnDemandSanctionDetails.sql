@@ -18,6 +18,7 @@ EXEC
 		@Magnitude  = 'Moderate',
 		@Response = 'Phase Demotion',
 		@IsSkipped = 0,
+		@Comment = 'test on demand sanction',
 		@OnDemandSanctionedActivityDetailsTbl = @OnDemandSanctionedActivityDetailsTbl,
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
@@ -31,6 +32,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderOnDemandSanctionDetails]
 	@Magnitude VARCHAR(255) = NULL,
 	@Response VARCHAR(255) = NULL,
 	@IsSkipped BIT,
+	@Comment VARCHAR(MAX) = NULL,
 	@OnDemandSanctionedActivityDetailsTbl [dbo].[OnDemandSanctionedActivityDetailsTbl] READONLY,
 	@UpdatedBy VARCHAR(255)
 AS
@@ -95,7 +97,7 @@ BEGIN
 						@EventTypeId, 
 						@EventDateTime, 
 						@EnteredByPId, 
-						NULL, 
+						@Comment, 
 						0, 
 						NULL, 
 						NULL, 
@@ -186,6 +188,7 @@ BEGIN
 		@Magnitude VARCHAR(255),
 		@Response VARCHAR(255),
 		@IsSkipped BIT,
+		@Comment VARCHAR(MAX),
 		@OnDemandSanctionedActivityDetailsTbl [dbo].[OnDemandSanctionedActivityDetailsTbl] READONLY,
 		@UpdatedBy VARCHAR(255)';
 
@@ -199,6 +202,7 @@ BEGIN
 			@Magnitude = @Magnitude,
 			@Response = @Response,
 			@IsSkipped = @IsSkipped,
+			@Comment = @Comment,
 			@OnDemandSanctionedActivityDetailsTbl = @OnDemandSanctionedActivityDetailsTbl,
 			@UpdatedBy = @UpdatedBy;
 END
