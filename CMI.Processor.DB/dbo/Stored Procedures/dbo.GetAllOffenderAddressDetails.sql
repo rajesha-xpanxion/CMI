@@ -59,8 +59,11 @@ BEGIN
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[PersonAddressInfo] PAI
 				ON OI.[PersonId] = PAI.[PersonId]
 		WHERE
-			PAI.[FromTime] > @LastExecutionDateTime
-			OR @LastExecutionDateTime IS NULL
+			(PAI.[Line1] IS NOT NULL OR PAI.[Line2] IS NOT NULL OR PAI.[City] IS NOT NULL OR PAI.[State] IS NOT NULL OR PAI.[Zip] IS NOT NULL)
+			AND
+			(
+				PAI.[FromTime] > @LastExecutionDateTime	OR @LastExecutionDateTime IS NULL
+			)
 		';
 	END
 	ELSE
@@ -189,6 +192,8 @@ BEGIN
 			[$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[PersonAddressInfo] PAI
 				ON OI.[PersonId] = PAI.[PersonId]
 		WHERE
+			(PAI.[Line1] IS NOT NULL OR PAI.[Line2] IS NOT NULL OR PAI.[City] IS NOT NULL OR PAI.[State] IS NOT NULL OR PAI.[Zip] IS NOT NULL)
+			AND
 			(
 				PAI.[FromTime] > @LastExecutionDateTime
 				OR @LastExecutionDateTime IS NULL

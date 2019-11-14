@@ -93,7 +93,8 @@ namespace CMI.Automon.Service
                                     OfficerLogon = Convert.ToString(reader[DbColumnName.OfficerLogon]),
                                     OfficerEmail = Convert.ToString(reader[DbColumnName.OfficerEmail]),
                                     OfficerFirstName = Convert.ToString(reader[DbColumnName.OfficerFirstName]),
-                                    OfficerLastName = Convert.ToString(reader[DbColumnName.OfficerLastName])
+                                    OfficerLastName = Convert.ToString(reader[DbColumnName.OfficerLastName]),
+                                    DeptSupLevel = Convert.ToString(reader[DbColumnName.DeptSupLevel])
                                 });
                             }
                         }

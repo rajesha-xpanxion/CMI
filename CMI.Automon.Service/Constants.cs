@@ -118,6 +118,7 @@ namespace CMI.Automon.Service
         public static string OfficerEmail { get { return "OfficerEmail"; } }
         public static string OfficerFirstName { get { return "OfficerFirstName"; } }
         public static string OfficerLastName { get { return "OfficerLastName"; } }
+        public static string DeptSupLevel { get { return "DeptSupLevel"; } }
         public static string PhoneNumberType { get { return "PhoneNumberType"; } }
         public static string Phone { get { return "Phone"; } }
         public static string IsPrimary { get { return "IsPrimary"; } }
@@ -174,5 +175,10 @@ namespace CMI.Automon.Service
         public static string TermOfSupervision { get { return "TermOfSupervision"; } }
         public static string Description { get { return "Description"; } }
         public static string EventDateTime { get { return "EventDateTime"; } }
+    }
+
+    public static class DeptSupLevel
+    {
+        public static string Medium { get { return "Medium"; } }
     }
 }

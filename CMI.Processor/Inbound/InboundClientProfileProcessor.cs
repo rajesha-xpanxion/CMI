@@ -76,11 +76,13 @@ namespace CMI.Processor
                             DateOfBirth = offenderDetails.DateOfBirth.ToShortDateString(),
 
                             CaseloadId = MapCaseload(offenderDetails.CaseloadName),
-                            SupervisingOfficerEmailId = MapSupervisingOfficer(offenderDetails.OfficerFirstName, offenderDetails.OfficerLastName, offenderDetails.OfficerEmail)
+                            SupervisingOfficerEmailId = MapSupervisingOfficer(offenderDetails.OfficerFirstName, offenderDetails.OfficerLastName, offenderDetails.OfficerEmail),
+                            StaticRiskRating = MapStaticRiskRating(offenderDetails.DeptSupLevel)
                         };
 
-                        //check if client already exists
-                        if (ClientService.GetClientDetails(client.IntegrationId) == null)
+                        //check if client already exists and if yes then retrieve it
+                        Client existingClientDetails = ClientService.GetClientDetails(client.IntegrationId);
+                        if (existingClientDetails == null)
                         {
                             //add new client profile details to Nexus
                             if (ClientService.AddNewClientDetails(client))
@@ -150,6 +152,15 @@ namespace CMI.Processor
                         }
                         else
                         {
+                            //check if any value already exists for static risk rating, yes = replace it in passing model so that existing value will not be replaced
+                            if(!string.IsNullOrEmpty(existingClientDetails.StaticRiskRating) && !existingClientDetails.StaticRiskRating.Equals(Nexus.Service.Constants.StaticRiskRatingUnspecified))
+                            {
+                                client.StaticRiskRating = existingClientDetails.StaticRiskRating;
+                            }
+
+                            //set original value of NeedsClassification retrieved from Nexus to field in passing model so that it will not get overridden
+                            client.NeedsClassification = existingClientDetails.NeedsClassification;
+
                             if (ClientService.UpdateClientDetails(client))
                             {
                                 taskExecutionStatus.NexusUpdateRecordCount++;
@@ -428,6 +439,31 @@ namespace CMI.Processor
                     Exception = ex
                 });
             }
+
+            //load StaticRiskRatings lookup data
+            try
+            {
+                if (LookupService.StaticRiskRatings != null)
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "LoadLookupData",
+                        Message = "Successfully retrieved StaticRiskRatings from lookup",
+                        CustomParams = JsonConvert.SerializeObject(LookupService.StaticRiskRatings)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "LoadLookupData",
+                    Message = "Error occurred while loading StaticRiskRatings lookup data",
+                    Exception = ex
+                });
+            }
         }
 
         private string MapEthnicity(string automonRaceDescription, string automonRacePermDesc)
@@ -475,6 +511,23 @@ namespace CMI.Processor
                     && s.LastName.Equals(automonLastName, StringComparison.InvariantCultureIgnoreCase) 
                     && s.Email.Equals(automonEmailAddress, StringComparison.InvariantCultureIgnoreCase)
                 ).Email;
+            }
+
+            return null;
+        }
+
+        private string MapStaticRiskRating(string automonDeptSupLevel)
+        {
+            // check if match can be found in lookup values
+            if (LookupService.StaticRiskRatings != null && LookupService.StaticRiskRatings.Any(c => c.Equals(automonDeptSupLevel, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                return automonDeptSupLevel;
+            }
+
+            //check if dept sup level is having value as "Medium", yes = return with "Moderate" (Medium from Automon gets mapped with Moderate in Nexus)
+            if(!string.IsNullOrEmpty(automonDeptSupLevel) && automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.Medium, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return Nexus.Service.Constants.StaticRiskRatingModerate;
             }
 
             return null;

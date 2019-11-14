@@ -22,6 +22,9 @@ namespace CMI.Nexus.Service
         /// Represent auth token format to passed in to API
         /// </summary>
         public static string AuthTokenFormat { get { return "{0} {1}"; } }
+
+        public static string StaticRiskRatingUnspecified { get { return "Unspecified"; } }
+        public static string StaticRiskRatingModerate { get { return "Moderate"; } }
     }
 
     public static class Status

@@ -22,6 +22,7 @@ namespace CMI.Nexus.Service
         List<SupervisingOfficer> _SupervisingOfficers;
         List<string> _TimeZones;
         List<string> _OffenseCategories;
+        List<string> _StaticRiskRatings;
         #endregion
 
         #region Public Properties
@@ -156,6 +157,21 @@ namespace CMI.Nexus.Service
                 else
                 {
                     return GetOffenseCategories();
+                }
+            }
+        }
+
+        public List<string> StaticRiskRatings
+        {
+            get
+            {
+                if (_StaticRiskRatings != null)
+                {
+                    return _StaticRiskRatings;
+                }
+                else
+                {
+                    return GetStaticRiskRatings();
                 }
             }
         }
@@ -397,6 +413,31 @@ namespace CMI.Nexus.Service
             }
 
             return _OffenseCategories;
+        }
+
+        private List<string> GetStaticRiskRatings()
+        {
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format(Constants.AuthTokenFormat, authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/staticRiskRatings", nexusConfig.CaseIntegrationApiVersion)).Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    _StaticRiskRatings = apiResponse.Content.ReadAsAsync<List<string>>().Result;
+                }
+                else
+                {
+                    _StaticRiskRatings = null;
+                }
+            }
+
+            return _StaticRiskRatings;
         }
         #endregion
     }

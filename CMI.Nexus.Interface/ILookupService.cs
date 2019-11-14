@@ -22,5 +22,7 @@ namespace CMI.Nexus.Interface
         List<string> TimeZones { get; }
 
         List<string> OffenseCategories { get; }
+
+        List<string> StaticRiskRatings { get; }
     }
 }

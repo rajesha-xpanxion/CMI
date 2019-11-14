@@ -24,6 +24,7 @@ Date			Author			Changes
 20-Sept-19		Rajesh Awate	Changes to select 1 client type for an offender based on order of PRCS > MS (MCS) > Formal
 20-Sept-19		Rajesh Awate	Changes to exclude records having word "bench warrant" in its caseload name
 31-Oct-19		Rajesh Awate	Changes for consideration of Mugshot Photo while fetching differential data
+14-Nov-17		Rajesh Awate	Changes to return value for Dept Sup Level attribute
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -80,7 +81,9 @@ BEGIN
 			OFC.[Email] As [OfficerEmail],
 
 			OFCNAME.[Firstname] As [OfficerFirstName],
-			OFCNAME.[LastName] As [OfficerLastName]
+			OFCNAME.[LastName] As [OfficerLastName],
+
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''DepartmentSupervisionLevel'') AS [DeptSupLevel]
 		FROM
 			[$AutomonDatabaseName].[dbo].[AnyName] AN JOIN [$AutomonDatabaseName].[dbo].[Person] P
 				ON AN.[Id] = P.[NameId]
@@ -192,7 +195,9 @@ BEGIN
 			OFC.[Email] As [OfficerEmail],
 
 			OFCNAME.[Firstname] As [OfficerFirstName],
-			OFCNAME.[LastName] As [OfficerLastName]
+			OFCNAME.[LastName] As [OfficerLastName],
+
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''DepartmentSupervisionLevel'') AS [DeptSupLevel]
 		FROM
 			[$AutomonDatabaseName].[dbo].[AnyName] AN JOIN [$AutomonDatabaseName].[dbo].[Person] P
 				ON AN.[Id] = P.[NameId]
