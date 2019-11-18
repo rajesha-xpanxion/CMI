@@ -12,5 +12,6 @@ namespace CMI.Processor.DAL
         public int NumTaskFailed { get; set; }
         public string ExecutionStatusMessage { get; set; }
         public string ErrorDetails { get; set; }
+        public bool IsExecutedInIncrementalMode { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace CMI.Processor
         private readonly IServiceProvider serviceProvider;
         private readonly IConfiguration configuration;
         private readonly IProcessorProvider processorProvider;
-        private DateTime? lastExecutionDateTime;
+        private LastExecutionStatus lastExecutionStatus;
 
         public InboundProcessor(
             IServiceProvider serviceProvider,
@@ -27,7 +27,7 @@ namespace CMI.Processor
 
             processorProvider = (ProcessorProvider)serviceProvider.GetService(typeof(IProcessorProvider));
 
-            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = DAL.ProcessorType.Inbound, ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
+            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = DAL.ProcessorType.Inbound, ExecutedOn = DateTime.Now, IsExecutedInIncrementalMode = true, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
             TaskExecutionStatuses = new List<TaskExecutionStatus>();
         }
 
@@ -43,6 +43,25 @@ namespace CMI.Processor
 
             //retrieve last execution date time
             RetrieveLastExecutionDateTime();
+
+            DateTime? lastExecutionDateTime = lastExecutionStatus.LastIncrementalModeExecutionDateTime;
+            //derive whether current execution should be in incremental or non-incremental mode
+            if (ProcessorConfig.TimespanInHoursForNonIncrementalModeExecution >= 0)
+            {
+                if (
+                    lastExecutionStatus.LastNonIncrementalModeExecutionDateTime.HasValue
+                    && lastExecutionStatus.LastNonIncrementalModeExecutionDateTime.Value.AddHours(ProcessorConfig.TimespanInHoursForNonIncrementalModeExecution) >= DateTime.Now
+                )
+                {
+                    lastExecutionDateTime = lastExecutionStatus.LastIncrementalModeExecutionDateTime;
+                    ProcessorExecutionStatus.IsExecutedInIncrementalMode = true;
+                }
+                else
+                {
+                    lastExecutionDateTime = null;
+                    ProcessorExecutionStatus.IsExecutedInIncrementalMode = false;
+                }
+            }
 
             //process client profiles
             if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.ClientProfiles, StringComparison.InvariantCultureIgnoreCase)))
@@ -116,14 +135,14 @@ namespace CMI.Processor
         {
             try
             {
-                lastExecutionDateTime = processorProvider.GetLastExecutionDateTime(DAL.ProcessorType.Inbound);
+                lastExecutionStatus = processorProvider.GetLastExecutionDateTime(DAL.ProcessorType.Inbound);
 
                 Logger.LogInfo(new LogRequest
                 {
                     OperationName = this.GetType().Name,
                     MethodName = "RetrieveLastExecutionDateTime",
-                    Message = "Successfully retrieved Last Execution Date Time",
-                    CustomParams = JsonConvert.SerializeObject(lastExecutionDateTime)
+                    Message = "Successfully retrieved Last Execution Date Time.",
+                    CustomParams = JsonConvert.SerializeObject(lastExecutionStatus)
                 });
             }
             catch (Exception ex)
@@ -132,7 +151,7 @@ namespace CMI.Processor
                 {
                     OperationName = this.GetType().Name,
                     MethodName = "RetrieveLastExecutionDateTime",
-                    Message = "Error occurred while retriving processor last execution status.",
+                    Message = "Error occurred while retriving processor Last Execution Date Time.",
                     Exception = ex
                 });
             }

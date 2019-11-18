@@ -26,9 +26,9 @@ namespace CMI.Processor.DAL
         #endregion
 
         #region Public Methods
-        public DateTime? GetLastExecutionDateTime(ProcessorType processorType = ProcessorType.Inbound)
+        public LastExecutionStatus GetLastExecutionDateTime(ProcessorType processorType = ProcessorType.Inbound)
         {
-            DateTime? lastExecutionDateTime = null;
+            LastExecutionStatus lastExecutionStatus = new LastExecutionStatus();
 
             using (SqlConnection conn = new SqlConnection(processorConfig.CmiDbConnString))
             {
@@ -48,16 +48,27 @@ namespace CMI.Processor.DAL
                         Direction = ParameterDirection.Input
                     });
 
-                    object objLastExecutionDateTime = cmd.ExecuteScalar();
-
-                    if(!Convert.IsDBNull(objLastExecutionDateTime))
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        lastExecutionDateTime = (DateTime)objLastExecutionDateTime;
+                        while (reader.Read())
+                        {
+                            object objLastIncrementalModeExecutionDateTime = reader[TableColumnName.LastIncrementalModeExecutionDateTime];
+                            if (!Convert.IsDBNull(objLastIncrementalModeExecutionDateTime))
+                            {
+                                lastExecutionStatus.LastIncrementalModeExecutionDateTime = (DateTime)objLastIncrementalModeExecutionDateTime;
+                            }
+
+                            object objLastNonIncrementalModeExecutionDateTime = reader[TableColumnName.LastNonIncrementalModeExecutionDateTime];
+                            if (!Convert.IsDBNull(objLastNonIncrementalModeExecutionDateTime))
+                            {
+                                lastExecutionStatus.LastNonIncrementalModeExecutionDateTime = (DateTime)objLastNonIncrementalModeExecutionDateTime;
+                            }
+                        }
                     }
                 }
             }
 
-            return lastExecutionDateTime;
+            return lastExecutionStatus;
         }
 
         public void SaveExecutionStatus(ExecutionStatus executionStatus)
@@ -86,6 +97,13 @@ namespace CMI.Processor.DAL
                             ParameterName = SqlParamName.ExecutedOn,
                             Value = executionStatus.ExecutedOn,
                             SqlDbType = SqlDbType.DateTime,
+                            Direction = ParameterDirection.Input
+                        });
+                        cmd.Parameters.Add(new SqlParameter
+                        {
+                            ParameterName = SqlParamName.IsExecutedInIncrementalMode,
+                            Value = executionStatus.IsExecutedInIncrementalMode,
+                            SqlDbType = SqlDbType.Bit,
                             Direction = ParameterDirection.Input
                         });
                         cmd.Parameters.Add(new SqlParameter

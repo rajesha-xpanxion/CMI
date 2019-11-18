@@ -22,9 +22,6 @@ namespace CMI.Nexus.Service
         /// Represent auth token format to passed in to API
         /// </summary>
         public static string AuthTokenFormat { get { return "{0} {1}"; } }
-
-        public static string StaticRiskRatingUnspecified { get { return "Unspecified"; } }
-        public static string StaticRiskRatingModerate { get { return "Moderate"; } }
     }
 
     public static class Status
@@ -61,5 +58,15 @@ namespace CMI.Nexus.Service
         public static string Note { get { return "Note"; } }
         public static string ProtectiveOrder { get { return "ProtectiveOrder"; } }
 
+    }
+
+    public static class StaticRiskRating
+    {
+        public static string Unspecified { get { return "Unspecified"; } }
+        public static string Low { get { return "Low"; } }
+        public static string Moderate { get { return "Moderate"; } }
+        public static string HighDrug { get { return "High - Drug"; } }
+        public static string HighProperty { get { return "High - Property"; } }
+        public static string HighViolence { get { return "High - Violence"; } }
     }
 }

@@ -152,8 +152,8 @@ namespace CMI.Processor
                         }
                         else
                         {
-                            //check if any value already exists for static risk rating, yes = replace it in passing model so that existing value will not be replaced
-                            if(!string.IsNullOrEmpty(existingClientDetails.StaticRiskRating) && !existingClientDetails.StaticRiskRating.Equals(Nexus.Service.Constants.StaticRiskRatingUnspecified))
+                            //check if any value already exists for static risk rating, yes = replace it in passing model so that existing value will not be replaced/changed
+                            if(!string.IsNullOrEmpty(existingClientDetails.StaticRiskRating) && !existingClientDetails.StaticRiskRating.Equals(Nexus.Service.StaticRiskRating.Unspecified))
                             {
                                 client.StaticRiskRating = existingClientDetails.StaticRiskRating;
                             }
@@ -518,19 +518,42 @@ namespace CMI.Processor
 
         private string MapStaticRiskRating(string automonDeptSupLevel)
         {
+            string nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Unspecified;
+
+            //try to convert Dept Sup Level from Automon into suitable Static Risk Rating of Nexus
+            if(automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.Low))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Low;
+            }
+            else if (automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.Medium))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Moderate;
+            }
+            else if(automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.HighD))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.HighDrug;
+            }
+            else if (automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.HighP))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.HighProperty;
+            }
+            else if (automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.HighV))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.HighViolence;
+            }
+            else
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Unspecified;
+            }
+
             // check if match can be found in lookup values
-            if (LookupService.StaticRiskRatings != null && LookupService.StaticRiskRatings.Any(c => c.Equals(automonDeptSupLevel, StringComparison.InvariantCultureIgnoreCase)))
+            if (LookupService.StaticRiskRatings != null && LookupService.StaticRiskRatings.Any(c => c.Equals(nexusStaticRiskRating, StringComparison.InvariantCultureIgnoreCase)))
             {
-                return automonDeptSupLevel;
+                return nexusStaticRiskRating;
             }
 
-            //check if dept sup level is having value as "Medium", yes = return with "Moderate" (Medium from Automon gets mapped with Moderate in Nexus)
-            if(!string.IsNullOrEmpty(automonDeptSupLevel) && automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.Medium, StringComparison.InvariantCultureIgnoreCase))
-            {
-                return Nexus.Service.Constants.StaticRiskRatingModerate;
-            }
-
-            return null;
+            //given value does not exists in lookup, set it with default "Unspecified".
+            return Nexus.Service.StaticRiskRating.Unspecified;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace CMI.Processor
             this.configuration = configuration;
             this.emailNotificationProvider = emailNotificationProvider;
 
-            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = DAL.ProcessorType.Outbound, ExecutedOn = DateTime.Now, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
+            ProcessorExecutionStatus = new ExecutionStatus { ProcessorType = DAL.ProcessorType.Outbound, ExecutedOn = DateTime.Now, IsExecutedInIncrementalMode = true, IsSuccessful = true, NumTaskProcessed = 0, NumTaskSucceeded = 0, NumTaskFailed = 0 };
             TaskExecutionStatuses = new List<TaskExecutionStatus>();
         }
 

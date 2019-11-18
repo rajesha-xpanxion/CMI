@@ -179,6 +179,10 @@ namespace CMI.Automon.Service
 
     public static class DeptSupLevel
     {
+        public static string Low { get { return "Low"; } }
         public static string Medium { get { return "Medium"; } }
+        public static string HighD { get { return "High-D"; } }
+        public static string HighP { get { return "High-P"; } }
+        public static string HighV { get { return "High-V"; } }
     }
 }

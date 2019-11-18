@@ -15,6 +15,8 @@
 
         public static string IsSuccessful { get { return "@IsSuccessful"; } }
 
+        public static string IsExecutedInIncrementalMode { get { return "@IsExecutedInIncrementalMode"; } }
+
         public static string NumTaskProcessed { get { return "@NumTaskProcessed"; } }
 
         public static string NumTaskSucceeded { get { return "@NumTaskSucceeded"; } }
@@ -65,6 +67,8 @@
         public static string ReceivedOn { get { return "ReceivedOn"; } }
         public static string AutomonIdentifier { get { return "AutomonIdentifier"; } }
         public static string Item { get { return "Item"; } }
+        public static string LastIncrementalModeExecutionDateTime { get { return "LastIncrementalModeExecutionDateTime"; } }
+        public static string LastNonIncrementalModeExecutionDateTime { get { return "LastNonIncrementalModeExecutionDateTime"; } }
     }
 
     public static class InboundProcessorStage

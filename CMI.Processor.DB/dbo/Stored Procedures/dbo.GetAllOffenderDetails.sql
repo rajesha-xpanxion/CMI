@@ -9,7 +9,7 @@ DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
 INSERT INTO @OfficerLogonsToFilterTbl
 	([Item])
 VALUES
-	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt')
+	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt'),('calliguie'),('jwindham'),('eamorde'),('tsnyder'),('pespinosa'),('qwaterman'),('mdragony'),('bshreeve'),('ahastings'),('cmartinez')
 EXEC	
 	[dbo].[GetAllOffenderDetails]
 		@AutomonDatabaseName = 'CX',
@@ -25,6 +25,7 @@ Date			Author			Changes
 20-Sept-19		Rajesh Awate	Changes to exclude records having word "bench warrant" in its caseload name
 31-Oct-19		Rajesh Awate	Changes for consideration of Mugshot Photo while fetching differential data
 14-Nov-17		Rajesh Awate	Changes to return value for Dept Sup Level attribute
+18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -34,12 +35,6 @@ AS
 BEGIN
 	DECLARE @SQLString NVARCHAR(MAX), @ParmDefinition NVARCHAR(1000);
 
-	--check if any ooficer logon filter passed
-	IF(EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl))
-	BEGIN
-		SET @LastExecutionDateTime = NULL;
-	END
-	
 	IF(@LastExecutionDateTime IS NOT NULL)
 	BEGIN
 		SET @SQLString = 
@@ -151,6 +146,13 @@ BEGIN
 					AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 					AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
 					AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
+			)
+
+			--apply officer logon filter if any passed
+			AND
+			(
+				NOT EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF) 
+				OR EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF WHERE OLTF.[Item] = OFC.[Logon])
 			)
 		';
 	END
