@@ -38,7 +38,6 @@ BEGIN
 		[dbo].[ProcessorExecutionHistory]
 	WHERE
 		[ProcessorTypeId] = @ProcessorTypeId
-		AND [IsSuccessful] = 1
 		AND [IsExecutedInIncrementalMode] = 0;
 	
 	SELECT
