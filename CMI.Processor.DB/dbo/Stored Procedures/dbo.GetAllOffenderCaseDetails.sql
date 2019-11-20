@@ -25,6 +25,7 @@ Date			Author			Changes
 19-Sept-19		Rajesh Awate	Changes to map Conviction Date -> Sentencing Date to Offense Date
 19-Sept-19		Rajesh Awate	Changes to map Sentencing Date to Case Date. If found NULL skip whole record.
 18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
+20-Nov-17		Rajesh Awate	Changes for US114589
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderCaseDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -53,7 +54,7 @@ BEGIN
 					[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')
 				)
 			AS DATE) AS [OffenseDate],
-			CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) AS [CaseDate],
+			ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) AS [CaseDate],
 			CAST(CI.[SupervisionStartDate] AS DATE) AS [SupervisionStartDate],
 			CAST(CI.[SupervisionEndDate] AS DATE) AS [SupervisionEndDate],
 			[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''Case_TerminationType'') AS [ClosureReason]
@@ -78,10 +79,10 @@ BEGIN
 				OR AD.[PermDesc] = ''ConvictionDate''
 				OR AD.[PermDesc] = ''SentencingDate''
 			)
-			AND [$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'') IS NOT NULL
+			AND ISNULL([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate''), CI.[StartDate]) IS NOT NULL
 			AND CAST(CI.[SupervisionStartDate] AS DATE) <= CAST(CI.[SupervisionEndDate] AS DATE)
 			AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
-			AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
+			AND ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) <= DATEADD(DAY, 30, GETDATE())
 		';
 	END
 	ELSE
@@ -206,7 +207,7 @@ BEGIN
 					[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')
 				)
 			AS DATE) AS [OffenseDate],
-			CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) AS [CaseDate],
+			ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) AS [CaseDate],
 			CAST(CI.[SupervisionStartDate] AS DATE) AS [SupervisionStartDate],
 			CAST(CI.[SupervisionEndDate] AS DATE) AS [SupervisionEndDate],
 			[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''Case_TerminationType'') AS [ClosureReason]
@@ -232,10 +233,10 @@ BEGIN
 				OR AD.[PermDesc] = ''ConvictionDate''
 				OR AD.[PermDesc] = ''SentencingDate''
 			)
-			AND [$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'') IS NOT NULL
+			AND ISNULL([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate''), CI.[StartDate]) IS NOT NULL
 			AND CAST(CI.[SupervisionStartDate] AS DATE) <= CAST(CI.[SupervisionEndDate] AS DATE)
 			AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
-			AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
+			AND ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) <= DATEADD(DAY, 30, GETDATE())
 			AND EXISTS
 			(
 				SELECT

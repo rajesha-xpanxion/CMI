@@ -152,8 +152,18 @@ namespace CMI.Processor
                         }
                         else
                         {
+                            //log details of existing client profile
+                            Logger.LogDebug(new LogRequest
+                            {
+                                OperationName = this.GetType().Name,
+                                MethodName = "Execute",
+                                Message = "Client Profile already exists.",
+                                AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                                NexusData = JsonConvert.SerializeObject(existingClientDetails)
+                            });
+
                             //check if any value already exists for static risk rating, yes = replace it in passing model so that existing value will not be replaced/changed
-                            if(!string.IsNullOrEmpty(existingClientDetails.StaticRiskRating) && !existingClientDetails.StaticRiskRating.Equals(Nexus.Service.StaticRiskRating.Unspecified))
+                            if (!string.IsNullOrEmpty(existingClientDetails.StaticRiskRating) && !existingClientDetails.StaticRiskRating.Equals(Nexus.Service.StaticRiskRating.Unspecified))
                             {
                                 client.StaticRiskRating = existingClientDetails.StaticRiskRating;
                             }
@@ -527,7 +537,7 @@ namespace CMI.Processor
             }
             else if (automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.Medium))
             {
-                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Moderate;
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Medium;
             }
             else if(automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.HighD))
             {
@@ -541,6 +551,18 @@ namespace CMI.Processor
             {
                 nexusStaticRiskRating = Nexus.Service.StaticRiskRating.HighViolence;
             }
+            else if (automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.CMLow))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.CMLow;
+            }
+            else if (automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.CMMedium))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.CMMedium;
+            }
+            else if (automonDeptSupLevel.Equals(Automon.Service.DeptSupLevel.CMHigh))
+            {
+                nexusStaticRiskRating = Nexus.Service.StaticRiskRating.CMHigh;
+            }
             else
             {
                 nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Unspecified;
@@ -552,8 +574,8 @@ namespace CMI.Processor
                 return nexusStaticRiskRating;
             }
 
-            //given value does not exists in lookup, set it with default "Unspecified".
-            return Nexus.Service.StaticRiskRating.Unspecified;
+            //given value does not exists in lookup, set it as null.
+            return null;
         }
     }
 }

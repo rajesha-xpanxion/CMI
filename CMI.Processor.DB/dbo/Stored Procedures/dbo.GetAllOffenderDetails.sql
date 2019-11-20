@@ -26,6 +26,7 @@ Date			Author			Changes
 31-Oct-19		Rajesh Awate	Changes for consideration of Mugshot Photo while fetching differential data
 14-Nov-17		Rajesh Awate	Changes to return value for Dept Sup Level attribute
 18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
+20-Nov-17		Rajesh Awate	Changes for US114859
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -146,7 +147,7 @@ BEGIN
 					AND CI.[Status] = ''Active''
 					AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 					AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
-					AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
+					AND ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) <= DATEADD(DAY, 30, GETDATE())
 			)
 
 			--apply officer logon filter if any passed
@@ -263,7 +264,7 @@ BEGIN
 					AND CI.[Status] = ''Active''
 					AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 					AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
-					AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
+					AND ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) <= DATEADD(DAY, 30, GETDATE())
 			)
 
 			--apply officer logon filter if any passed

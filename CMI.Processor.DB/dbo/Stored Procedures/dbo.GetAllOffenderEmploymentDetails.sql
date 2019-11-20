@@ -21,6 +21,7 @@ Date			Author			Changes
 27-Aug-18		Rajesh Awate	Created.
 10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
 18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
+20-Nov-17		Rajesh Awate	Changes for US114589
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderEmploymentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -187,7 +188,7 @@ BEGIN
 						AND CI.[Status] = ''Active''
 						AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 						AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
-						AND CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE) <= DATEADD(DAY, 30, GETDATE())
+						AND ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) <= DATEADD(DAY, 30, GETDATE())
 				)
 
 				--apply officer logon filter if any passed

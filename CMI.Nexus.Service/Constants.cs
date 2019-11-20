@@ -64,9 +64,13 @@ namespace CMI.Nexus.Service
     {
         public static string Unspecified { get { return "Unspecified"; } }
         public static string Low { get { return "Low"; } }
-        public static string Moderate { get { return "Moderate"; } }
+        public static string Medium { get { return "Medium"; } }
         public static string HighDrug { get { return "High - Drug"; } }
         public static string HighProperty { get { return "High - Property"; } }
         public static string HighViolence { get { return "High - Violence"; } }
+        public static string CMLow { get { return "CM-Low"; } }
+        public static string CMMedium { get { return "CM-Medium"; } }
+        public static string CMHigh { get { return "CM-High"; } }
+        public static string High { get { return "High"; } }
     }
 }

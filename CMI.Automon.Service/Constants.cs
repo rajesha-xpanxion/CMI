@@ -184,5 +184,9 @@ namespace CMI.Automon.Service
         public static string HighD { get { return "High-D"; } }
         public static string HighP { get { return "High-P"; } }
         public static string HighV { get { return "High-V"; } }
+        public static string HighOverride { get { return "High-Override"; } }
+        public static string CMLow { get { return "CM-Low"; } }
+        public static string CMMedium { get { return "CM-Medium"; } }
+        public static string CMHigh { get { return "CM-High"; } }
     }
 }

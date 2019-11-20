@@ -62,6 +62,19 @@ namespace CMI.Processor
                     ProcessorExecutionStatus.IsExecutedInIncrementalMode = false;
                 }
             }
+            else
+            {
+                lastExecutionDateTime = lastExecutionStatus.LastIncrementalModeExecutionDateTime;
+                ProcessorExecutionStatus.IsExecutedInIncrementalMode = true;
+            }
+
+            //log execution mode details
+            Logger.LogDebug(new LogRequest
+            {
+                OperationName = this.GetType().Name,
+                MethodName = "Execute",
+                Message = string.Format("Inbound Processor is currently being executed in {0} mode.", ProcessorExecutionStatus.IsExecutedInIncrementalMode ? ProcessorExecutionMode.Incremental : ProcessorExecutionMode.NonIncremental)
+            });
 
             //process client profiles
             if (ProcessorConfig.InboundProcessorConfig.StagesToProcess != null && ProcessorConfig.InboundProcessorConfig.StagesToProcess.Any(a => a.Equals(InboundProcessorStage.ClientProfiles, StringComparison.InvariantCultureIgnoreCase)))

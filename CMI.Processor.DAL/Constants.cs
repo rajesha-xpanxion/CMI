@@ -138,4 +138,10 @@
         public static string Rest { get { return "REST"; } }
         public static string Amqp { get { return "AMQP"; } }
     }
+
+    public static class ProcessorExecutionMode
+    {
+        public static string Incremental { get { return "Incremental"; } }
+        public static string NonIncremental { get { return "Non-Incremental"; } }
+    }
 }
