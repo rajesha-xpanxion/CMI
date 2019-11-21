@@ -528,6 +528,12 @@ namespace CMI.Processor
 
         private string MapStaticRiskRating(string automonDeptSupLevel)
         {
+            //check if passed value is null or empty string, yes = return null
+            if(string.IsNullOrEmpty(automonDeptSupLevel))
+            {
+                return null;
+            }
+
             string nexusStaticRiskRating = Nexus.Service.StaticRiskRating.Unspecified;
 
             //try to convert Dept Sup Level from Automon into suitable Static Risk Rating of Nexus

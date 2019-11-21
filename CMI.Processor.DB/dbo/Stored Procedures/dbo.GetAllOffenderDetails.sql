@@ -113,6 +113,9 @@ BEGIN
 
 															LEFT JOIN [$AutomonDatabaseName].[dbo].[DocumentInfo] DI
 																ON P.[Id] = DI.[PersonId]
+
+																LEFT JOIN [$AutomonDatabaseName].[dbo].[PersonAttribute] PA
+																	ON P.[Id] = PA.[PersonId]
 		WHERE
 			AN.[Firstname] IS NOT NULL
 			AND P.[DOB] IS NOT NULL
@@ -128,6 +131,7 @@ BEGIN
 				OR P.[LastModified] > @LastExecutionDateTime 
 				OR OFCL.[FromTime] > @LastExecutionDateTime 
 				OR DI.[EnteredDateTime] > @LastExecutionDateTime 
+				OR PA.[FromTime] > @LastExecutionDateTime 
 				OR @LastExecutionDateTime IS NULL
 			)
 			AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
@@ -148,13 +152,6 @@ BEGIN
 					AND CI.[SupervisionStartDate] <= DATEADD(DAY, 30, GETDATE())
 					AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
 					AND ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) <= DATEADD(DAY, 30, GETDATE())
-			)
-
-			--apply officer logon filter if any passed
-			AND
-			(
-				NOT EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF) 
-				OR EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF WHERE OLTF.[Item] = OFC.[Logon])
 			)
 		';
 	END
