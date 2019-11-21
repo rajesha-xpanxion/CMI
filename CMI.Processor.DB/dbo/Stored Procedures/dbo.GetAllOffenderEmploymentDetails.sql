@@ -22,6 +22,7 @@ Date			Author			Changes
 10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
 18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
 20-Nov-17		Rajesh Awate	Changes for US114589
+21-Nov-17		Rajesh Awate	Changes to handle updating of address & phone in diferential mode
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderEmploymentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -55,10 +56,21 @@ BEGIN
 						ON PARI.[AssociationRoleId] = ARI.[Id]
 						LEFT JOIN [$AutomonDatabaseName].[dbo].[OrganizationInfo] ORGI
 							ON PAI.[OrganizationId] = ORGI.[Id]
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[AddressInfo] AI
+								ON ORGI.[AddressId] = AI.[Id]
+								LEFT JOIN [$AutomonDatabaseName].[dbo].[PhoneNumberInfo] PNI
+									ON ORGI.[PhoneId] = PNI.[Id]
 		WHERE
 			ARI.[PermDesc] = ''Employer''
 			AND (PAI.[ToTime] IS NULL AND [PARI].[ToTime] IS NULL)
-			AND (PAI.[FromTime] >= @LastExecutionDateTime OR PARI.[FromTime] >= @LastExecutionDateTime OR ORGI.[EnteredDateTime] >= @LastExecutionDateTime)
+			AND 
+			(
+				PAI.[FromTime] >= @LastExecutionDateTime 
+				OR PARI.[FromTime] >= @LastExecutionDateTime 
+				OR ORGI.[EnteredDateTime] >= @LastExecutionDateTime 
+				OR AI.[FromTime] >= @LastExecutionDateTime 
+				OR PNI.[FromTime] >= @LastExecutionDateTime
+			)
 		UNION
 		SELECT DISTINCT
 			OI.[Pin],
@@ -80,6 +92,10 @@ BEGIN
 						ON PARI.[AssociationRoleId] = ARI.[Id]
 						LEFT JOIN [$AutomonDatabaseName].[dbo].[OrganizationInfo] ORGI
 							ON PAI.[OrganizationId] = ORGI.[Id]
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[AddressInfo] AI
+								ON ORGI.[AddressId] = AI.[Id]
+								LEFT JOIN [$AutomonDatabaseName].[dbo].[PhoneNumberInfo] PNI
+									ON ORGI.[PhoneId] = PNI.[Id]
 		WHERE
 			ARI.[PermDesc] = ''Employer''
 			AND 
@@ -88,7 +104,14 @@ BEGIN
 				OR 
 				([PARI].[ToTime] IS NOT NULL AND PARI.[DeletedByPId] IS NOT NULL)
 			)
-			AND (PAI.[ToTime] >= @LastExecutionDateTime OR PARI.[ToTime] >= @LastExecutionDateTime OR ORGI.[EnteredDateTime] >= @LastExecutionDateTime)
+			AND 
+			(
+				PAI.[ToTime] >= @LastExecutionDateTime 
+				OR PARI.[ToTime] >= @LastExecutionDateTime 
+				OR ORGI.[EnteredDateTime] >= @LastExecutionDateTime 
+				OR AI.[FromTime] >= @LastExecutionDateTime 
+				OR PNI.[FromTime] >= @LastExecutionDateTime
+			)
 		';
 	END
 	ELSE

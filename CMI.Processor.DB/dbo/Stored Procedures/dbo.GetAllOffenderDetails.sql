@@ -153,6 +153,13 @@ BEGIN
 					AND CI.[SupervisionStartDate] < CI.[SupervisionEndDate]
 					AND ISNULL(CAST(([$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](CI.[Id], NULL, ''SentencingDate'')) AS DATE), CI.[StartDate]) <= DATEADD(DAY, 30, GETDATE())
 			)
+
+			--apply officer logon filter if any passed
+			AND
+			(
+				NOT EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF) 
+				OR EXISTS(SELECT 1 FROM @OfficerLogonsToFilterTbl OLTF WHERE OLTF.[Item] = OFC.[Logon])
+			)
 		';
 	END
 	ELSE
