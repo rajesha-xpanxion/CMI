@@ -21,6 +21,7 @@ History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 08-July-19		Rajesh Awate	Changes to handle update scenario.
+22-Nov-19		Rajesh Awate	Fix for Bug 108315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderVehicleDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -42,10 +43,10 @@ BEGIN
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@MakeLId			INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Make'' AND L.[PermDesc] = @Make),
-			@BodyStyleLId		INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Body Style'' AND L.[PermDesc] = @BodyStyle),
-			@ColorLId			INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Color'' AND L.[PermDesc] = @Color),
-			@AssociationLId		INT	= (SELECT L.[Id] FROM [$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT ON L.[LookupTypeId] = LT.[Id] WHERE LT.[Description] = ''Vehicle Association'' AND L.[PermDesc] = ''Offender''),
+			@MakeLId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Make'' AND [Description] = @Make),
+			@BodyStyleLId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Body Style'' AND [Description] = @BodyStyle),
+			@ColorLId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Color'' AND [Description] = @Color),
+			@AssociationLId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Association'' AND [PermDesc] = ''Offender''),
 			@VehicleId			INT	= @Id;
 
 		EXEC 
