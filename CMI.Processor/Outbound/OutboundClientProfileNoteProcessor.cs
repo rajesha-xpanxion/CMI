@@ -51,7 +51,18 @@ namespace CMI.Processor
 
             try
             {
-                foreach(OutboundMessageDetails message in messages)
+                if (messages.Any())
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "Execute",
+                        Message = string.Format("{0} Note messages received for processing.", messages.Count()),
+                        CustomParams = JsonConvert.SerializeObject(messages)
+                    });
+                }
+
+                foreach (OutboundMessageDetails message in messages)
                 {
                     OffenderNote offenderNoteDetails = null;
                     message.IsProcessed = true;

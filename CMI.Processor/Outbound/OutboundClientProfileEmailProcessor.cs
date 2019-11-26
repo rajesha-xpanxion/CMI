@@ -46,6 +46,17 @@ namespace CMI.Processor
 
             try
             {
+                if (messages.Any())
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "Execute",
+                        Message = string.Format("{0} Client Profile - Email Details messages received for processing.", messages.Count()),
+                        CustomParams = JsonConvert.SerializeObject(messages)
+                    });
+                }
+
                 foreach (OutboundMessageDetails message in messages)
                 {
                     OffenderEmail offenderEmailDetails = null;

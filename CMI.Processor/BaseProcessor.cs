@@ -111,10 +111,18 @@ namespace CMI.Processor
                     IsProcessed = m.IsProcessed,
                     ReceivedOn = m.ReceivedOn,
                     AutomonIdentifier = (
-                        outboundMessages.Any(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                        outboundMessages.Any(x => 
+                            !string.IsNullOrEmpty(x.AutomonIdentifier) 
+                            && x.ActivityTypeName.Equals(m.ActivityTypeName, StringComparison.InvariantCultureIgnoreCase)
+                            && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                        )
                     )
                     ? outboundMessages
-                            .Where(x => !string.IsNullOrEmpty(x.AutomonIdentifier) && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase))
+                            .Where(x => 
+                                !string.IsNullOrEmpty(x.AutomonIdentifier)
+                                && x.ActivityTypeName.Equals(m.ActivityTypeName, StringComparison.InvariantCultureIgnoreCase)
+                                && x.ActivityIdentifier.Equals(m.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                            )
                             .OrderByDescending(y => y.ReceivedOn)
                             .FirstOrDefault()
                             .AutomonIdentifier

@@ -70,6 +70,17 @@ namespace CMI.Processor
 
             try
             {
+                if (messages.Any())
+                {
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "Execute",
+                        Message = string.Format("{0} New Client Profile messages received for processing.", messages.Count()),
+                        CustomParams = JsonConvert.SerializeObject(messages)
+                    });
+                }
+
                 foreach (OutboundMessageDetails message in messages)
                 {
                     OffenderDetails offenderDetails = null;
