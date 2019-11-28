@@ -46,13 +46,16 @@ namespace CMI.Processor
                 allOffenderNoteDetails = offenderNoteService.GetAllOffenderNotes(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
                 //log number of records received from Automon
-                Logger.LogDebug(new LogRequest
+                if (allOffenderNoteDetails.Any())
                 {
-                    OperationName = this.GetType().Name,
-                    MethodName = "Execute",
-                    Message = "Offender Note records received from Automon.",
-                    CustomParams = allOffenderNoteDetails.Count().ToString()
-                });
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "Execute",
+                        Message = "Offender Note records received from Automon.",
+                        CustomParams = allOffenderNoteDetails.Count().ToString()
+                    });
+                }
 
                 foreach (var offenderNoteDetails in allOffenderNoteDetails)
                 {

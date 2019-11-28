@@ -7,7 +7,7 @@ Description:	To delete given offender employment details to given automon databa
 ---------------------------------------------------------------------------------
 Test execution:-
 EXEC	
-	[dbo].[DeleteOffenderEmploymntDetails]
+	[dbo].[DeleteOffenderEmploymentDetails]
 		@AutomonDatabaseName = 'CX',
 		@Pin = '5824',
 		@Id = 0,
@@ -17,6 +17,7 @@ History:-
 Date			Author			Changes
 18-Apr-19		Rajesh Awate	Created.
 12-July-19		Rajesh Awate	Changes to delete employment details using Id.
+27-Nov-19		Rajesh Awate	Fix for issue in delete offender employer association
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[DeleteOffenderEmploymentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -33,22 +34,13 @@ BEGIN
 		DECLARE 
 			@EnteredByPId				INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId					INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@OrganizationId				INT	= @Id,
-			@PersonAssociationId		INT	= 0;
+			@PersonAssociationId		INT	= @Id;
 
-		SET @PersonAssociationId = ISNULL((SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[PersonAssociationInfo] WHERE [PersonId] = @PersonId AND [OrganizationId] = @OrganizationId ORDER BY [FromTime] DESC), 0);
-		
-		
 		EXEC 
-			[$AutomonDatabaseName].[dbo].[DeletePersonAssociation]
+			[$AutomonDatabaseName].[dbo].[DeactivatePersonAssociation]
 				@PersonAssociationId,
 				@EnteredByPId;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[DeleteOrganization]
-				@OrganizationId,
-				@EnteredByPId;
-		
 		';
 
 

@@ -49,13 +49,16 @@ namespace CMI.Processor
                 allOffenderAddresses = offenderAddressService.GetAllOffenderAddresses(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
                 //log number of records received from Automon
-                Logger.LogDebug(new LogRequest
+                if (allOffenderAddresses.Any())
                 {
-                    OperationName = this.GetType().Name,
-                    MethodName = "Execute",
-                    Message = "Offender Address records received from Automon.",
-                    CustomParams = allOffenderAddresses.Count().ToString()
-                });
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "Execute",
+                        Message = "Offender Address records received from Automon.",
+                        CustomParams = allOffenderAddresses.Count().ToString()
+                    });
+                }
 
                 foreach (var offenderAddressDetails in allOffenderAddresses)
                 {
