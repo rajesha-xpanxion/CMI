@@ -9,7 +9,7 @@ DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
 INSERT INTO @OfficerLogonsToFilterTbl
 	([Item])
 VALUES
-	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt'),('calliguie'),('jwindham'),('eamorde'),('tsnyder'),('pespinosa'),('qwaterman'),('mdragony'),('bshreeve'),('ahastings'),('cmartinez')
+	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt'),('calliguie'),('jwindham'),('eamorde'),('tsnyder'),('pespinosa'),('qwaterman'),('mdragony'),('bshreeve'),('ahastings'),('cmartinez'),('aescobar'),('ddevol')
 EXEC	
 	[dbo].[GetAllOffenderDetails]
 		@AutomonDatabaseName = 'CX',
@@ -26,7 +26,8 @@ Date			Author			Changes
 31-Oct-19		Rajesh Awate	Changes for consideration of Mugshot Photo while fetching differential data
 14-Nov-17		Rajesh Awate	Changes to return value for Dept Sup Level attribute
 18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
-20-Nov-17		Rajesh Awate	Changes for US114859
+20-Nov-19		Rajesh Awate	Changes for US114859
+28-Nov-19		Rajesh Awate	Changes for US112771
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -136,7 +137,7 @@ BEGIN
 			)
 			AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
 			AND CSCT.[PermDesc] = ''Service''
-			AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+			AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''MS'' OR CT.[PermDesc] = ''Adult.Interstate'')
 			AND DI.[DocumentTypeDescription] = ''Photo-Mugshot''
 			AND CL.[Name] NOT LIKE ''%bench warrant%''
 			AND EXISTS
@@ -254,7 +255,7 @@ BEGIN
 			)
 			AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
 			AND CSCT.[PermDesc] = ''Service''
-			AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+			AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''MS'' OR CT.[PermDesc] = ''Adult.Interstate'')
 			AND CL.[Name] NOT LIKE ''%bench warrant%''
 			AND EXISTS
 			(

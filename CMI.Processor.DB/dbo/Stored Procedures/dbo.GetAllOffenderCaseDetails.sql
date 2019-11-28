@@ -9,7 +9,7 @@ DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
 INSERT INTO @OfficerLogonsToFilterTbl
 	([Item])
 VALUES
-	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt'),('calliguie'),('jwindham'),('eamorde'),('tsnyder'),('pespinosa'),('qwaterman'),('mdragony'),('bshreeve'),('ahastings'),('cmartinez')
+	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt'),('calliguie'),('jwindham'),('eamorde'),('tsnyder'),('pespinosa'),('qwaterman'),('mdragony'),('bshreeve'),('ahastings'),('cmartinez'),('aescobar'),('ddevol')
 EXEC	
 	[dbo].[GetAllOffenderCaseDetails]
 		@AutomonDatabaseName = 'CX',
@@ -24,8 +24,9 @@ Date			Author			Changes
 10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
 19-Sept-19		Rajesh Awate	Changes to map Conviction Date -> Sentencing Date to Offense Date
 19-Sept-19		Rajesh Awate	Changes to map Sentencing Date to Case Date. If found NULL skip whole record.
-18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
-20-Nov-17		Rajesh Awate	Changes for US114589
+18-Nov-19		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
+20-Nov-19		Rajesh Awate	Changes for US114589
+28-Nov-19		Rajesh Awate	Changes for US112771
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderCaseDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -69,7 +70,7 @@ BEGIN
 							ON CA.[AttributeId] = AD.[Id]
 		WHERE
 			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR CCI.[FromTime] >= @LastExecutionDateTime)
-			AND (CI.[PermDesc] = ''Formal'' OR CI.[PermDesc] = ''PRCS'' OR CI.[PermDesc] = ''MCS'' OR CI.[PermDesc] = ''Adult.Interstate'')
+			AND (CI.[PermDesc] = ''Formal'' OR CI.[PermDesc] = ''PRCS'' OR CI.[PermDesc] = ''MCS'' OR CI.[PermDesc] = ''MS'' OR CI.[PermDesc] = ''Adult.Interstate'')
 			AND 
 			(
 				AD.[PermDesc] = ''Case_SupervisionStart'' 
@@ -168,7 +169,7 @@ BEGIN
 				)
 				AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
 				AND CSCT.[PermDesc] = ''Service''
-				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''MS'' OR CT.[PermDesc] = ''MS'' OR CT.[PermDesc] = ''Adult.Interstate'')
 				AND CL.[Name] NOT LIKE ''%bench warrant%''
 				AND EXISTS
 				(

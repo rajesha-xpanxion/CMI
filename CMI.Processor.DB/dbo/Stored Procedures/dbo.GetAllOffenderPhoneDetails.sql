@@ -10,7 +10,7 @@ DECLARE @OfficerLogonsToFilterTbl [dbo].[Varchar50Tbl];
 INSERT INTO @OfficerLogonsToFilterTbl
 	([Item])
 VALUES
-	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt'),('calliguie'),('jwindham'),('eamorde'),('tsnyder'),('pespinosa'),('qwaterman'),('mdragony'),('bshreeve'),('ahastings'),('cmartinez')
+	('mboyd'),('ryost'),('kpitts'),('khennings'),('ebellew'),('gromanko'),('acraven'),('rrussell'),('kplunkett'),('sclark'),('bvogt'),('jward'),('fblanco'),('plewis'),('jwyatt'),('calliguie'),('jwindham'),('eamorde'),('tsnyder'),('pespinosa'),('qwaterman'),('mdragony'),('bshreeve'),('ahastings'),('cmartinez'),('aescobar'),('ddevol')
 EXEC	
 	[dbo].[GetAllOffenderPhoneDetails]
 		@AutomonDatabaseName = 'CX',
@@ -21,8 +21,9 @@ History:-
 Date			Author			Changes
 04-July-18		Rajesh Awate	Created.
 10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
-18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
-20-Nov-17		Rajesh Awate	Changes for US114589
+18-Nov-19		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
+20-Nov-19		Rajesh Awate	Changes for US114589
+28-Nov-19		Rajesh Awate	Changes for US112771
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderPhoneDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -146,7 +147,7 @@ BEGIN
 				)
 				AND [$AutomonDatabaseName].[dbo].[GetCaseStatus](CC.[Id]) = ''Active''
 				AND CSCT.[PermDesc] = ''Service''
-				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''Adult.Interstate'')
+				AND (CT.[PermDesc] = ''Formal'' OR CT.[PermDesc] = ''PRCS'' OR CT.[PermDesc] = ''MCS'' OR CT.[PermDesc] = ''MS'' OR CT.[PermDesc] = ''Adult.Interstate'')
 				AND CL.[Name] NOT LIKE ''%bench warrant%''
 				AND EXISTS
 				(
