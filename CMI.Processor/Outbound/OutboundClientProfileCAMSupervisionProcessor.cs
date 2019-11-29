@@ -146,6 +146,7 @@ namespace CMI.Processor
                                 NexusData = JsonConvert.SerializeObject(message)
                             });
                             message.IsSuccessful = true;
+                            taskExecutionStatus.NexusReceivedMessageCount--;
                         }
                     }
                     catch (CmiException ce)
