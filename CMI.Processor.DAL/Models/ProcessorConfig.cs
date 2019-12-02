@@ -10,7 +10,7 @@ namespace CMI.Processor.DAL
         public string ExecutionStatusReportEmailSubject { get; set; }
         public string CriticalErrorEmailSubject { get; set; }
         public string ProcessorTypesToExecute { get; set; }
-        public int TimespanInHoursForNonIncrementalModeExecution { get; set; }
+        public string TimespanForNonIncrementalModeExecution { get; set; }
         public InboundProcessorConfig InboundProcessorConfig { get; set; }
         public OutboundProcessorConfig OutboundProcessorConfig { get; set; }
     }

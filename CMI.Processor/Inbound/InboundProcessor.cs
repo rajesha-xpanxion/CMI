@@ -46,18 +46,24 @@ namespace CMI.Processor
 
             DateTime? lastExecutionDateTime = lastExecutionStatus.LastIncrementalModeExecutionDateTime;
             //derive whether current execution should be in incremental or non-incremental mode
-            if (ProcessorConfig.TimespanInHoursForNonIncrementalModeExecution >= 0)
+            if (
+                !string.IsNullOrEmpty(ProcessorConfig.TimespanForNonIncrementalModeExecution)
+                && int.TryParse(ProcessorConfig.TimespanForNonIncrementalModeExecution.Split(":")[0], out int timeSpanHours)
+                && int.TryParse(ProcessorConfig.TimespanForNonIncrementalModeExecution.Split(":")[1], out int timeSpanMinutes)
+            )
             {
                 if (
                     lastExecutionStatus.LastNonIncrementalModeExecutionDateTime.HasValue
-                    && lastExecutionStatus.LastNonIncrementalModeExecutionDateTime.Value.AddHours(ProcessorConfig.TimespanInHoursForNonIncrementalModeExecution) >= DateTime.Now
+                    && lastExecutionStatus.LastNonIncrementalModeExecutionDateTime.Value.AddHours(timeSpanHours).AddMinutes(timeSpanMinutes) >= DateTime.Now
                 )
                 {
+                    //set processor in Incremental mode
                     lastExecutionDateTime = lastExecutionStatus.LastIncrementalModeExecutionDateTime;
                     ProcessorExecutionStatus.IsExecutedInIncrementalMode = true;
                 }
                 else
                 {
+                    //set processor in Non-Incremental mode
                     lastExecutionDateTime = null;
                     ProcessorExecutionStatus.IsExecutedInIncrementalMode = false;
                 }
