@@ -75,59 +75,68 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
-                        //save details to Automon and get Id
-                        int automonId = offenderDrugTestResultService.SaveOffenderDrugTestResultDetails(ProcessorConfig.CmiDbConnString, offenderDrugTestResultDetails);
-
-                        //check if saving details to Automon was successsful
-                        if (automonId == 0)
+                        if (!offenderDrugTestResultDetails.TestResult.Equals(Nexus.Service.Status.Removed, StringComparison.InvariantCultureIgnoreCase) && offenderDrugTestResultDetails.Id > 0)
                         {
-                            throw new CmiException("Offender - Drug Test Result details could not be saved in Automon.");
-                        }
 
-                        //check if details got newly added in Automon
-                        bool isDetailsAddedInAutomon = offenderDrugTestResultDetails.Id == 0 && automonId > 0 && offenderDrugTestResultDetails.Id != automonId;
+                            //save details to Automon and get Id
+                            int automonId = offenderDrugTestResultService.SaveOffenderDrugTestResultDetails(ProcessorConfig.CmiDbConnString, offenderDrugTestResultDetails);
 
-                        offenderDrugTestResultDetails.Id = automonId;
-
-                        //mark this message as successful
-                        message.IsSuccessful = true;
-
-                        //save new identifier in message details
-                        message.AutomonIdentifier = offenderDrugTestResultDetails.Id.ToString();
-
-                        //update automon identifier for rest of messages having same activity identifier
-                        messages.Where(
-                            x =>
-                                string.IsNullOrEmpty(x.AutomonIdentifier)
-                                && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
-                        ).
-                        ToList().
-                        ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
-
-                        //check if it was add or update operation and update Automon message counter accordingly
-                        if (isDetailsAddedInAutomon)
-                        {
-                            taskExecutionStatus.AutomonAddMessageCount++;
-                            Logger.LogDebug(new LogRequest
+                            //check if saving details to Automon was successsful
+                            if (automonId == 0)
                             {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "New Offender - Drug Test Result details added successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderDrugTestResultDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
+                                throw new CmiException("Offender - Drug Test Result details could not be saved in Automon.");
+                            }
+
+                            //check if details got newly added in Automon
+                            bool isDetailsAddedInAutomon = offenderDrugTestResultDetails.Id == 0 && automonId > 0 && offenderDrugTestResultDetails.Id != automonId;
+
+                            offenderDrugTestResultDetails.Id = automonId;
+
+                            //mark this message as successful
+                            message.IsSuccessful = true;
+
+                            //save new identifier in message details
+                            message.AutomonIdentifier = offenderDrugTestResultDetails.Id.ToString();
+
+                            //update automon identifier for rest of messages having same activity identifier
+                            messages.Where(
+                                x =>
+                                    string.IsNullOrEmpty(x.AutomonIdentifier)
+                                    && x.ActivityIdentifier.Equals(message.ActivityIdentifier, StringComparison.InvariantCultureIgnoreCase)
+                            ).
+                            ToList().
+                            ForEach(y => y.AutomonIdentifier = message.AutomonIdentifier);
+
+                            //check if it was add or update operation and update Automon message counter accordingly
+                            if (isDetailsAddedInAutomon)
+                            {
+                                taskExecutionStatus.AutomonAddMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "New Offender - Drug Test Result details added successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderDrugTestResultDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
+                            else
+                            {
+                                taskExecutionStatus.AutomonUpdateMessageCount++;
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Existing Offender - Drug Test Result details updated successfully.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderDrugTestResultDetails),
+                                    NexusData = JsonConvert.SerializeObject(message)
+                                });
+                            }
                         }
                         else
                         {
-                            taskExecutionStatus.AutomonUpdateMessageCount++;
-                            Logger.LogDebug(new LogRequest
-                            {
-                                OperationName = this.GetType().Name,
-                                MethodName = "Execute",
-                                Message = "Existing Offender - Drug Test Result details updated successfully.",
-                                AutomonData = JsonConvert.SerializeObject(offenderDrugTestResultDetails),
-                                NexusData = JsonConvert.SerializeObject(message)
-                            });
+                            //mark this message as successful
+                            message.IsSuccessful = true;
                         }
                     }
                     catch (CmiException ce)

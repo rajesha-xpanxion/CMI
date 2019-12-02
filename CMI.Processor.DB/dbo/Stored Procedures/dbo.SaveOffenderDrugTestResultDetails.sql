@@ -59,38 +59,39 @@ BEGIN
 
 		EXEC [$AutomonDatabaseName].[dbo].[UpdateEvent] @EventTypeId, @StartDate, @EnteredByPId, @Comment, 0, NULL, NULL, 0, @EndDate, NULL, @Status, NULL, @Id = @EventId OUTPUT;
 
-		IF(@OffenderId IS NOT NULL AND @OffenderId > 0)
+		IF(@OffenderId IS NOT NULL AND @OffenderId > 0 AND @EventId > 0)
 		BEGIN
 			EXEC [$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] @OffenderId, @EventId;
-		END
 
-		--Test Date/Time
-		SET @Value = CAST(@StartDate AS VARCHAR(255));
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Value, NULL, ''CeDrugTest.TestDateTime'', NULL, NULL, NULL;
+			--Test Date/Time
+			SET @Value = CAST(@StartDate AS VARCHAR(255));
+			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Value, NULL, ''CeDrugTest.TestDateTime'', NULL, NULL, NULL;
 
-		--Device
-		IF(@DeviceType IS NOT NULL)
-		BEGIN
-			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @DeviceType, NULL, ''CeDrugTest.DeviceType'', NULL, NULL, NULL;
-		END
+			--Device
+			IF(@DeviceType IS NOT NULL)
+			BEGIN
+				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @DeviceType, NULL, ''CeDrugTest.DeviceType'', NULL, NULL, NULL;
+			END
 
-		--Collector
-		SET @Value = (SELECT [FirstLastName] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy);
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Value, NULL, ''CeDrugTest.Collector'', NULL, NULL, NULL;
+			--Collector
+			SET @Value = (SELECT [FirstLastName] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy);
+			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Value, NULL, ''CeDrugTest.Collector'', NULL, NULL, NULL;
 
-		--Initial Test Result
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @TestResult, NULL, ''CeDrugTest.InitialOutcome'', NULL, NULL, NULL;
+			--Initial Test Result
+			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @TestResult, NULL, ''CeDrugTest.InitialOutcome'', NULL, NULL, NULL;
 
-		--Final Test Result
-		IF(@IsSaveFinalTestResult = 1)
-		BEGIN
-			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @TestResult, NULL, ''CeDrugTest.FinalTestResult'', NULL, NULL, NULL;
-		END
+			--Final Test Result
+			IF(@IsSaveFinalTestResult = 1)
+			BEGIN
+				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @TestResult, NULL, ''CeDrugTest.FinalTestResult'', NULL, NULL, NULL;
+			END
 
-		--Validities
-		IF(@Validities IS NOT NULL)
-		BEGIN
-			EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Validities, NULL, ''CeDrugTest.Validities'', NULL, NULL, NULL;
+			--Validities
+			IF(@Validities IS NOT NULL)
+			BEGIN
+				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Validities, NULL, ''CeDrugTest.Validities'', NULL, NULL, NULL;
+			END
+
 		END
 		
 		SELECT @EventId;

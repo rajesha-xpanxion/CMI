@@ -45,6 +45,8 @@ namespace CMI.Nexus.Service
         public static string Skipped { get { return "Skipped"; } }
 
         public static string Compliant { get { return "compliant"; } }
+
+        public static string Removed { get { return "Removed"; } }
     }
 
     public static class DataElementType
