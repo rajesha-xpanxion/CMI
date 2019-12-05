@@ -189,4 +189,19 @@ namespace CMI.Automon.Service
         public static string CMMedium { get { return "CM-Medium"; } }
         public static string CMHigh { get { return "CM-High"; } }
     }
+
+    public static class VehicleMake
+    {
+        public static string Unknown { get { return "Unknown"; } }
+    }
+
+    public static class VehicleBodyStyle
+    {
+        public static string Unknown { get { return "Unknown"; } }
+    }
+
+    public static class VehicleColor
+    {
+        public static string Unknown { get { return "Unknown"; } }
+    }
 }

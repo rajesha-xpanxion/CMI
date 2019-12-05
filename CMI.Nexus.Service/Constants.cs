@@ -75,4 +75,19 @@ namespace CMI.Nexus.Service
         public static string CMHigh { get { return "CM-High"; } }
         public static string High { get { return "High"; } }
     }
+
+    public static class VehicleMake
+    {
+        public static string Unknown { get { return "Unknown"; } }
+    }
+
+    public static class VehicleModel
+    {
+        public static string Unknown { get { return "Unknown"; } }
+    }
+
+    public static class VehicleColor
+    {
+        public static string Unknown { get { return "Unknown"; } }
+    }
 }

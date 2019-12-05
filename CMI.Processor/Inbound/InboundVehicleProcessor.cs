@@ -81,9 +81,9 @@ namespace CMI.Processor
 
                         if (ClientService.GetClientDetails(vehicle.ClientId) != null)
                         {
-                            if (vehicleService.GetVehicleDetails(vehicle.ClientId, vehicle.VehicleId) == null)
+                            Vehicle existingVehicleDetails = vehicleService.GetVehicleDetails(vehicle.ClientId, vehicle.VehicleId);
+                            if (existingVehicleDetails == null)
                             {
-
                                 if (vehicle.IsActive && vehicleService.AddNewVehicleDetails(vehicle))
                                 {
                                     taskExecutionStatus.NexusAddRecordCount++;
@@ -120,6 +120,59 @@ namespace CMI.Processor
                             }
                             else
                             {
+                                //log details of existing client profile vehicle details
+                                Logger.LogDebug(new LogRequest
+                                {
+                                    OperationName = this.GetType().Name,
+                                    MethodName = "Execute",
+                                    Message = "Client Profile - Vehicle details already exists.",
+                                    AutomonData = JsonConvert.SerializeObject(offenderVehicleDetails),
+                                    NexusData = JsonConvert.SerializeObject(existingVehicleDetails)
+                                });
+
+                                //check if any value already exists for Make && no value being passed from Automon, yes = replace it in passing model so that existing value will not be replaced/changed
+                                if (
+                                    !string.IsNullOrEmpty(existingVehicleDetails.Make) 
+                                    && !existingVehicleDetails.Make.Equals(Nexus.Service.VehicleMake.Unknown) 
+                                    && 
+                                    (
+                                        string.IsNullOrEmpty(vehicle.Make)
+                                        || vehicle.Make.Equals(Automon.Service.VehicleMake.Unknown, StringComparison.InvariantCultureIgnoreCase)
+                                    )
+                                )
+                                {
+                                    vehicle.Make = existingVehicleDetails.Make;
+                                }
+
+                                //check if any value already exists for Model, yes = replace it in passing model so that existing value will not be replaced/changed
+                                if (
+                                    !string.IsNullOrEmpty(existingVehicleDetails.Model) 
+                                    && !existingVehicleDetails.Model.Equals(Nexus.Service.VehicleModel.Unknown)
+                                    && 
+                                    (
+                                        string.IsNullOrEmpty(vehicle.Model)
+                                        || vehicle.Model.Equals(Automon.Service.VehicleBodyStyle.Unknown, StringComparison.InvariantCultureIgnoreCase)
+                                    )
+                                )
+                                {
+                                    vehicle.Model = existingVehicleDetails.Model;
+                                }
+
+                                //check if any value already exists for Color, yes = replace it in passing model so that existing value will not be replaced/changed
+                                if (
+                                    !string.IsNullOrEmpty(existingVehicleDetails.Color) 
+                                    && !existingVehicleDetails.Color.Equals(Nexus.Service.VehicleColor.Unknown)
+                                    &&
+                                    (
+                                        string.IsNullOrEmpty(vehicle.Color)
+                                        || vehicle.Color.Equals(Automon.Service.VehicleColor.Unknown, StringComparison.InvariantCultureIgnoreCase)
+                                    )
+                                )
+                                {
+                                    vehicle.Color = existingVehicleDetails.Color;
+                                }
+
+                                //update vehicle details in Nexus
                                 if (vehicleService.UpdateVehicleDetails(vehicle))
                                 {
                                     taskExecutionStatus.NexusUpdateRecordCount++;
