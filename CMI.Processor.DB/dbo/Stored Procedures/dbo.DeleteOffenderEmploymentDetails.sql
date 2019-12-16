@@ -18,6 +18,7 @@ Date			Author			Changes
 18-Apr-19		Rajesh Awate	Created.
 12-July-19		Rajesh Awate	Changes to delete employment details using Id.
 27-Nov-19		Rajesh Awate	Fix for issue in delete offender employer association
+16-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[DeleteOffenderEmploymentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -36,10 +37,15 @@ BEGIN
 			@PersonId					INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@PersonAssociationId		INT	= @Id;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[DeactivatePersonAssociation]
-				@PersonAssociationId,
-				@EnteredByPId;
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
+		BEGIN
+		
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[DeactivatePersonAssociation]
+					@PersonAssociationId,
+					@EnteredByPId;
+		END
 
 		';
 

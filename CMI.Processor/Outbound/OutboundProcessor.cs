@@ -128,6 +128,13 @@ namespace CMI.Processor
                 return TaskExecutionStatuses;
             }
 
+            //check if we want to process activities which was generated on client profiles added directly in Nexus
+            if (!ProcessorConfig.OutboundProcessorConfig.IsProcessActivityForNexusAddedClients)
+            {
+                //filter out messages which are having client integration id in Guid format. This is to avoid 
+                toBeProcessedOutboundMessages = toBeProcessedOutboundMessages.Where(t => !Guid.TryParse(t.ClientIntegrationId, out Guid guid));
+            }
+
             //process each type of message based on whether it is allowed or not
             //new client
             if (

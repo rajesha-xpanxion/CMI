@@ -49,7 +49,6 @@ namespace CMI.Automon.Service
         public static string PhoneNumberType { get { return "@PhoneNumberType"; } }
         public static string VehicleYear { get { return "@VehicleYear"; } }
         public static string Make { get { return "@Make"; } }
-        public static string BodyStyle { get { return "@BodyStyle"; } }
         public static string Color { get { return "@Color"; } }
         public static string LicensePlate { get { return "@LicensePlate"; } }
         public static string OrganizationName { get { return "@OrganizationName"; } }
@@ -140,7 +139,6 @@ namespace CMI.Automon.Service
         public static string IsActive { get { return "IsActive"; } }
         public static string NoteType { get { return "NoteType"; } }
         public static string Make { get { return "Make"; } }
-        public static string BodyStyle { get { return "BodyStyle"; } }
         public static string Vyear { get { return "Vyear"; } }
         public static string LicensePlate { get { return "LicensePlate"; } }
         public static string Color { get { return "Color"; } }
@@ -193,15 +191,12 @@ namespace CMI.Automon.Service
     public static class VehicleMake
     {
         public static string Unknown { get { return "Unknown"; } }
-    }
-
-    public static class VehicleBodyStyle
-    {
-        public static string Unknown { get { return "Unknown"; } }
+        public static string Other { get { return "Other"; } }
     }
 
     public static class VehicleColor
     {
         public static string Unknown { get { return "Unknown"; } }
+        public static string Other { get { return "Other"; } }
     }
 }

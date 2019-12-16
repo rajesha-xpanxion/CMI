@@ -22,6 +22,7 @@ Date			Author			Changes
 27-Aug-18		Rajesh Awate	Changes to skip records having Vyear as NULL and return Unknown for NULL for columns Make, BodyStyle & Color
 10-Sept-19		Rajesh Awate	Changes for integration by officer filter.
 18-Nov-19		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
+11-Dec-19		Rajesh Awate	Changes for US116002
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderVehicleDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -39,7 +40,6 @@ BEGIN
 			OI.[Pin],
 			VI.[Id],
 			ISNULL(VI.[Make], ''Unknown'') AS [Make],
-			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],
@@ -56,7 +56,6 @@ BEGIN
 			OI.[Pin],
 			VI.[Id],
 			ISNULL(VI.[Make], ''Unknown'') AS [Make],
-			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],
@@ -79,7 +78,6 @@ BEGIN
 			OI.[Pin],
 			VI.[Id],
 			ISNULL(VI.[Make], ''Unknown'') AS [Make],
-			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],
@@ -111,7 +109,6 @@ BEGIN
 			OI.[Pin],
 			VI.[Id],
 			ISNULL(VI.[Make], ''Unknown'') AS [Make],
-			ISNULL(VI.[BodyStyle], ''Unknown'') AS [BodyStyle],
 			VI.[Vyear],
 			VI.[LicensePlate],
 			ISNULL(VI.[Color], ''Unknown'') AS [Color],

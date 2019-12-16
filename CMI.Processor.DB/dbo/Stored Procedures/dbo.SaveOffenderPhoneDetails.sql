@@ -18,6 +18,7 @@ History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 09-July-19		Rajesh Awate	Changes to handle update scenario.
+16-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderPhoneDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -35,30 +36,35 @@ BEGIN
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId	INT				= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@OffenderId		INT				= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@PersonId		INT				= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
 			@PhoneNumberId	INT				= @Id,
 			@PersonPhoneId	INT				= 0;
 		
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
-				@EnteredByPId, 
-				@Phone, 
-				NULL, 
-				NULL, 
-				NULL, 
-				@Id = @PhoneNumberId OUTPUT;
+		
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
+		BEGIN
+		
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
+					@EnteredByPId, 
+					@Phone, 
+					NULL, 
+					NULL, 
+					NULL, 
+					@Id = @PhoneNumberId OUTPUT;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePersonPhone] 
-				@PersonId, 
-				@PhoneNumberId, 
-				NULL, 
-				0, 
-				@PersonPhoneId OUTPUT, 
-				@PhoneNumberType, 
-				NULL, 
-				NULL;
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonPhone] 
+					@PersonId, 
+					@PhoneNumberId, 
+					NULL, 
+					0, 
+					@PersonPhoneId OUTPUT, 
+					@PhoneNumberType, 
+					NULL, 
+					NULL;
+		END
 		
 		SELECT @PhoneNumberId;
 		';

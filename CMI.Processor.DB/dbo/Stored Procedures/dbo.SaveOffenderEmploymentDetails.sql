@@ -24,6 +24,7 @@ History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 08-July-19		Rajesh Awate	Changes to handle update scenario.
+16-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderEmploymentDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -54,161 +55,167 @@ BEGIN
 			@AddressId					INT = (SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[AddressInfo] WHERE [Line1] = @OrganizationAddress ORDER BY [FromTime] DESC),
 			@PhoneNumberId				INT	= (SELECT TOP 1 [Id] FROM [$AutomonDatabaseName].[dbo].[PhoneNumberInfo] WHERE [Phone] = @OrganizationPhone ORDER BY [FromTime] DESC);
 
-		--organization address
-		IF(@OrganizationAddress IS NOT NULL)
-		BEGIN
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdateAddress] 
-					@OrganizationAddress, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					NULL, 
-					@EnteredByPId = @EnteredByPId, 
-					@Id = @AddressId OUTPUT;
-		END
 		
-		--organization phone
-		IF(@OrganizationPhone IS NOT NULL)
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
 		BEGIN
+		
+			--organization address
+			IF(@OrganizationAddress IS NOT NULL)
+			BEGIN
+				EXEC 
+					[$AutomonDatabaseName].[dbo].[UpdateAddress] 
+						@OrganizationAddress, 
+						NULL, 
+						NULL, 
+						NULL, 
+						NULL, 
+						NULL, 
+						NULL, 
+						@EnteredByPId = @EnteredByPId, 
+						@Id = @AddressId OUTPUT;
+			END
+		
+			--organization phone
+			IF(@OrganizationPhone IS NOT NULL)
+			BEGIN
+				EXEC 
+					[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
+						@EnteredByPId, 
+						@OrganizationPhone, 
+						NULL, 
+						NULL, 
+						NULL, 
+						@PhoneNumberId OUTPUT;
+			END
+		
+			SET @OrganizationId = ISNULL(
+				(
+					SELECT TOP 1 
+						[Id] 
+					FROM 
+						[$AutomonDatabaseName].[dbo].[Organization] 
+					WHERE 
+						[Name] = @OrganizationName 
+						AND [AddressId] = @AddressId 
+						AND [PhoneId] = @PhoneNumberId 
+						AND [IsActive] = 1 
+						AND [OrganizationTypeId] = @OrganizationTypeId 
+					ORDER BY 
+						[EnteredDateTime] DESC
+				),
+				0
+			);
+
+			--organization
 			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdatePhoneNumber] 
+				[$AutomonDatabaseName].[dbo].[UpdateOrganization]
+					@OrganizationName,
+					@OrganizationTypeId,
+					@EnteredByPId,
+					1, --@IsActive
+					NULL, --@Description
+					@AddressId, --@AddressId - need to retrieve separately
+					@PhoneNumberId, --@PhoneId - need to retrieve separately
+					NULL, --@FaxId - can be ignored
+					NULL, --@MailingAddressId - can be ignored
+					NULL, --@ForeignKeyCode - can be ignored
+					NULL, --@ParentId - can be ignored
+					@OrganizationId OUTPUT;
+
+			--person associattion
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonAssociation] 
+					@PersonId,
+					@EnteredByPId,
+					NULL, --@RelatedPersonId
+					@OrganizationId,
+					NULL, --@FromTime
+					NULL, --@ToTime
+					NULL, --@DeletedByPId
+					0, --@LivesWith
+					0, --@LegalCustody           BIT      = 0,
+					0, --@PhysicalCustody        BIT      = 0,
+					0, --@FinancialSupport       BIT      = 0,
+					NULL, --@LegalDesignationLId    INT      = NULL,
+					NULL, --@NoteId                 INT      = NULL,
+					@PersonAssociationId OUTPUT;
+
+
+			--person association role
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationRole] 
+					@PersonAssociationId, 
 					@EnteredByPId, 
-					@OrganizationPhone, 
+					1, 
+					''Employer'', 
 					NULL, 
 					NULL, 
 					NULL, 
-					@PhoneNumberId OUTPUT;
-		END
-		
-		SET @OrganizationId = ISNULL(
-			(
-				SELECT TOP 1 
-					[Id] 
-				FROM 
-					[$AutomonDatabaseName].[dbo].[Organization] 
-				WHERE 
-					[Name] = @OrganizationName 
-					AND [AddressId] = @AddressId 
-					AND [PhoneId] = @PhoneNumberId 
-					AND [IsActive] = 1 
-					AND [OrganizationTypeId] = @OrganizationTypeId 
-				ORDER BY 
-					[EnteredDateTime] DESC
-			),
-			0
-		);
-
-		--organization
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateOrganization]
-				@OrganizationName,
-				@OrganizationTypeId,
-				@EnteredByPId,
-				1, --@IsActive
-				NULL, --@Description
-				@AddressId, --@AddressId - need to retrieve separately
-				@PhoneNumberId, --@PhoneId - need to retrieve separately
-				NULL, --@FaxId - can be ignored
-				NULL, --@MailingAddressId - can be ignored
-				NULL, --@ForeignKeyCode - can be ignored
-				NULL, --@ParentId - can be ignored
-				@OrganizationId OUTPUT;
-
-		--person associattion
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePersonAssociation] 
-				@PersonId,
-				@EnteredByPId,
-				NULL, --@RelatedPersonId
-				@OrganizationId,
-				NULL, --@FromTime
-				NULL, --@ToTime
-				NULL, --@DeletedByPId
-				0, --@LivesWith
-				0, --@LegalCustody           BIT      = 0,
-				0, --@PhysicalCustody        BIT      = 0,
-				0, --@FinancialSupport       BIT      = 0,
-				NULL, --@LegalDesignationLId    INT      = NULL,
-				NULL, --@NoteId                 INT      = NULL,
-				@PersonAssociationId OUTPUT;
-
-
-		--person association role
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationRole] 
-				@PersonAssociationId, 
-				@EnteredByPId, 
-				1, 
-				''Employer'', 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
-				@PersonAssociationRoleId OUTPUT;
+					NULL, 
+					NULL, 
+					@PersonAssociationRoleId OUTPUT;
 
 		
-		--pay frequency
-		IF(@PayFrequency IS NOT NULL)
-		BEGIN
-			EXEC
-				[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
-					@PersonAssociationId, 
-					@EnteredByPId,
-					@PayFrequency,
-					NULL,
-					''PayFrequency'',
-					NULL,
-					NULL,
-					NULL;
-		END
+			--pay frequency
+			IF(@PayFrequency IS NOT NULL)
+			BEGIN
+				EXEC
+					[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
+						@PersonAssociationId, 
+						@EnteredByPId,
+						@PayFrequency,
+						NULL,
+						''PayFrequency'',
+						NULL,
+						NULL,
+						NULL;
+			END
 
-		--pay rate
-		IF(@PayRate IS NOT NULL)
-		BEGIN
-			EXEC
-				[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
-					@PersonAssociationId, 
-					@EnteredByPId,
-					@PayRate,
-					NULL,
-					''PayRate'',
-					NULL,
-					NULL,
-					NULL;
-		END
+			--pay rate
+			IF(@PayRate IS NOT NULL)
+			BEGIN
+				EXEC
+					[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
+						@PersonAssociationId, 
+						@EnteredByPId,
+						@PayRate,
+						NULL,
+						''PayRate'',
+						NULL,
+						NULL,
+						NULL;
+			END
 
-		--work type
-		IF(@WorkType IS NOT NULL)
-		BEGIN
-			EXEC
-				[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
-					@PersonAssociationId, 
-					@EnteredByPId,
-					@WorkType,
-					NULL,
-					''WorkType'',
-					NULL,
-					NULL,
-					NULL;
-		END
+			--work type
+			IF(@WorkType IS NOT NULL)
+			BEGIN
+				EXEC
+					[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
+						@PersonAssociationId, 
+						@EnteredByPId,
+						@WorkType,
+						NULL,
+						''WorkType'',
+						NULL,
+						NULL,
+						NULL;
+			END
 
-		--job title
-		IF(@WorkType IS NOT NULL)
-		BEGIN
-			EXEC
-				[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
-					@PersonAssociationId, 
-					@EnteredByPId,
-					@JobTitle,
-					NULL,
-					''JobTitle'',
-					NULL,
-					NULL,
-					NULL;
+			--job title
+			IF(@WorkType IS NOT NULL)
+			BEGIN
+				EXEC
+					[$AutomonDatabaseName].[dbo].[UpdatePersonAssociationAttribute]
+						@PersonAssociationId, 
+						@EnteredByPId,
+						@JobTitle,
+						NULL,
+						''JobTitle'',
+						NULL,
+						NULL,
+						NULL;
+			END
 		END
 		
 		SELECT @PersonAssociationId;

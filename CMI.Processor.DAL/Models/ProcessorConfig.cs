@@ -27,5 +27,6 @@ namespace CMI.Processor.DAL
         public IEnumerable<string> ActivityTypesToProcess { get; set; }
         public IEnumerable<string> ActivitySubTypesToProcess { get; set; }
         public string SecondaryStorageRepositoryFileFullPath { get; set; }
+        public bool IsProcessActivityForNexusAddedClients { get; set; }
     }
 }

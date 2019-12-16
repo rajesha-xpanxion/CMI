@@ -45,73 +45,75 @@ BEGIN
 		--declare required variables and assign it with values
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
-			@PersonId			INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin), 0),
 			@OffenderId			INT	= ISNULL((SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin), 0),
 			@EventTypeId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[EventType] WHERE [PermDesc] = ''NexusContact''),
 			@EventId			INT = @Id,
 			@Value				VARCHAR(255);
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEvent] 
-				@EventTypeId, 
-				@StartDate, 
-				@EnteredByPId, 
-				NULL, 
-				0, 
-				NULL, 
-				NULL, 
-				0, 
-				@EndDate, 
-				NULL, 
-				@Status, 
-				NULL, 
-				@Id = @EventId OUTPUT;
-
+		
+		--check if OffenderId could be found for given Pin
 		IF(@OffenderId IS NOT NULL AND @OffenderId > 0)
 		BEGIN
+		
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateEvent] 
+					@EventTypeId, 
+					@StartDate, 
+					@EnteredByPId, 
+					NULL, 
+					0, 
+					NULL, 
+					NULL, 
+					0, 
+					@EndDate, 
+					NULL, 
+					@Status, 
+					NULL, 
+					@Id = @EventId OUTPUT;
+
 			EXEC 
 				[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
 					@OffenderId, 
 					@EventId;
+
+			--Offender Present
+			SET @Value = CASE WHEN @IsOffenderPresent = 1 THEN ''True'' ELSE ''False'' END;
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
+					@EventId, 
+					@EnteredByPId, 
+					@Value, 
+					NULL, 
+					''SupvContactOPresent'', 
+					NULL, 
+					NULL, 
+					NULL;
+
+			--Contact Type
+			SET @Value = 
+				(
+					SELECT TOP 1 
+						CAST(L.[Id] AS VARCHAR(255)) 
+					FROM 
+						[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT 
+							ON L.[LookupTypeId] = LT.[Id] 
+					WHERE 
+						LT.[IsActive] = 1 
+						AND LT.[Description] = ''Contact Type'' 
+						AND L.[IsActive] = 1 
+						AND L.[PermDesc] = ''InpersonNexusDrugTest''
+				);
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
+					@EventId, 
+					@EnteredByPId, 
+					@Value, 
+					NULL, 
+					''CaseEventInv_ContactType'', 
+					NULL, 
+					NULL, 
+					NULL;
 		END
-
-		--Offender Present
-		SET @Value = CASE WHEN @IsOffenderPresent = 1 THEN ''True'' ELSE ''False'' END;
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
-				@EventId, 
-				@EnteredByPId, 
-				@Value, 
-				NULL, 
-				''SupvContactOPresent'', 
-				NULL, 
-				NULL, 
-				NULL;
-
-		--Contact Type
-		SET @Value = 
-			(
-				SELECT TOP 1 
-					CAST(L.[Id] AS VARCHAR(255)) 
-				FROM 
-					[$AutomonDatabaseName].[dbo].[Lookup] L JOIN [$AutomonDatabaseName].[dbo].[LookupType] LT 
-						ON L.[LookupTypeId] = LT.[Id] 
-				WHERE 
-					LT.[IsActive] = 1 
-					AND LT.[Description] = ''Contact Type'' 
-					AND L.[IsActive] = 1 
-					AND L.[PermDesc] = ''InpersonNexusDrugTest''
-			);
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEventAttribute] 
-				@EventId, 
-				@EnteredByPId, 
-				@Value, 
-				NULL, 
-				''CaseEventInv_ContactType'', 
-				NULL, 
-				NULL, 
-				NULL;
 		
 		SELECT @EventId;
 		';

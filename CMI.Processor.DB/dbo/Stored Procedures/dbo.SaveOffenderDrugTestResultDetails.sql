@@ -28,6 +28,7 @@ Date			Author			Changes
 08-Apr-19		Rajesh Awate	Created.
 08-July-19		Rajesh Awate	Changes to handle update scenario.
 19-Aug-19		Rajesh Awate	Changes to save Final Test Result based on condition
+13-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -57,10 +58,12 @@ BEGIN
 			@EventId			INT = @Id,
 			@Value				VARCHAR(255);
 
-		EXEC [$AutomonDatabaseName].[dbo].[UpdateEvent] @EventTypeId, @StartDate, @EnteredByPId, @Comment, 0, NULL, NULL, 0, @EndDate, NULL, @Status, NULL, @Id = @EventId OUTPUT;
-
-		IF(@OffenderId IS NOT NULL AND @OffenderId > 0 AND @EventId > 0)
+		--check if OffenderId could be found for given Pin
+		IF(@OffenderId IS NOT NULL AND @OffenderId > 0)
 		BEGIN
+		
+			EXEC [$AutomonDatabaseName].[dbo].[UpdateEvent] @EventTypeId, @StartDate, @EnteredByPId, @Comment, 0, NULL, NULL, 0, @EndDate, NULL, @Status, NULL, @Id = @EventId OUTPUT;
+
 			EXEC [$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] @OffenderId, @EventId;
 
 			--Test Date/Time
@@ -91,7 +94,6 @@ BEGIN
 			BEGIN
 				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Validities, NULL, ''CeDrugTest.Validities'', NULL, NULL, NULL;
 			END
-
 		END
 		
 		SELECT @EventId;

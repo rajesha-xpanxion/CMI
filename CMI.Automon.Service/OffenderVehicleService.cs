@@ -104,13 +104,6 @@ namespace CMI.Automon.Service
                         });
                         cmd.Parameters.Add(new SqlParameter()
                         {
-                            ParameterName = SqlParamName.BodyStyle,
-                            SqlDbType = System.Data.SqlDbType.VarChar,
-                            Value = offenderVehicleDetails.BodyStyle,
-                            IsNullable = false
-                        });
-                        cmd.Parameters.Add(new SqlParameter()
-                        {
                             ParameterName = SqlParamName.Color,
                             SqlDbType = System.Data.SqlDbType.VarChar,
                             Value = offenderVehicleDetails.Color,
@@ -245,7 +238,6 @@ namespace CMI.Automon.Service
                                     Pin = Convert.ToString(reader[DbColumnName.Pin]),
                                     Id = Convert.ToInt32(reader[DbColumnName.Id]),
                                     Make = Convert.ToString(reader[DbColumnName.Make]),
-                                    BodyStyle = Convert.ToString(reader[DbColumnName.BodyStyle]),
                                     VehicleYear = Convert.ToInt32(reader[DbColumnName.Vyear]),
                                     LicensePlate = Convert.ToString(reader[DbColumnName.LicensePlate]),
                                     Color = Convert.ToString(reader[DbColumnName.Color]),

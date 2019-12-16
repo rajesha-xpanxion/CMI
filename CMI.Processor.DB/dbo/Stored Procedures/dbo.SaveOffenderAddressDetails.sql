@@ -19,6 +19,7 @@ History:-
 Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 10-July-19		Rajesh Awate	Changes to handle update scenario.
+13-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderAddressDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -41,26 +42,31 @@ BEGIN
 			@AddressId			INT = @Id,
 			@PersonAddressId	INT = 0;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateAddress] 
-				@Line1, 
-				@Line2, 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
-				@EnteredByPId = @EnteredByPId, 
-				@Id = @AddressId OUTPUT;
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
+		BEGIN
+		
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateAddress] 
+					@Line1, 
+					@Line2, 
+					NULL, 
+					NULL, 
+					NULL, 
+					NULL, 
+					NULL, 
+					@EnteredByPId = @EnteredByPId, 
+					@Id = @AddressId OUTPUT;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdatePersonAddress] 
-				@PersonId, 
-				NULL, 
-				@AddressId, 
-				0, 
-				@PersonAddressId OUTPUT, 
-				@AddressType;
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdatePersonAddress] 
+					@PersonId, 
+					NULL, 
+					@AddressId, 
+					0, 
+					@PersonAddressId OUTPUT, 
+					@AddressType;
+		END
 		
 		SELECT @AddressId;
 		';

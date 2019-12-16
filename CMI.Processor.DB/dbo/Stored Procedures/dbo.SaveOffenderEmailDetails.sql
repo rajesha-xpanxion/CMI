@@ -18,6 +18,7 @@ History:-
 Date			Author			Changes
 11-Apr-19		Rajesh Awate	Created.
 09-July-19		Rajesh Awate	Changes to handle update scenario.
+16-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderEmailDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -38,13 +39,17 @@ BEGIN
 			@EmailAddressId	INT				= @Id;
 
 		
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEmail] 
-				@EmailAddress, 
-				@PersonId,
-				@EnteredByPId,
-				0,
-				@Id = @EmailAddressId OUTPUT;
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
+		BEGIN
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateEmail] 
+					@EmailAddress, 
+					@PersonId,
+					@EnteredByPId,
+					0,
+					@Id = @EmailAddressId OUTPUT;
+		END
 		
 		SELECT @EmailAddressId;
 		';

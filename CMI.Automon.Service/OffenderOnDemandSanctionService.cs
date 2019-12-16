@@ -115,7 +115,6 @@ namespace CMI.Automon.Service
                             Locale = CultureInfo.InvariantCulture
                         };
                         dataTable.Columns.Add(TableColumnName.TermOfSupervision, typeof(string));
-                        dataTable.Columns.Add(TableColumnName.Description, typeof(string));
                         dataTable.Columns.Add(TableColumnName.EventDateTime, typeof(DateTime));
                         //check for null & check if any record to process
                         if (offenderOnDemandSanctionDetails.OnDemandSanctionedActivities != null && offenderOnDemandSanctionDetails.OnDemandSanctionedActivities.Any())
@@ -124,7 +123,6 @@ namespace CMI.Automon.Service
                             {
                                 dataTable.Rows.Add(
                                     onDemandsanctionedActivityDetails.TermOfSupervision,
-                                    onDemandsanctionedActivityDetails.Description,
                                     onDemandsanctionedActivityDetails.EventDateTime
                                 );
                             }

@@ -12,7 +12,6 @@ EXEC
 		@Id = 0,
 		@VehicleYear = 2012,
 		@Make = 'Suzuki',
-		@BodyStyle = 'Sedan',
 		@Color = 'Grey',
 		@LicensePlate = 'MH14DF5029',
 		@UpdatedBy = 'rawate@xpanxion.com';
@@ -22,6 +21,8 @@ Date			Author			Changes
 06-Apr-19		Rajesh Awate	Created.
 08-July-19		Rajesh Awate	Changes to handle update scenario.
 22-Nov-19		Rajesh Awate	Fix for Bug 108315
+11-Dec-19		Rajesh Awate	Changes for US116002
+16-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderVehicleDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -29,7 +30,6 @@ CREATE PROCEDURE [dbo].[SaveOffenderVehicleDetails]
 	@Id INT = 0,
 	@VehicleYear INT = NULL,
 	@Make VARCHAR(150),
-	@BodyStyle VARCHAR(150),
 	@Color VARCHAR(150),
 	@LicensePlate VARCHAR(10),
 	@UpdatedBy VARCHAR(255)
@@ -43,32 +43,74 @@ BEGIN
 		DECLARE 
 			@EnteredByPId		INT	= ISNULL((SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OfficerInfo] WHERE [Email] = @UpdatedBy), 0),
 			@PersonId			INT	= (SELECT [PersonId] FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] WHERE [Pin] = @Pin),
-			@MakeLId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Make'' AND [Description] = @Make),
-			@BodyStyleLId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Body Style'' AND [Description] = @BodyStyle),
-			@ColorLId			INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Color'' AND [Description] = @Color),
+			@MakeLId			INT	= 
+				ISNULL
+				(
+					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Make'' AND [Description] = @Make),
+					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Make'' AND [Description] = ''Other'')
+				),
+			@ColorLId			INT	= 
+				ISNULL
+				(
+					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Color'' AND [Description] = @Color),
+					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Color'' AND [Description] = ''Other'')
+				),
 			@AssociationLId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Association'' AND [PermDesc] = ''Offender''),
-			@VehicleId			INT	= @Id;
+			@VehicleId			INT	= @Id,
+			@BodyStyleLId       INT,
+			@LicenseState       VARCHAR(3),
+			@LicenseTypeLId     INT,
+			@CountryLId         INT,
+			@VehicleIdNumber    VARCHAR(30),
+			@Description        VARCHAR(225),
+			@InsuranceCompany   VARCHAR(50),
+			@InsuranceCoAddress VARCHAR(255),
+			@PolicyNumber       VARCHAR(30),
+			@ExpirationDate     DATETIME;
 
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateVehicle] 
-				@PersonId, 
-				@VehicleYear, 
-				@MakeLId, 
-				@BodyStyleLId, 
-				@ColorLId, 
-				@LicensePlate, 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
-				@AssociationLId, 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
-				NULL, 
-				@EnteredByPId, 
-				@Id = @VehicleId OUTPUT;
+		
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
+		BEGIN
+		
+			--retrieve other details which has already been saved to avoid data loss
+			SELECT
+				@BodyStyleLId = [BodyStyleLId],
+				@LicenseState = [LicenseState],
+				@LicenseTypeLId = [LicenseTypeLId],
+				@CountryLId = [CountryLId],
+				@VehicleIdNumber = [VehicleIdNumber],
+				@Description = [Description],
+				@InsuranceCompany = [InsuranceCompany],
+				@InsuranceCoAddress = [InsuranceCoAddress],
+				@PolicyNumber = [PolicyNumber],
+				@ExpirationDate = [ExpirationDate]
+			FROM
+				[dbo].[VehicleInfo]
+			WHERE
+				[Id] = @VehicleId;
+		
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateVehicle] 
+					@PersonId, 
+					@VehicleYear, 
+					@MakeLId, 
+					@BodyStyleLId, 
+					@ColorLId, 
+					@LicensePlate, 
+					@LicenseState, 
+					@LicenseTypeLId, 
+					@CountryLId, 
+					@VehicleIdNumber, 
+					@AssociationLId, 
+					@Description, 
+					@InsuranceCompany, 
+					@InsuranceCoAddress, 
+					@PolicyNumber, 
+					@ExpirationDate, 
+					@EnteredByPId, 
+					@Id = @VehicleId OUTPUT;
+		END
 
 		SELECT @VehicleId;
 		';
@@ -81,7 +123,6 @@ BEGIN
 		@Id INT,
 		@VehicleYear INT,
 		@Make VARCHAR(150),
-		@BodyStyle VARCHAR(150),
 		@Color VARCHAR(150),
 		@LicensePlate VARCHAR(10),
 		@UpdatedBy VARCHAR(255)';
@@ -95,7 +136,6 @@ BEGIN
 				@Id = @Id,
 				@VehicleYear = @VehicleYear,
 				@Make = @Make,
-				@BodyStyle = @BodyStyle,
 				@Color = @Color,
 				@LicensePlate = @LicensePlate,
 				@UpdatedBy = @UpdatedBy;

@@ -16,6 +16,7 @@ EXEC
 History:-
 Date			Author			Changes
 03-Sept-19		Rajesh Awate	Created.
+16-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderGPSViolationDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -43,43 +44,49 @@ BEGIN
 			@Value								VARCHAR(255)	= CONVERT(VARCHAR(255), @ViolationDateTime, 22),
 			@ExistingGPSViolationDateTime		DATETIME		= NULL;
 
-		--check if any record exists for given person attribute id, YES = retrieve details, NO = try to get details by person id
-		IF(EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc) WHERE [Id] = @PersonAttributeId))
-		BEGIN
-			SELECT
-				@PersonAttributeId = [Id],
-				@ExistingGPSViolationDateTime = CONVERT(DATETIME, [Value])
-			FROM
-				[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
-			WHERE
-				[Id] = @PersonAttributeId;
-		END
-		ELSE
-		BEGIN
-			SELECT
-				@PersonAttributeId = [Id],
-				@ExistingGPSViolationDateTime = CONVERT(DATETIME, [Value])
-			FROM
-				[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
-			WHERE
-				[PersonId] = @PersonId;
-		END
 		
-		--check if valid offender pin is passed
-		IF(@PersonId IS NOT NULL AND (@ExistingGPSViolationDateTime IS NULL OR @ExistingGPSViolationDateTime < @ViolationDateTime))
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
 		BEGIN
-			--update GPS Violation attribute
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
-					@PersonId, 
-					@Value, 
-					@EnteredByPId, 
-					0,
-					NULL,
-					@PermDesc, 
-					NULL,
-					NULL,
-					@PersonAttributeId OUTPUT;
+		
+			--check if any record exists for given person attribute id, YES = retrieve details, NO = try to get details by person id
+			IF(EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc) WHERE [Id] = @PersonAttributeId))
+			BEGIN
+				SELECT
+					@PersonAttributeId = [Id],
+					@ExistingGPSViolationDateTime = CONVERT(DATETIME, [Value])
+				FROM
+					[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
+				WHERE
+					[Id] = @PersonAttributeId;
+			END
+			ELSE
+			BEGIN
+				SELECT
+					@PersonAttributeId = [Id],
+					@ExistingGPSViolationDateTime = CONVERT(DATETIME, [Value])
+				FROM
+					[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
+				WHERE
+					[PersonId] = @PersonId;
+			END
+		
+			--check if valid offender pin is passed
+			IF(@ExistingGPSViolationDateTime IS NULL OR @ExistingGPSViolationDateTime < @ViolationDateTime)
+			BEGIN
+				--update GPS Violation attribute
+				EXEC 
+					[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
+						@PersonId, 
+						@Value, 
+						@EnteredByPId, 
+						0,
+						NULL,
+						@PermDesc, 
+						NULL,
+						NULL,
+						@PersonAttributeId OUTPUT;
+			END
 		END
 
 		SELECT @PersonAttributeId;

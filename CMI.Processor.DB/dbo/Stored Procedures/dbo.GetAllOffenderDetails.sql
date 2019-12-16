@@ -67,7 +67,8 @@ BEGIN
 				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''MCS'') THEN ''MCS''
 				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''MS'') THEN ''MS''
 				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''Formal'') THEN ''Formal''
-				ELSE CT.[PermDesc]
+				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''Adult.Interstate'') THEN ''Interstate Compact''
+				ELSE ''Formal''
 			END AS [ClientType],
 
 			RD.[Description] AS [RaceDescription],
@@ -193,7 +194,8 @@ BEGIN
 				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''MCS'') THEN ''MCS''
 				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''MS'') THEN ''MS''
 				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''Formal'') THEN ''Formal''
-				ELSE CT.[PermDesc]
+				WHEN EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[OffenderInfo] OI JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] CI ON OI.[Id] = CI.[OffenderId] WHERE OI.[Id] = O.[Id] AND CI.[Status] = ''Active'' AND CI.[PermDesc] = ''Adult.Interstate'') THEN ''Interstate Compact''
+				ELSE ''Formal''
 			END AS [ClientType],
 
 			RD.[Description] AS [RaceDescription],

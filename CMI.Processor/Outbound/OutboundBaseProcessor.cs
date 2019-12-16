@@ -422,7 +422,6 @@ namespace CMI.Processor
                     UpdatedBy = updatedBy,
                     VehicleYear = details.Year,
                     Make = details.Make,
-                    BodyStyle = details.Model,
                     Color = details.Color,
                     LicensePlate = details.LicensePlate
                 };
@@ -774,7 +773,6 @@ namespace CMI.Processor
                         Automon.Model.OnDemandSanctionedActivityDetails onDemandSanctionedActivityDetails = new Automon.Model.OnDemandSanctionedActivityDetails
                         {
                             TermOfSupervision = sanctionedActivity.TermOfSupervision,
-                            Description = sanctionedActivity.Description,
                             EventDateTime = convertedDateTime
                         };
 

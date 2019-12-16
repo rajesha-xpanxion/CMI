@@ -72,7 +72,6 @@ namespace CMI.Processor
                             ClientId = FormatId(offenderVehicleDetails.Pin),
                             VehicleId = string.Format("{0}-{1}", FormatId(offenderVehicleDetails.Pin), offenderVehicleDetails.Id),
                             Make = offenderVehicleDetails.Make,
-                            Model = offenderVehicleDetails.BodyStyle,
                             Year = offenderVehicleDetails.VehicleYear,
                             LicensePlate = offenderVehicleDetails.LicensePlate,
                             Color = offenderVehicleDetails.Color,
@@ -138,25 +137,15 @@ namespace CMI.Processor
                                     (
                                         string.IsNullOrEmpty(vehicle.Make)
                                         || vehicle.Make.Equals(Automon.Service.VehicleMake.Unknown, StringComparison.InvariantCultureIgnoreCase)
+                                        || vehicle.Make.Equals(Automon.Service.VehicleMake.Other, StringComparison.InvariantCultureIgnoreCase)
                                     )
                                 )
                                 {
                                     vehicle.Make = existingVehicleDetails.Make;
                                 }
 
-                                //check if any value already exists for Model, yes = replace it in passing model so that existing value will not be replaced/changed
-                                if (
-                                    !string.IsNullOrEmpty(existingVehicleDetails.Model) 
-                                    && !existingVehicleDetails.Model.Equals(Nexus.Service.VehicleModel.Unknown)
-                                    && 
-                                    (
-                                        string.IsNullOrEmpty(vehicle.Model)
-                                        || vehicle.Model.Equals(Automon.Service.VehicleBodyStyle.Unknown, StringComparison.InvariantCultureIgnoreCase)
-                                    )
-                                )
-                                {
-                                    vehicle.Model = existingVehicleDetails.Model;
-                                }
+                                //restore value of Vehicle Model
+                                vehicle.Model = existingVehicleDetails.Model;
 
                                 //check if any value already exists for Color, yes = replace it in passing model so that existing value will not be replaced/changed
                                 if (
@@ -166,6 +155,7 @@ namespace CMI.Processor
                                     (
                                         string.IsNullOrEmpty(vehicle.Color)
                                         || vehicle.Color.Equals(Automon.Service.VehicleColor.Unknown, StringComparison.InvariantCultureIgnoreCase)
+                                        || vehicle.Color.Equals(Automon.Service.VehicleColor.Other, StringComparison.InvariantCultureIgnoreCase)
                                     )
                                 )
                                 {

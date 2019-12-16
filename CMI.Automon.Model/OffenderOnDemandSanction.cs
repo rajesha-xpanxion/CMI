@@ -15,7 +15,6 @@ namespace CMI.Automon.Model
     public class OnDemandSanctionedActivityDetails
     {
         public string TermOfSupervision { get; set; }
-        public string Description { get; set; }
         public DateTime EventDateTime { get; set; }
     }
 }

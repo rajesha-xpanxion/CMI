@@ -47,7 +47,10 @@ BEGIN
 			CI.[Status] AS [CaseStatus],
 			CCI.[StatuteCode] AS [OffenseLabel],
 			SI.[OffenseCode] AS [OffenseStatute],
-			[$AutomonDatabaseName].[dbo].[GetCaseOffenseLevel](CI.[Id]) AS [OffenseCategory],
+			COALESCE(
+				[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](PCI.[Id], NULL, ''PrimaryOffenseGroup''),
+				[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](PCI.[Id], NULL, ''SecondaryOffenseGroup'')
+			) AS [OffenseCategory],
 			ISNULL(CCI.[MostSeriousCharge], 0) AS [IsPrimary],
 			CAST(
 				COALESCE(
@@ -68,6 +71,10 @@ BEGIN
 						ON CI.[Id] = CA.[CaseId]
 						LEFT JOIN [$AutomonDatabaseName].[dbo].[AttributeDef] AD
 							ON CA.[AttributeId] = AD.[Id]
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseCase] CC
+								ON CI.[Id] = CC.[ChildCaseId]
+								LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] PCI
+									ON CC.[ParentCaseId] = PCI.[Id]
 		WHERE
 			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR CCI.[FromTime] >= @LastExecutionDateTime)
 			AND (CI.[PermDesc] = ''Formal'' OR CI.[PermDesc] = ''PRCS'' OR CI.[PermDesc] = ''MCS'' OR CI.[PermDesc] = ''MS'' OR CI.[PermDesc] = ''Adult.Interstate'')
@@ -200,7 +207,10 @@ BEGIN
 			CI.[Status] AS [CaseStatus],
 			CCI.[StatuteCode] AS [OffenseLabel],
 			SI.[OffenseCode] AS [OffenseStatute],
-			[$AutomonDatabaseName].[dbo].[GetCaseOffenseLevel](CI.[Id]) AS [OffenseCategory],
+			COALESCE(
+				[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](PCI.[Id], NULL, ''PrimaryOffenseGroup''),
+				[$AutomonDatabaseName].[dbo].[GetCaseAttributeValue](PCI.[Id], NULL, ''SecondaryOffenseGroup'')
+			) AS [OffenseCategory],
 			ISNULL(CCI.[MostSeriousCharge], 0) AS [IsPrimary],
 			CAST(
 				COALESCE(
@@ -221,6 +231,10 @@ BEGIN
 						ON CI.[Id] = CA.[CaseId]
 						LEFT JOIN [$AutomonDatabaseName].[dbo].[AttributeDef] AD
 							ON CA.[AttributeId] = AD.[Id]
+							LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseCase] CC
+								ON CI.[Id] = CC.[ChildCaseId]
+								LEFT JOIN [$AutomonDatabaseName].[dbo].[CaseInfo] PCI
+									ON CC.[ParentCaseId] = PCI.[Id]
 
 		WHERE
 			(CI.[FromTime] >= @LastExecutionDateTime OR CA.[FromTime] >= @LastExecutionDateTime OR CCI.[FromTime] >= @LastExecutionDateTime OR @LastExecutionDateTime IS NULL)

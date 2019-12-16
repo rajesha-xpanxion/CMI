@@ -19,6 +19,7 @@ EXEC
 History:-
 Date			Author			Changes
 30-Aug-19		Rajesh Awate	Created.
+16-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderMugshotDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -40,71 +41,77 @@ BEGIN
 			@DocumentDataId	INT = (SELECT [DocumentDataId] FROM [$AutomonDatabaseName].[dbo].[DocumentInfo] WHERE [Id] = @DocumentId),
 			@DocumentTypeId INT;
 
-		--retrieve document type id
-		SELECT
-			@DocumentTypeId = [Id]
-		FROM
-			[$AutomonDatabaseName].[dbo].[DocumentType]
-		WHERE
-			[Description] = ''Photo-Mugshot'';
 		
-		--update document
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateDocument]
-				@PersonId = @PersonId,
-				@DocumentFormat = 0 ,
-				@EnteredByPId = @EnteredByPId,
-				@DocumentDataId = @DocumentDataId,
-				@EnteredDateTime = NULL,
-				@CaseId = NULL,
-				@ViolationId = NULL,
-				@DocumentTypeId = @DocumentTypeId,
-				@LocalFileName = NULL,
-				@Description = NULL,
-				@DocumentTemplateId = NULL,
-				@CompletedByPId = NULL,
-				@HasThumbnail = 0,
-				@ReadOnly = 1,
-				@SignedByOfficerId = NULL,
-				@SignedBySupervisorId = NULL,
-				@SignedByBranchChiefId = NULL,
-				@DocumentExecutionId = NULL,
-				@DocumentDate = @DocumentDate,
-				@Id = @DocumentId OUTPUT;
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
+		BEGIN
+		
+			--retrieve document type id
+			SELECT
+				@DocumentTypeId = [Id]
+			FROM
+				[$AutomonDatabaseName].[dbo].[DocumentType]
+			WHERE
+				[Description] = ''Photo-Mugshot'';
+		
+			--update document
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateDocument]
+					@PersonId = @PersonId,
+					@DocumentFormat = 0 ,
+					@EnteredByPId = @EnteredByPId,
+					@DocumentDataId = @DocumentDataId,
+					@EnteredDateTime = NULL,
+					@CaseId = NULL,
+					@ViolationId = NULL,
+					@DocumentTypeId = @DocumentTypeId,
+					@LocalFileName = NULL,
+					@Description = NULL,
+					@DocumentTemplateId = NULL,
+					@CompletedByPId = NULL,
+					@HasThumbnail = 0,
+					@ReadOnly = 1,
+					@SignedByOfficerId = NULL,
+					@SignedBySupervisorId = NULL,
+					@SignedByBranchChiefId = NULL,
+					@DocumentExecutionId = NULL,
+					@DocumentDate = @DocumentDate,
+					@Id = @DocumentId OUTPUT;
 			
-		--update document data
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateDocumentData] 
-				@FileLocation = NULL, 
-				@FileName = NULL, 
-				@DocumentData = @DocumentData, 
-				@ThumbnailData = NULL, 
-				@DocumentId = @DocumentId, 
-				@Id = @DocumentDataId OUTPUT;
+			--update document data
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateDocumentData] 
+					@FileLocation = NULL, 
+					@FileName = NULL, 
+					@DocumentData = @DocumentData, 
+					@ThumbnailData = NULL, 
+					@DocumentId = @DocumentId, 
+					@Id = @DocumentDataId OUTPUT;
 
-		--re-update document for correct document data id
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateDocument]
-				@PersonId = @PersonId,
-				@DocumentFormat = 0 ,
-				@EnteredByPId = @EnteredByPId,
-				@DocumentDataId = @DocumentDataId,
-				@EnteredDateTime = NULL,
-				@CaseId = NULL,
-				@ViolationId = NULL,
-				@DocumentTypeId = @DocumentTypeId,
-				@LocalFileName = NULL,
-				@Description = NULL,
-				@DocumentTemplateId = NULL,
-				@CompletedByPId = NULL,
-				@HasThumbnail = 0,
-				@ReadOnly = 1,
-				@SignedByOfficerId = NULL,
-				@SignedBySupervisorId = NULL,
-				@SignedByBranchChiefId = NULL,
-				@DocumentExecutionId = NULL,
-				@DocumentDate = @DocumentDate,
-				@Id = @DocumentId OUTPUT;
+			--re-update document for correct document data id
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateDocument]
+					@PersonId = @PersonId,
+					@DocumentFormat = 0 ,
+					@EnteredByPId = @EnteredByPId,
+					@DocumentDataId = @DocumentDataId,
+					@EnteredDateTime = NULL,
+					@CaseId = NULL,
+					@ViolationId = NULL,
+					@DocumentTypeId = @DocumentTypeId,
+					@LocalFileName = NULL,
+					@Description = NULL,
+					@DocumentTemplateId = NULL,
+					@CompletedByPId = NULL,
+					@HasThumbnail = 0,
+					@ReadOnly = 1,
+					@SignedByOfficerId = NULL,
+					@SignedBySupervisorId = NULL,
+					@SignedByBranchChiefId = NULL,
+					@DocumentExecutionId = NULL,
+					@DocumentDate = @DocumentDate,
+					@Id = @DocumentId OUTPUT;
+		END
 
 		--return document id
 		SELECT @DocumentId;

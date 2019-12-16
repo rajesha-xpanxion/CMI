@@ -21,6 +21,7 @@ Date			Author			Changes
 03-Apr-19		Rajesh Awate	Created.
 10-May-19		Rajesh Awate	Changes to use new event type for notes.
 05-July-19		Rajesh Awate	Changes to handle update scenario.
+13-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderNoteDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -46,31 +47,36 @@ BEGIN
 
 		--SELECT @EventTypeId, @EventDateTime, @EnteredByPId, @Comment, @EventId, @OffenderId;
 
-		--add new event
-		EXEC 
-			[$AutomonDatabaseName].[dbo].[UpdateEvent] 
-				@EventTypeId, 
-				@EventDateTime, 
-				@EnteredByPId, 
-				@Comment, 
-				0,
-				NULL,
-				NULL,
-				0,
-				NULL,
-				NULL,
-				2, --status as Complete
-				NULL,
-				@Id = @EventId OUTPUT;
+		--check if OffenderId could be found for given Pin
+		IF(@OffenderId IS NOT NULL AND @OffenderId > 0)
+		BEGIN
+
+			--add new event
+			EXEC 
+				[$AutomonDatabaseName].[dbo].[UpdateEvent] 
+					@EventTypeId, 
+					@EventDateTime, 
+					@EnteredByPId, 
+					@Comment, 
+					0,
+					NULL,
+					NULL,
+					0,
+					NULL,
+					NULL,
+					2, --status as Complete
+					NULL,
+					@Id = @EventId OUTPUT;
 
 		
-		--associate newly added event with given offender
-		IF(@EventId IS NOT NULL)
-		BEGIN
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
-					@OffenderId, 
-					@EventId;
+			--associate newly added event with given offender
+			IF(@EventId IS NOT NULL)
+			BEGIN
+				EXEC 
+					[$AutomonDatabaseName].[dbo].[UpdateOffenderEvent] 
+						@OffenderId, 
+						@EventId;
+			END
 		END
 
 		SELECT @EventId;

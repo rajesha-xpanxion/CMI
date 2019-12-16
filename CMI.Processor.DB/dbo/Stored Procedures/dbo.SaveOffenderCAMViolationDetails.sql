@@ -16,6 +16,7 @@ EXEC
 History:-
 Date			Author			Changes
 03-Sept-19		Rajesh Awate	Created.
+13-Dec-19		Rajesh Awate	Changes for US116315
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderCAMViolationDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -43,43 +44,49 @@ BEGIN
 			@Value							VARCHAR(255)	= CONVERT(VARCHAR(255), @ViolationDateTime, 22),
 			@ExistingCAMViolationDateTime	DATETIME		= NULL;
 
-		--check if any record exists for given person attribute id, YES = retrieve details, NO = try to get details by person id
-		IF(EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc) WHERE [Id] = @PersonAttributeId))
+		
+		--check if PersonId could be found for given Pin
+		IF(@PersonId IS NOT NULL AND @PersonId > 0)
 		BEGIN
-			SELECT
-				@PersonAttributeId = [Id],
-				@ExistingCAMViolationDateTime = CONVERT(DATETIME, [Value])
-			FROM
-				[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
-			WHERE
-				[Id] = @PersonAttributeId;
-		END
-		ELSE
-		BEGIN
-			SELECT
-				@PersonAttributeId = [Id],
-				@ExistingCAMViolationDateTime = CONVERT(DATETIME, [Value])
-			FROM
-				[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
-			WHERE
-				[PersonId] = @PersonId;
-		END
+		
+			--check if any record exists for given person attribute id, YES = retrieve details, NO = try to get details by person id
+			IF(EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc) WHERE [Id] = @PersonAttributeId))
+			BEGIN
+				SELECT
+					@PersonAttributeId = [Id],
+					@ExistingCAMViolationDateTime = CONVERT(DATETIME, [Value])
+				FROM
+					[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
+				WHERE
+					[Id] = @PersonAttributeId;
+			END
+			ELSE
+			BEGIN
+				SELECT
+					@PersonAttributeId = [Id],
+					@ExistingCAMViolationDateTime = CONVERT(DATETIME, [Value])
+				FROM
+					[$AutomonDatabaseName].[dbo].[PersonAttributes](''Person'', @PermDesc)
+				WHERE
+					[PersonId] = @PersonId;
+			END
 
-		--check if valid offender pin is passed
-		IF(@PersonId IS NOT NULL AND (@ExistingCAMViolationDateTime IS NULL OR @ExistingCAMViolationDateTime < @ViolationDateTime))
-		BEGIN
-			--update CAM violation attribute
-			EXEC 
-				[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
-					@PersonId, 
-					@Value, 
-					@EnteredByPId, 
-					0,
-					NULL,
-					@PermDesc, 
-					NULL,
-					NULL,
-					@PersonAttributeId OUTPUT;
+			--check if valid offender pin is passed
+			IF(@ExistingCAMViolationDateTime IS NULL OR @ExistingCAMViolationDateTime < @ViolationDateTime)
+			BEGIN
+				--update CAM violation attribute
+				EXEC 
+					[$AutomonDatabaseName].[dbo].[UpdatePersonAttribute] 
+						@PersonId, 
+						@Value, 
+						@EnteredByPId, 
+						0,
+						NULL,
+						@PermDesc, 
+						NULL,
+						NULL,
+						@PersonAttributeId OUTPUT;
+			END
 		END
 
 		SELECT @PersonAttributeId;
