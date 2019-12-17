@@ -118,6 +118,8 @@ namespace CMI.Automon.Service
         public static string OfficerFirstName { get { return "OfficerFirstName"; } }
         public static string OfficerLastName { get { return "OfficerLastName"; } }
         public static string DeptSupLevel { get { return "DeptSupLevel"; } }
+        public static string SupervisionStatus { get { return "SupervisionStatus"; } }
+        public static string BodyStatus { get { return "BodyStatus"; } }
         public static string PhoneNumberType { get { return "PhoneNumberType"; } }
         public static string Phone { get { return "Phone"; } }
         public static string IsPrimary { get { return "IsPrimary"; } }

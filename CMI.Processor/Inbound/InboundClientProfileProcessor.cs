@@ -28,7 +28,7 @@ namespace CMI.Processor
             this.offenderProfilePictureService = offenderProfilePictureService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -41,7 +41,7 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<Offender> allOffenderDetails = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Client Profiles" };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Client Profiles" };
 
             try
             {
@@ -80,7 +80,8 @@ namespace CMI.Processor
 
                             CaseloadId = MapCaseload(offenderDetails.CaseloadName),
                             SupervisingOfficerEmailId = MapSupervisingOfficer(offenderDetails.OfficerFirstName, offenderDetails.OfficerLastName, offenderDetails.OfficerEmail),
-                            StaticRiskRating = MapStaticRiskRating(offenderDetails.DeptSupLevel)
+                            StaticRiskRating = MapStaticRiskRating(offenderDetails.DeptSupLevel),
+                            CmsStatus = MapCmsStatus(offenderDetails.SupervisionStatus, offenderDetails.BodyStatus)
                         };
 
                         //check if client already exists and if yes then retrieve it
@@ -148,6 +149,22 @@ namespace CMI.Processor
                                             Message = "New Client Profile Picture added successfully.",
                                             AutomonData = JsonConvert.SerializeObject(offenderMugshot),
                                             NexusData = JsonConvert.SerializeObject(clientProfilePicture)
+                                        });
+                                    }
+                                }
+
+                                //update CMS Status
+                                if(!string.IsNullOrEmpty(client.CmsStatus))
+                                {
+                                    if(ClientService.UpdateClientCmsStatus(client.IntegrationId, client.CmsStatus))
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Client Cms Status updated successfully.",
+                                            AutomonData = JsonConvert.SerializeObject(new { offenderDetails.SupervisionStatus, offenderDetails.BodyStatus }),
+                                            NexusData = JsonConvert.SerializeObject(client.CmsStatus)
                                         });
                                     }
                                 }
@@ -240,6 +257,22 @@ namespace CMI.Processor
                                                 NexusData = JsonConvert.SerializeObject(clientProfilePicture)
                                             });
                                         }
+                                    }
+                                }
+
+                                //update CMS Status
+                                if (!string.IsNullOrEmpty(client.CmsStatus))
+                                {
+                                    if (ClientService.UpdateClientCmsStatus(client.IntegrationId, client.CmsStatus))
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Client Cms Status updated successfully.",
+                                            AutomonData = JsonConvert.SerializeObject(new { offenderDetails.SupervisionStatus, offenderDetails.BodyStatus }),
+                                            NexusData = JsonConvert.SerializeObject(client.CmsStatus)
+                                        });
                                     }
                                 }
                             }
@@ -585,6 +618,34 @@ namespace CMI.Processor
 
             //given value does not exists in lookup, set it as null.
             return null;
+        }
+
+        private string MapCmsStatus(string automonSupervisionStatus, string automonBodyStatus)
+        {
+            string nexusCmsStatus = string.Empty;
+
+            //check if both values available, YES = concat them
+            if(!string.IsNullOrEmpty(automonSupervisionStatus) && !string.IsNullOrEmpty(automonBodyStatus))
+            {
+                nexusCmsStatus = string.Format("{0} - {1}", automonSupervisionStatus, automonBodyStatus);
+            }
+            //check if only supervision status available, YES = set it as nexus cms status
+            else if(!string.IsNullOrEmpty(automonSupervisionStatus))
+            {
+                nexusCmsStatus = automonSupervisionStatus;
+            }
+            //check if only body status available, YES = set it as nexus cms status
+            else if (!string.IsNullOrEmpty(automonBodyStatus))
+            {
+                nexusCmsStatus = automonBodyStatus;
+            }
+            //no value is available, set nexus cms status as null
+            else
+            {
+                nexusCmsStatus = null;
+            }
+
+            return nexusCmsStatus;
         }
     }
 }

@@ -28,6 +28,7 @@ Date			Author			Changes
 18-Nov-17		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
 20-Nov-19		Rajesh Awate	Changes for US114859
 28-Nov-19		Rajesh Awate	Changes for US112771
+17-Dec-19		Rajesh Awate	Changes for US116004
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -82,7 +83,9 @@ BEGIN
 			OFCNAME.[Firstname] As [OfficerFirstName],
 			OFCNAME.[LastName] As [OfficerLastName],
 
-			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''DepartmentSupervisionLevel'') AS [DeptSupLevel]
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''DepartmentSupervisionLevel'') AS [DeptSupLevel],
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''SupervisionStatus'') AS [SupervisionStatus],
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''BodyStatus'') AS [BodyStatus]
 		FROM
 			[$AutomonDatabaseName].[dbo].[AnyName] AN JOIN [$AutomonDatabaseName].[dbo].[Person] P
 				ON AN.[Id] = P.[NameId]
@@ -209,7 +212,9 @@ BEGIN
 			OFCNAME.[Firstname] As [OfficerFirstName],
 			OFCNAME.[LastName] As [OfficerLastName],
 
-			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''DepartmentSupervisionLevel'') AS [DeptSupLevel]
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''DepartmentSupervisionLevel'') AS [DeptSupLevel],
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''SupervisionStatus'') AS [SupervisionStatus],
+			[$AutomonDatabaseName].[dbo].[GetPersonAttributeValue](P.[Id], NULL, ''BodyStatus'') AS [BodyStatus]
 		FROM
 			[$AutomonDatabaseName].[dbo].[AnyName] AN JOIN [$AutomonDatabaseName].[dbo].[Person] P
 				ON AN.[Id] = P.[NameId]

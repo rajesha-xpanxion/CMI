@@ -20,5 +20,7 @@ namespace CMI.Nexus.Interface
         bool UpdateClientProfilePicture(ClientProfilePicture clientProfilePicture);
 
         bool DeleteClientProfilePicture(string clientId);
+
+        bool UpdateClientCmsStatus(string clientId, string cmsStatus);
     }
 }

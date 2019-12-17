@@ -16,6 +16,7 @@ namespace CMI.Nexus.Model
         public string CaseloadId { get; set; }
         public string StaticRiskRating { get; set; }
         public string NeedsClassification { get; set; }
+        public string CmsStatus { get; set; }
     }
 
     public class ClientProfilePicture : Client

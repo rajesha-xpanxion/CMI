@@ -127,7 +127,6 @@ namespace CMI.Nexus.Service
             }
         }
 
-
         public bool AddNewClientProfilePicture(ClientProfilePicture clientProfilePicture)
         {
             using (HttpClient apiHost = new HttpClient())
@@ -233,6 +232,31 @@ namespace CMI.Nexus.Service
                 else
                 {
                     throw new CmiException(string.Format("Error occurred while deleting existing client profile picture. API Response: {0}", responseString));
+                }
+            }
+        }
+
+        public bool UpdateClientCmsStatus(string clientId, string cmsStatus)
+        {
+            using (HttpClient apiHost = new HttpClient())
+            {
+                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                apiHost.DefaultRequestHeaders.Accept.Clear();
+                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                var apiResponse = apiHost.PutAsync(string.Format("api/{0}/clients/{1}/cmsStatus/{2}", nexusConfig.CaseIntegrationApiVersion, clientId, cmsStatus), null).Result;
+
+                var responseString = apiResponse.Content.ReadAsStringAsync().Result;
+
+                if (apiResponse.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new CmiException(string.Format("Error occurred while updating client cms status. API Response: {0}", responseString));
                 }
             }
         }
