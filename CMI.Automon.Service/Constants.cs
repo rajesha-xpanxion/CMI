@@ -74,6 +74,7 @@ namespace CMI.Automon.Service
         public static string Validities { get { return "@Validities"; } }
         public static string Id { get { return "@Id"; } }
         public static string IsSaveFinalTestResult { get { return "@IsSaveFinalTestResult"; } }
+        public static string SentToLab { get { return "@SentToLab"; } }
 
         public static string DocumentData { get { return "@DocumentData"; } }
         public static string DocumentId { get { return "@DocumentId"; } }

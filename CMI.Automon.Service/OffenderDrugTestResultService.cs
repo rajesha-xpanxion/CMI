@@ -145,6 +145,13 @@ namespace CMI.Automon.Service
                             Value = offenderDrugTestResultDetails.IsSaveFinalTestResult,
                             IsNullable = false
                         });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.SentToLab,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDrugTestResultDetails.SentToLab,
+                            IsNullable = true
+                        });
 
                         cmd.Connection = conn;
 

@@ -21,6 +21,7 @@ EXEC
 		@TestResult = 'Failed',
 		@Validities = 'Diluted',
 		@IsSaveFinalTestResult = 0,
+		@SentToLab = 'No',
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -29,6 +30,7 @@ Date			Author			Changes
 08-July-19		Rajesh Awate	Changes to handle update scenario.
 19-Aug-19		Rajesh Awate	Changes to save Final Test Result based on condition
 13-Dec-19		Rajesh Awate	Changes for US116315
+18-Dec-19		Rajesh Awate	Changes to save Sent To Lab attribute
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -42,6 +44,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@TestResult VARCHAR(255) = 'Failed',
 	@Validities VARCHAR(255) = NULL,
 	@IsSaveFinalTestResult BIT = 0,
+	@SentToLab VARCHAR(255) = NULL,
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -94,6 +97,12 @@ BEGIN
 			BEGIN
 				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @Validities, NULL, ''CeDrugTest.Validities'', NULL, NULL, NULL;
 			END
+
+			--Sent To Lab
+			IF(@SentToLab IS NOT NULL AND EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[AttributeDef] WHERE [Module] = ''Event'' AND [PermDesc] = ''CeDrugTest.SentToLab''))
+			BEGIN
+				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @SentToLab, NULL, ''CeDrugTest.SentToLab'', NULL, NULL, NULL;
+			END
 		END
 		
 		SELECT @EventId;
@@ -113,6 +122,7 @@ BEGIN
 		@TestResult VARCHAR(255),
 		@Validities VARCHAR(255),
 		@IsSaveFinalTestResult BIT,
+		@SentToLab VARCHAR(255),
 		@UpdatedBy VARCHAR(255)';
 
 --PRINT @SQLString;
@@ -130,5 +140,6 @@ BEGIN
 				@TestResult = @TestResult,
 				@Validities = @Validities,
 				@IsSaveFinalTestResult = @IsSaveFinalTestResult,
+				@SentToLab = @SentToLab,
 				@UpdatedBy = @UpdatedBy;
 END

@@ -239,7 +239,8 @@ namespace CMI.Processor
                         ?
                             details.SentToLab.Equals("Yes", StringComparison.InvariantCultureIgnoreCase)
                         :
-                            false
+                            false,
+                    SentToLab = details.SentToLab
                 };
             }
             //Field Visit
