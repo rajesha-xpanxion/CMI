@@ -39,5 +39,6 @@ namespace CMI.Automon.Service
         public static string SaveOffenderIncentiveDetails { get { return "[dbo].[SaveOffenderIncentiveDetails]"; } }
         public static string SaveOffenderSanctionDetails { get { return "[dbo].[SaveOffenderSanctionDetails]"; } }
         public static string SaveOffenderOnDemandSanctionDetails { get { return "[dbo].[SaveOffenderOnDemandSanctionDetails]"; } }
+        public static string SaveOffenderTouchPointCheckInDetails { get { return "[dbo].[SaveOffenderTouchPointCheckInDetails"; } }
     }
 }

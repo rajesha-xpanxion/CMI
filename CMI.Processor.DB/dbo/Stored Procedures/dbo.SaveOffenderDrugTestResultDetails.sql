@@ -22,6 +22,7 @@ EXEC
 		@Validities = 'Diluted',
 		@IsSaveFinalTestResult = 0,
 		@SentToLab = 'No',
+		@LabRequisitionNumber = '123456789',
 		@UpdatedBy = 'rawate@xpanxion.com';
 ---------------------------------------------------------------------------------
 History:-
@@ -31,6 +32,7 @@ Date			Author			Changes
 19-Aug-19		Rajesh Awate	Changes to save Final Test Result based on condition
 13-Dec-19		Rajesh Awate	Changes for US116315
 18-Dec-19		Rajesh Awate	Changes to save Sent To Lab attribute
+19-Dec-19		Rajesh Awate	Changes to save Lab Requisition #
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -45,6 +47,7 @@ CREATE PROCEDURE [dbo].[SaveOffenderDrugTestResultDetails]
 	@Validities VARCHAR(255) = NULL,
 	@IsSaveFinalTestResult BIT = 0,
 	@SentToLab VARCHAR(255) = NULL,
+	@LabRequisitionNumber VARCHAR(255) = NULL,
 	@UpdatedBy VARCHAR(255)
 AS
 BEGIN
@@ -103,6 +106,12 @@ BEGIN
 			BEGIN
 				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @SentToLab, NULL, ''CeDrugTest.SentToLab'', NULL, NULL, NULL;
 			END
+
+			--Lab Requisition #
+			IF(@LabRequisitionNumber IS NOT NULL AND EXISTS(SELECT 1 FROM [$AutomonDatabaseName].[dbo].[AttributeDef] WHERE [Module] = ''Event'' AND [PermDesc] = ''NexusDrugTest.LabReqNo''))
+			BEGIN
+				EXEC [$AutomonDatabaseName].[dbo].[UpdateEventAttribute] @EventId, @EnteredByPId, @LabRequisitionNumber, NULL, ''NexusDrugTest.LabReqNo'', NULL, NULL, NULL;
+			END
 		END
 		
 		SELECT @EventId;
@@ -123,23 +132,26 @@ BEGIN
 		@Validities VARCHAR(255),
 		@IsSaveFinalTestResult BIT,
 		@SentToLab VARCHAR(255),
+		@LabRequisitionNumber VARCHAR(255)
 		@UpdatedBy VARCHAR(255)';
 
 --PRINT @SQLString;
 
-	EXECUTE sp_executesql 
-				@SQLString, 
-				@ParmDefinition,  
-				@Pin = @Pin,
-				@Id = @Id,
-				@StartDate = @StartDate,
-				@Comment = @Comment,
-				@EndDate = @EndDate,
-				@Status = @Status,
-				@DeviceType = @DeviceType,
-				@TestResult = @TestResult,
-				@Validities = @Validities,
-				@IsSaveFinalTestResult = @IsSaveFinalTestResult,
-				@SentToLab = @SentToLab,
-				@UpdatedBy = @UpdatedBy;
+	EXECUTE 
+		sp_executesql 
+			@SQLString, 
+			@ParmDefinition,  
+			@Pin = @Pin,
+			@Id = @Id,
+			@StartDate = @StartDate,
+			@Comment = @Comment,
+			@EndDate = @EndDate,
+			@Status = @Status,
+			@DeviceType = @DeviceType,
+			@TestResult = @TestResult,
+			@Validities = @Validities,
+			@IsSaveFinalTestResult = @IsSaveFinalTestResult,
+			@SentToLab = @SentToLab,
+			@LabRequisitionNumber = @LabRequisitionNumber,
+			@UpdatedBy = @UpdatedBy;
 END

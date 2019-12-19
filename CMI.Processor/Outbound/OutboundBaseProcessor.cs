@@ -240,7 +240,8 @@ namespace CMI.Processor
                             details.SentToLab.Equals("Yes", StringComparison.InvariantCultureIgnoreCase)
                         :
                             false,
-                    SentToLab = details.SentToLab
+                    SentToLab = details.SentToLab,
+                    LabRequisitionNumber = details.DrugTestId
                 };
             }
             //Field Visit
@@ -791,6 +792,43 @@ namespace CMI.Processor
                     IsSkipped = details.Status.Equals(Status.Skipped, StringComparison.InvariantCultureIgnoreCase),
                     Notes = details.Notes,
                     OnDemandSanctionedActivities = onDemandSanctionedActivities
+                };
+            }
+            //TouchPoint Check-In
+            else if (typeof(T) == typeof(ClientProfileTouchPointCheckInDetailsActivityResponse))
+            {
+                ClientProfileTouchPointCheckInDetailsActivityResponse details = (ClientProfileTouchPointCheckInDetailsActivityResponse)(object)activityDetails;
+
+                //check if timezone information provided in given datetime, NO = specify it
+                if (details.CheckInDateTime.Kind != DateTimeKind.Utc)
+                {
+                    details.CheckInDateTime = DateTime.SpecifyKind(details.CheckInDateTime, DateTimeKind.Utc);
+                }
+
+                DateTime convertedDateTime =
+                    !string.IsNullOrEmpty(AutomonTimeZone)
+                            ? TimeZoneInfo.ConvertTimeBySystemTimeZoneId(details.CheckInDateTime, AutomonTimeZone)
+                            : details.CheckInDateTime.ToLocalTime();
+
+                return new OffenderTouchPointCheckIn()
+                {
+                    Pin = clientIntegrationId,
+                    Id = id,
+                    UpdatedBy = updatedBy,
+                    StartDate = convertedDateTime,
+                    EndDate = convertedDateTime,
+                    /* Status: Pending = 0, Missed = 16, Cancelled = 10, Complete = 2 */
+                    Status =
+                        details.Status != null
+                        ?
+                            details.Status.Equals(Status.Attended, StringComparison.InvariantCultureIgnoreCase)
+                            || details.Status.Equals(Status.Attempted, StringComparison.InvariantCultureIgnoreCase)
+                            ?
+                                (int)EventStatus.Complete
+                            :
+                                (int)EventStatus.Pending
+                        :
+                            (int)EventStatus.Pending
                 };
             }
 

@@ -100,6 +100,7 @@
         public static string Incentive { get { return "Incentive"; } }
         public static string Sanction { get { return "Sanction"; } }
         public static string OnDemandSanction { get { return "OnDemand Sanction"; } }
+        public static string TouchPointCheckIn { get { return "TouchPoint Check-In"; } }
     }
 
     public static class OutboundProcessorClientProfileActivitySubType

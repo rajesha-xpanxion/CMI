@@ -184,6 +184,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<IOffenderIncentiveService, OffenderIncentiveService>();
             serviceCollection.AddSingleton<IOffenderSanctionService, OffenderSanctionService>();
             serviceCollection.AddSingleton<IOffenderOnDemandSanctionService, OffenderOnDemandSanctionService>();
+            serviceCollection.AddSingleton<IOffenderTouchPointCheckInService, OffenderTouchPointCheckInService>();
         }
 
         private static void ConfigureNexusServices(IServiceCollection serviceCollection)
@@ -244,6 +245,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<OutboundClientProfileIncentiveProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileSanctionProcessor>();
             serviceCollection.AddSingleton<OutboundClientProfileOnDemandSanctionProcessor>();
+            serviceCollection.AddSingleton<OutboundClientProfileTouchPointCheckInProcessor>();
         }
 
         private static void ConfigureMessageRetrieverService(IServiceCollection serviceCollection, IConfiguration configuration)

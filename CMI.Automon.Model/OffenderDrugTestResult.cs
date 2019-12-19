@@ -13,5 +13,6 @@ namespace CMI.Automon.Model
         public string Validities { get; set; }
         public bool IsSaveFinalTestResult { get; set; }
         public string SentToLab { get; set; }
+        public string LabRequisitionNumber { get; set; }
     }
 }
