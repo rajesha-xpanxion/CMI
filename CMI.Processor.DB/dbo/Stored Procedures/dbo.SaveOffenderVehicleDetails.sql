@@ -1,4 +1,5 @@
 ﻿
+
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	06-Apr-19
@@ -47,13 +48,13 @@ BEGIN
 				ISNULL
 				(
 					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Make'' AND [Description] = @Make),
-					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Make'' AND [Description] = ''Other'')
+					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Make'' AND [PermDesc] = ''Other'')
 				),
 			@ColorLId			INT	= 
 				ISNULL
 				(
 					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Color'' AND [Description] = @Color),
-					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Color'' AND [Description] = ''Other'')
+					(SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Color'' AND [PermDesc] = ''VehicleColorOther'')
 				),
 			@AssociationLId		INT	= (SELECT [Id] FROM [$AutomonDatabaseName].[dbo].[LookupInfo] WHERE [LookupType] = ''Vehicle Association'' AND [PermDesc] = ''Offender''),
 			@VehicleId			INT	= @Id,
