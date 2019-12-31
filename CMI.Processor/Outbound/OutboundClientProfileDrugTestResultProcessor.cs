@@ -75,9 +75,35 @@ namespace CMI.Processor
                             message.ActionUpdatedBy
                         );
 
-                        if (!offenderDrugTestResultDetails.TestResult.Equals(Nexus.Service.Status.Removed, StringComparison.InvariantCultureIgnoreCase) && offenderDrugTestResultDetails.Id > 0)
+                        //check if message was received for removed result status & same does not exists already in Automon, YES = skip processing
+                        if (offenderDrugTestResultDetails.TestResult.Equals(Nexus.Service.Status.Removed, StringComparison.InvariantCultureIgnoreCase) && offenderDrugTestResultDetails.Id == 0)
                         {
+                            //mark this message as successful
+                            message.IsSuccessful = true;
+                        }
+                        //check if message was received for removed result state & record for it already exist, YES = delete it from Automon
+                        else if (offenderDrugTestResultDetails.TestResult.Equals(Nexus.Service.Status.Removed, StringComparison.InvariantCultureIgnoreCase) && offenderDrugTestResultDetails.Id > 0)
+                        {
+                            //delete details from Automon
+                            offenderDrugTestResultService.DeleteOffenderDrugTestResultDetails(ProcessorConfig.CmiDbConnString, offenderDrugTestResultDetails);
+                            taskExecutionStatus.AutomonDeleteMessageCount++;
 
+                            //mark this message as successful
+                            message.IsSuccessful = true;
+
+                            message.AutomonIdentifier = null;
+
+                            Logger.LogDebug(new LogRequest
+                            {
+                                OperationName = this.GetType().Name,
+                                MethodName = "Execute",
+                                Message = "Offender - Drug Test Result Details removed successfully.",
+                                AutomonData = JsonConvert.SerializeObject(offenderDrugTestResultDetails),
+                                NexusData = JsonConvert.SerializeObject(message)
+                            });
+                        }
+                        else
+                        {
                             //save details to Automon and get Id
                             int automonId = offenderDrugTestResultService.SaveOffenderDrugTestResultDetails(ProcessorConfig.CmiDbConnString, offenderDrugTestResultDetails);
 
@@ -132,11 +158,6 @@ namespace CMI.Processor
                                     NexusData = JsonConvert.SerializeObject(message)
                                 });
                             }
-                        }
-                        else
-                        {
-                            //mark this message as successful
-                            message.IsSuccessful = true;
                         }
                     }
                     catch (CmiException ce)

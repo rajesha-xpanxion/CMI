@@ -132,7 +132,7 @@ BEGIN
 		@Validities VARCHAR(255),
 		@IsSaveFinalTestResult BIT,
 		@SentToLab VARCHAR(255),
-		@LabRequisitionNumber VARCHAR(255)
+		@LabRequisitionNumber VARCHAR(255),
 		@UpdatedBy VARCHAR(255)';
 
 --PRINT @SQLString;

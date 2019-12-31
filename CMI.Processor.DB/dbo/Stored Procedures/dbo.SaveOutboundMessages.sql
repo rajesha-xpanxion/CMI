@@ -1,10 +1,4 @@
 ﻿
-
-
-
-
-
-
 /*==========================================================================================
 Author:			Rajesh Awate
 Create date:	04-Apr-19
@@ -25,6 +19,7 @@ EXEC
 History:-
 Date			Author			Changes
 04-Apr-19		Rajesh Awate	Created.
+30-Dec-19		Rajesh Awate	Fix for issue when Created message is received followed by Removed message with same Activity Identifier
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[SaveOutboundMessages]
 	@OutboundMessageTbl [dbo].[OutboundMessageTbl] READONLY
@@ -220,7 +215,7 @@ BEGIN
 					VWOM.[ActivityIdentifier] = OMO.[ActivityIdentifier]
 					AND VWOM.[ActivityTypeId] = OMO.[ActivityTypeId]
 					AND ISNULL(VWOM.[ActivitySubTypeId], '') = ISNULL(OMO.[ActivitySubTypeId], '')
-					AND VWOM.[AutomonIdentifier] IS NOT NULL
+					AND (VWOM.[AutomonIdentifier] IS NOT NULL OR (VWOM.[ActionReasonName] = 'Removed' AND VWOM.[OutboundMessageId] <> OMO.[Id]))
 				ORDER BY 
 					VWOM.[ReceivedOn] DESC
 			)

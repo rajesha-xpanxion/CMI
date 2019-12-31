@@ -87,7 +87,7 @@ BEGIN
 				@PolicyNumber = [PolicyNumber],
 				@ExpirationDate = [ExpirationDate]
 			FROM
-				[dbo].[VehicleInfo]
+				[$AutomonDatabaseName].[dbo].[VehicleInfo]
 			WHERE
 				[Id] = @VehicleId;
 		

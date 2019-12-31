@@ -167,6 +167,78 @@ namespace CMI.Automon.Service
                 }
             }
         }
+
+        public void DeleteOffenderDrugTestResultDetails(string CmiDbConnString, OffenderDrugTestResult offenderDrugTestResultDetails)
+        {
+            if (automonConfig.IsDevMode)
+            {
+                //string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderDrugTestResultDetails);
+
+                ////check if repository parent directory exists, if not then create
+                //if (!Directory.Exists(automonConfig.TestDataJsonRepoPath))
+                //{
+                //    Directory.CreateDirectory(automonConfig.TestDataJsonRepoPath);
+                //}
+
+                ////read existing objects
+                //List<OffenderDrugTestResult> offenderDrugTestResultDetailsList = File.Exists(testDataJsonFileName)
+                //    ? JsonConvert.DeserializeObject<List<OffenderDrugTestResult>>(File.ReadAllText(testDataJsonFileName))
+                //    : new List<OffenderDrugTestResult>();
+
+                ////merge
+                //offenderDrugTestResultDetailsList.Add(offenderDrugTestResultDetails);
+
+                ////write back
+                //File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderDrugTestResultDetailsList));
+
+                //return offenderDrugTestResultDetails.Id == 0 ? new Random().Next(0, 10000) : offenderDrugTestResultDetails.Id;
+            }
+            else
+            {
+                using (SqlConnection conn = new SqlConnection(CmiDbConnString))
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = new SqlCommand())
+                    {
+                        cmd.CommandText = StoredProc.DeleteOffenderDrugTestResultDetails;
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.AutomonDatabaseName,
+                            SqlDbType = System.Data.SqlDbType.NVarChar,
+                            Value = new SqlConnectionStringBuilder(automonConfig.AutomonDbConnString).InitialCatalog
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Pin,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDrugTestResultDetails.Pin,
+                            IsNullable = false
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.Id,
+                            SqlDbType = System.Data.SqlDbType.Int,
+                            Value = offenderDrugTestResultDetails.Id,
+                            IsNullable = true
+                        });
+                        cmd.Parameters.Add(new SqlParameter()
+                        {
+                            ParameterName = SqlParamName.UpdatedBy,
+                            SqlDbType = System.Data.SqlDbType.VarChar,
+                            Value = offenderDrugTestResultDetails.UpdatedBy,
+                            IsNullable = false
+                        });
+
+                        cmd.Connection = conn;
+
+                        cmd.ExecuteScalar();
+                    }
+                }
+            }
+        }
         #endregion
     }
 }

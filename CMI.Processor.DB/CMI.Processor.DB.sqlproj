@@ -117,6 +117,7 @@
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderOnDemandSanctionDetails.sql" />
     <Build Include="dbo\User Defined Types\dbo.OnDemandSanctionedActivityDetailsTbl.sql" />
     <Build Include="dbo\Stored Procedures\dbo.SaveOffenderTouchPointCheckInDetails.sql" />
+    <Build Include="dbo\Stored Procedures\dbo.DeleteOffenderDrugTestResultDetails.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\IDE\Extensions\Microsoft\SQLDB\Extensions\SqlServer\120\SqlSchemas\master.dacpac">
