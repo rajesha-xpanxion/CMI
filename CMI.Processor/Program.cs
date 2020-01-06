@@ -206,6 +206,7 @@ namespace CMI.Processor
             serviceCollection.AddSingleton<Common.Logging.ILogger, Common.Logging.DbLogger>();
             serviceCollection.AddSingleton<IProcessorProvider, ProcessorProvider>();
             serviceCollection.AddSingleton<Common.Notification.IEmailNotificationProvider, Common.Notification.EmailNotificationProvider>();
+            serviceCollection.AddSingleton<Common.Imaging.IImager, Common.Imaging.Imager>();
         }
 
         private static void ConfigureInboundProcessorServices(IServiceCollection serviceCollection)

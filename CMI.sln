@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.MessageRetriever.REST",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CMI.MessageRetriever.Interface", "CMI.MessageRetriever.Interface\CMI.MessageRetriever.Interface.csproj", "{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMI.Common.Imaging", "CMI.Common.Imaging\CMI.Common.Imaging.csproj", "{4E402EC5-D82E-496B-9894-79A9BDC3A184}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,10 @@ Global
 		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E402EC5-D82E-496B-9894-79A9BDC3A184}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E402EC5-D82E-496B-9894-79A9BDC3A184}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E402EC5-D82E-496B-9894-79A9BDC3A184}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E402EC5-D82E-496B-9894-79A9BDC3A184}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +132,7 @@ Global
 		{0E4BA0EB-C833-42E7-89CD-6F657260CC22} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
 		{A809E9B0-03AF-4183-BCF0-D26C8F9730C1} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
 		{EC15DF9F-A0A1-49FA-AF37-852CB24481C7} = {FD0FE486-32D6-44ED-9D77-7227FF1DA336}
+		{4E402EC5-D82E-496B-9894-79A9BDC3A184} = {B2A089A5-E071-408B-B695-D69F690D92B3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {346C34A5-4F49-4E23-8D33-C6D985F92129}

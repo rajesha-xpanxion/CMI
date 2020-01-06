@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CMI.Automon.Service\CMI.Automon.Service.csproj" />
+    <ProjectReference Include="..\CMI.Common.Imaging\CMI.Common.Imaging.csproj" />
     <ProjectReference Include="..\CMI.Common.Logging\CMI.Common.Logging.csproj" />
     <ProjectReference Include="..\CMI.Common.Notification\CMI.Common.Notification.csproj" />
     <ProjectReference Include="..\CMI.Nexus.Service\CMI.Nexus.Service.csproj" />

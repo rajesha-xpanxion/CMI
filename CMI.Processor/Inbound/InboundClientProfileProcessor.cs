@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using CMI.Common.Notification;
+using CMI.Common.Imaging;
 
 namespace CMI.Processor
 {
@@ -15,17 +16,20 @@ namespace CMI.Processor
     {
         private readonly IOffenderService offenderService;
         private readonly IOffenderProfilePictureService offenderProfilePictureService;
+        private readonly IImager imager;
 
         public InboundClientProfileProcessor(
             IServiceProvider serviceProvider,
             IConfiguration configuration,
             IOffenderService offenderService,
-            IOffenderProfilePictureService offenderProfilePictureService
+            IOffenderProfilePictureService offenderProfilePictureService,
+            IImager imager
         )
             : base(serviceProvider, configuration)
         {
             this.offenderService = offenderService;
             this.offenderProfilePictureService = offenderProfilePictureService;
+            this.imager = imager;
         }
 
         public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
@@ -117,12 +121,40 @@ namespace CMI.Processor
                                     });
                                 }
 
-                                ClientProfilePicture clientProfilePicture = null;
-
                                 //check if there is any mugshot photo set for given offender
                                 if (offenderMugshot != null && offenderMugshot.DocumentData!= null)
                                 {
-                                    clientProfilePicture = new ClientProfilePicture
+                                    //check if magshot size is exceeding threshold limit, YES = Resize it to small size
+                                    double offenderMugshotPhotoSizeInMegaBytes = imager.ConvertBytesToMegaBytes(offenderMugshot.DocumentData.LongLength);
+                                    if (offenderMugshotPhotoSizeInMegaBytes > ProcessorConfig.InboundProcessorConfig.InputImageSizeThresholdInMegaBytes)
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = string.Format(
+                                                "Offender MugShot-Photo having size of {0} MB is exceeding threshold size of {0} MB. Attempting to resize it.",
+                                                offenderMugshotPhotoSizeInMegaBytes,
+                                                ProcessorConfig.InboundProcessorConfig.InputImageSizeThresholdInMegaBytes
+                                            )
+                                        });
+
+                                        //try to resize image
+                                        offenderMugshot.DocumentData = imager.ResizeImage(offenderMugshot.DocumentData, ProcessorConfig.InboundProcessorConfig.OutputImageMaxSize);
+
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = string.Format(
+                                                "Offender MugShot-Photo resized to size of {0} MB.",
+                                                imager.ConvertBytesToMegaBytes(offenderMugshot.DocumentData.LongLength)
+                                            )
+                                        });
+                                    }
+
+                                    //transform offender mugshot photo into Nexus compliant model
+                                    ClientProfilePicture clientProfilePicture = new ClientProfilePicture
                                     {
                                         IntegrationId = FormatId(offenderMugshot.Pin),
                                         ImageBase64String = Convert.ToBase64String(offenderMugshot.DocumentData)

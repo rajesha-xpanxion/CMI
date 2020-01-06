@@ -19,6 +19,8 @@ namespace CMI.Processor.DAL
     {
         public IEnumerable<string> StagesToProcess { get; set; }
         public IEnumerable<string> OfficerLogonsToFilter { get; set; }
+        public double InputImageSizeThresholdInMegaBytes { get; set; }
+        public int OutputImageMaxSize { get; set; }
     }
 
     public class OutboundProcessorConfig
