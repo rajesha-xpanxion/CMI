@@ -1,8 +1,8 @@
-﻿
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Drawing.Imaging;
 
 namespace CMI.Common.Imaging
 {
@@ -13,59 +13,64 @@ namespace CMI.Common.Imaging
             return (bytes / 1024f) / 1024f;
         }
 
-        public byte[] ResizeImage(byte[] inputBytes, int targetMaxSize)
+        public byte[] ResizeImage(byte[] inputImageBytes, int targetMaxSize)
         {
             int outputWidth = targetMaxSize, outputHeight = targetMaxSize;
 
-            using (var inputImage = new Bitmap(ConvertBytesToImage(inputBytes)))
+            using (var inputImage = ConvertBytesToImage(inputImageBytes))
             {
-                //derive possible width & height if output image
-                if (inputImage.Width > inputImage.Height)
-                {
-                    outputWidth = targetMaxSize;
-                    outputHeight = Convert.ToInt32(inputImage.Height * targetMaxSize / (double)inputImage.Width);
-                }
-                else
-                {
-                    outputWidth = Convert.ToInt32(inputImage.Width * targetMaxSize / (double)inputImage.Height);
-                    outputHeight = targetMaxSize;
-                }
+                ImageFormat inputImageFormat = inputImage.RawFormat;
 
-                //draw new resized image
-                using (var outputImage = new Bitmap(outputWidth, outputHeight))
+                using (var inputImageBitmap = new Bitmap(inputImage))
                 {
-                    using (var outputImageGraphics = Graphics.FromImage(outputImage))
+                    //derive possible width & height if output image
+                    if (inputImageBitmap.Width > inputImageBitmap.Height)
                     {
-                        //set required properties
-                        outputImageGraphics.CompositingQuality = CompositingQuality.HighSpeed;
-                        outputImageGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        outputImageGraphics.CompositingMode = CompositingMode.SourceCopy;
+                        outputWidth = targetMaxSize;
+                        outputHeight = Convert.ToInt32(inputImageBitmap.Height * targetMaxSize / (double)inputImageBitmap.Width);
+                    }
+                    else
+                    {
+                        outputWidth = Convert.ToInt32(inputImageBitmap.Width * targetMaxSize / (double)inputImageBitmap.Height);
+                        outputHeight = targetMaxSize;
+                    }
 
-                        //draw actual imae
-                        outputImageGraphics.DrawImage(inputImage, 0, 0, outputWidth, outputHeight);
+                    //draw new resized image
+                    using (var outputImageBitmap = new Bitmap(outputWidth, outputHeight))
+                    {
+                        using (var outputImageGraphics = Graphics.FromImage(outputImageBitmap))
+                        {
+                            //set required properties
+                            outputImageGraphics.CompositingQuality = CompositingQuality.HighSpeed;
+                            outputImageGraphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            outputImageGraphics.CompositingMode = CompositingMode.SourceCopy;
 
-                        //return resized image bytes
-                        return ConvertImageToBytes(outputImage);
+                            //draw actual imae
+                            outputImageGraphics.DrawImage(inputImageBitmap, 0, 0, outputWidth, outputHeight);
+
+                            //return resized image bytes
+                            return ConvertImageToBytes(outputImageBitmap, inputImageFormat);
+                        }
                     }
                 }
             }
         }
 
-        private Image ConvertBytesToImage(byte[] inputBytes)
+        private Image ConvertBytesToImage(byte[] bytes)
         {
-            using (var ms = new MemoryStream(inputBytes))
+            using (var memoryStream = new MemoryStream(bytes))
             {
-                return Image.FromStream(ms);
+                return Image.FromStream(memoryStream);
             }
         }
 
-        private byte[] ConvertImageToBytes(Image inputImage)
+        private byte[] ConvertImageToBytes(Image image, ImageFormat imageFormat)
         {
-            using (var ms = new MemoryStream())
+            using (var memoryStream = new MemoryStream())
             {
-                inputImage.Save(ms, inputImage.RawFormat);
+                image.Save(memoryStream, imageFormat);
 
-                return ms.ToArray();
+                return memoryStream.ToArray();
             }
         }
     }
