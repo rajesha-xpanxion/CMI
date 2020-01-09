@@ -56,6 +56,26 @@ namespace CMI.Common.Imaging
             }
         }
 
+        public bool IsJpegFormat(byte[] inputBytes)
+        {
+            using (var inputImage = ConvertBytesToImage(inputBytes))
+            {
+                if(ImageFormat.Jpeg.Equals(inputImage.RawFormat))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public byte[] ConvertToJpegFormat(byte[] inputBytes)
+        {
+            using (var inputImage = ConvertBytesToImage(inputBytes))
+            {
+                return ConvertImageToBytes(inputImage, ImageFormat.Jpeg);
+            }
+        }
+
         private Image ConvertBytesToImage(byte[] bytes)
         {
             using (var memoryStream = new MemoryStream(bytes))

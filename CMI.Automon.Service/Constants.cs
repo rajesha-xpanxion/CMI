@@ -154,6 +154,8 @@ namespace CMI.Automon.Service
         public static string PayRate { get { return "PayRate"; } }
         public static string WorkType { get { return "WorkType"; } }
         public static string JobTitle { get { return "JobTitle"; } }
+        public static string DocumentId { get { return "DocumentId"; } }
+        public static string DocumentDate { get { return "DocumentDate"; } }
     }
 
     public static class TestResult

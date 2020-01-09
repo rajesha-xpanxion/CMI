@@ -29,8 +29,8 @@ namespace CMI.Automon.Model
 
     public class OffenderMugshot : Offender
     {
-        public byte[] DocumentData { get; set; }
         public int DocumentId { get; set; }
         public DateTime? DocumentDate { get; set; }
+        public byte[] DocumentData { get; set; }
     }
 }

@@ -27,10 +27,28 @@ namespace CMI.Automon.Service
         #region Public Methods
         public OffenderMugshot GetOffenderMugshotPhoto(string CmiDbConnString, string pin)
         {
+            OffenderMugshot offenderMugshot = null;
+
             if (automonConfig.IsDevMode)
             {
                 //test data
-                return new OffenderMugshot { Pin = pin };
+
+                /*
+                //test file
+                using (FileStream fs = new FileStream(@"D:\Projects\AMS\POC\MyImageResizer1\MyImageResizer1\SampleInputs\car wall paper.jpg", FileMode.Open, FileAccess.Read))
+                {
+                    using (BinaryReader br = new BinaryReader(fs))
+                    {
+                        byte[] imageBytes = br.ReadBytes((int)fs.Length);
+                        br.Close();
+                        fs.Close();
+
+                        return new OffenderMugshot { Pin = pin, DocumentId = new Random().Next(0, 10000), DocumentData = imageBytes };
+                    }
+                }
+                */
+
+                offenderMugshot = new OffenderMugshot { Pin = pin, DocumentId = new Random().Next(0, 10000) };
             }
             else
             {
@@ -57,10 +75,32 @@ namespace CMI.Automon.Service
 
                         cmd.Connection = conn;
 
-                        return new OffenderMugshot { Pin = pin, DocumentData = (byte[])(cmd.ExecuteScalar()) };
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                offenderMugshot = new OffenderMugshot
+                                {
+                                    Pin = Convert.ToString(reader[DbColumnName.Pin]),
+                                    DocumentId = Convert.ToInt32(reader[DbColumnName.DocumentId])
+                                };
+
+                                //document date
+                                if (Convert.IsDBNull(reader[DbColumnName.DocumentDate]))
+                                {
+                                    offenderMugshot.DocumentDate = null;
+                                }
+                                else
+                                {
+                                    offenderMugshot.DocumentDate = (DateTime?)reader[DbColumnName.DocumentDate];
+                                }
+                            }
+                        }
                     }
                 }
             }
+
+            return offenderMugshot;
         }
 
         public int SaveOffenderMugshotPhoto(string CmiDbConnString, OffenderMugshot offenderMugshotDetails)

@@ -13,6 +13,7 @@ EXEC
 History:-
 Date			Author			Changes
 28-Aug-19		Rajesh Awate	Created.
+09-Jan-20		Rajesh Awate	Changes to retrieve Document Id & Document Date
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetOffenderMugshotPhoto]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -24,6 +25,8 @@ BEGIN
 	SET @SQLString = 
 	'
 	SELECT TOP 1
+		DI.[Id] AS [DocumentId],
+		DI.[DocumentDate],
 		DD.[DocumentData]
 	FROM
 		[$AutomonDatabaseName].[dbo].[DocumentInfo] DI JOIN [$AutomonDatabaseName].[dbo].[DocumentData] DD
