@@ -9,6 +9,7 @@ namespace CMI.Nexus.Model
         public string CaseDate { get; set; }
         public string StartDate { get; set; }
         public string EndDate { get; set; }
+        public string EarlyReleaseDate { get; set; }
         public string EndReason { get; set; }
         public string Status { get; set; }
         public List<Offense> Offenses { get; set; }

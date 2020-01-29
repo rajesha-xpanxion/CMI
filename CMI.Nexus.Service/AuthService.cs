@@ -57,7 +57,7 @@ namespace CMI.Nexus.Service
                     apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
                     apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", _AuthToken.token_type, _AuthToken.access_token));
 
-                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/IAmAlive", nexusConfig.CaseIntegrationApiVersion)).Result;
+                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/Index", nexusConfig.CaseIntegrationApiVersion)).Result;
 
                     var responseString = apiResponse.Content.ReadAsStringAsync();
 

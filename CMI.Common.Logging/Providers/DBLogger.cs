@@ -40,7 +40,7 @@ namespace CMI.Common.Logging
 
         public async void LogWarning(LogRequest logRequest)
         {
-            if (logConfig.LogLevel <= LogLevel.Warning)
+            if (logConfig.IsEnabled && logConfig.LogLevel <= LogLevel.Warning)
             {
                 await Log(LogLevel.Warning, logRequest);
             }
