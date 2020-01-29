@@ -72,6 +72,7 @@ namespace CMI.Processor
                             ClientId = FormatId(offenderVehicleDetails.Pin),
                             VehicleId = string.Format("{0}-{1}", FormatId(offenderVehicleDetails.Pin), offenderVehicleDetails.Id),
                             Make = offenderVehicleDetails.Make,
+                            Model = Nexus.Service.VehicleModel.Unknown,     //set default value for Model as in Nexus API this field in mandatory
                             Year = offenderVehicleDetails.VehicleYear,
                             LicensePlate = offenderVehicleDetails.LicensePlate,
                             Color = offenderVehicleDetails.Color,
