@@ -75,8 +75,11 @@ namespace CMI.Processor
                             ContactType = MapContactType(offenderPhoneDetails.PhoneNumberType),
                             ContactValue = offenderPhoneDetails.Phone,
                             IsPrimary = offenderPhoneDetails.IsPrimary,
-                            Comment = string.IsNullOrEmpty(offenderPhoneDetails.Comment) ? offenderPhoneDetails.Comment : offenderPhoneDetails.Comment.Replace("/", "-"),
-                            IsActive = offenderPhoneDetails.IsActive
+                            IsActive = offenderPhoneDetails.IsActive,
+                            Comment = 
+                                string.IsNullOrEmpty(offenderPhoneDetails.Comment)
+                                ? null
+                                : offenderPhoneDetails.Comment.Replace(Environment.NewLine, " ").Replace("\"", @"""")
                         };
 
                         if (ClientService.GetClientDetails(contact.ClientId) != null)

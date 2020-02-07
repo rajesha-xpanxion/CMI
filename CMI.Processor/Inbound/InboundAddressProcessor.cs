@@ -74,8 +74,11 @@ namespace CMI.Processor
                             AddressType = MapAddressType(offenderAddressDetails.AddressType),
                             FullAddress = MapFullAddress(offenderAddressDetails.Line1, offenderAddressDetails.Line2, offenderAddressDetails.City, offenderAddressDetails.State, offenderAddressDetails.Zip),
                             IsPrimary = offenderAddressDetails.IsPrimary,
-                            Comment = string.IsNullOrEmpty(offenderAddressDetails.Comment) ? offenderAddressDetails.Comment : offenderAddressDetails.Comment.Replace("/", "-"),
-                            IsActive = offenderAddressDetails.IsActive
+                            IsActive = offenderAddressDetails.IsActive,
+                            Comment =
+                                string.IsNullOrEmpty(offenderAddressDetails.Comment)
+                                ? null
+                                : offenderAddressDetails.Comment.Replace(Environment.NewLine, " ").Replace("\"", @"""")
                         };
 
                         if (ClientService.GetClientDetails(address.ClientId) != null)

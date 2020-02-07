@@ -25,6 +25,7 @@ BEGIN
 	SET @SQLString = 
 	'
 	SELECT TOP 1
+		DI.[Pin],
 		DI.[Id] AS [DocumentId],
 		DI.[DocumentDate],
 		DD.[DocumentData]

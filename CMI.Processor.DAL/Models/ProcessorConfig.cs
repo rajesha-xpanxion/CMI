@@ -21,6 +21,8 @@ namespace CMI.Processor.DAL
         public IEnumerable<string> OfficerLogonsToFilter { get; set; }
         public double InputImageSizeThresholdInMegaBytes { get; set; }
         public int OutputImageMaxSize { get; set; }
+        public bool IsEnableImageFormatConversion { get; set; }
+        public bool IsSaveMugshotPhotoJsonToFile { get; set; }
     }
 
     public class OutboundProcessorConfig

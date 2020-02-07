@@ -82,7 +82,8 @@ namespace CMI.Automon.Service
                                 offenderMugshot = new OffenderMugshot
                                 {
                                     Pin = Convert.ToString(reader[DbColumnName.Pin]),
-                                    DocumentId = Convert.ToInt32(reader[DbColumnName.DocumentId])
+                                    DocumentId = Convert.ToInt32(reader[DbColumnName.DocumentId]),
+                                    DocumentData = ((byte[])reader[DbColumnName.DocumentData])
                                 };
 
                                 //document date
@@ -231,6 +232,29 @@ namespace CMI.Automon.Service
                     }
                 }
             }
+        }
+
+        public void SaveOffenderMugshotPhotoToJsonFile(OffenderMugshot offenderMugshotDetails)
+        {
+            string testDataJsonFileName = Path.Combine(automonConfig.TestDataJsonRepoPath, Constants.TestDataJsonFileNameAllOffenderMugshotDetails);
+
+            //check if repository parent directory exists, if not then create
+            if (!Directory.Exists(automonConfig.TestDataJsonRepoPath))
+            {
+                Directory.CreateDirectory(automonConfig.TestDataJsonRepoPath);
+            }
+
+            //read existing objects
+            List<OffenderMugshot> offenderMugshotDetailsList = File.Exists(testDataJsonFileName)
+                ? JsonConvert.DeserializeObject<List<OffenderMugshot>>(File.ReadAllText(testDataJsonFileName))
+                : new List<OffenderMugshot>();
+
+            //merge
+            offenderMugshotDetailsList.Add(offenderMugshotDetails);
+
+            //write back
+            File.WriteAllText(testDataJsonFileName, JsonConvert.SerializeObject(offenderMugshotDetailsList));
+
         }
         #endregion
     }

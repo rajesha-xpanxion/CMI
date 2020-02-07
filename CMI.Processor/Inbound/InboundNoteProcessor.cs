@@ -70,7 +70,8 @@ namespace CMI.Processor
                             NoteId = FormatId(Convert.ToString(offenderNoteDetails.Id)),
                             NoteText = offenderNoteDetails.Text,
                             NoteDatetime = offenderNoteDetails.Date.ToString(),
-                            NoteType = offenderNoteDetails.NoteType
+                            NoteType = offenderNoteDetails.NoteType,
+                            NoteAuthor = offenderNoteDetails.AuthorEmail
                         };
 
                         if (ClientService.GetClientDetails(note.ClientId) != null)

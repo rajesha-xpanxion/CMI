@@ -119,30 +119,41 @@ namespace CMI.Processor
                                         Message = "Offender MugShot-Photo found in Automon.",
                                         AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId })
                                     });
+
+                                    //check if to save mugshot photo json to file
+                                    if (ProcessorConfig.InboundProcessorConfig.IsSaveMugshotPhotoJsonToFile)
+                                    {
+                                        //save object to json file for test purpose
+                                        offenderProfilePictureService.SaveOffenderMugshotPhotoToJsonFile(offenderMugshot);
+                                    }
                                 }
 
                                 //check if there is any mugshot photo set for given offender
-                                if (offenderMugshot != null && offenderMugshot.DocumentData!= null)
+                                if (offenderMugshot != null && offenderMugshot.DocumentData != null)
                                 {
-                                    //check if image format is not Jpeg, YES = convert it into Jpeg format, No = continue
-                                    if (!imager.IsJpegFormat(offenderMugshot.DocumentData))
+                                    //check if to convert image format enable
+                                    if (ProcessorConfig.InboundProcessorConfig.IsEnableImageFormatConversion)
                                     {
-                                        Logger.LogDebug(new LogRequest
+                                        //check if image format is not Jpeg, YES = convert it into Jpeg format, No = continue
+                                        if (!imager.IsJpegFormat(offenderMugshot.DocumentData))
                                         {
-                                            OperationName = this.GetType().Name,
-                                            MethodName = "Execute",
-                                            Message = "Offender MugShot-Photo is not of Jpeg format. Attempting to convert into Jpeg format."
-                                        });
+                                            Logger.LogDebug(new LogRequest
+                                            {
+                                                OperationName = this.GetType().Name,
+                                                MethodName = "Execute",
+                                                Message = "Offender MugShot-Photo is not of Jpeg format. Attempting to convert into Jpeg format."
+                                            });
 
-                                        //attempt to convert into Jpeg format
-                                        offenderMugshot.DocumentData = imager.ConvertToJpegFormat(offenderMugshot.DocumentData);
+                                            //attempt to convert into Jpeg format
+                                            offenderMugshot.DocumentData = imager.ConvertToJpegFormat(offenderMugshot.DocumentData);
 
-                                        Logger.LogDebug(new LogRequest
-                                        {
-                                            OperationName = this.GetType().Name,
-                                            MethodName = "Execute",
-                                            Message = "Offender MugShot-Photo successfully converted into Jpeg format."
-                                        });
+                                            Logger.LogDebug(new LogRequest
+                                            {
+                                                OperationName = this.GetType().Name,
+                                                MethodName = "Execute",
+                                                Message = "Offender MugShot-Photo successfully converted into Jpeg format."
+                                            });
+                                        }
                                     }
 
                                     //check if magshot size is exceeding threshold limit, YES = Resize it to small size
@@ -207,9 +218,9 @@ namespace CMI.Processor
                                 }
 
                                 //update CMS Status
-                                if(!string.IsNullOrEmpty(client.CmsStatus))
+                                if (!string.IsNullOrEmpty(client.CmsStatus))
                                 {
-                                    if(ClientService.UpdateClientCmsStatus(client.IntegrationId, client.CmsStatus))
+                                    if (ClientService.UpdateClientCmsStatus(client.IntegrationId, client.CmsStatus))
                                     {
                                         Logger.LogDebug(new LogRequest
                                         {
@@ -258,7 +269,7 @@ namespace CMI.Processor
                                 });
 
                                 //check if any profile picture exists in Nexus
-                                if(ClientService.GetClientProfilePicture(client.IntegrationId) == null)
+                                if (ClientService.GetClientProfilePicture(client.IntegrationId) == null)
                                 {
                                     //profile picture does not exist in Nexus. Try to get it from Automon and set in Nexus.
 
@@ -274,30 +285,41 @@ namespace CMI.Processor
                                             Message = "Offender MugShot-Photo found in Automon.",
                                             AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId })
                                         });
+
+                                        //check if to save mugshot photo json to file
+                                        if (ProcessorConfig.InboundProcessorConfig.IsSaveMugshotPhotoJsonToFile)
+                                        {
+                                            //save object to json file for test purpose
+                                            offenderProfilePictureService.SaveOffenderMugshotPhotoToJsonFile(offenderMugshot);
+                                        }
                                     }
 
                                     //check if there is any mugshot photo set for given offender
                                     if (offenderMugshot != null && offenderMugshot.DocumentData != null)
                                     {
-                                        //check if image format is not Jpeg, YES = convert it into Jpeg format, No = continue
-                                        if (!imager.IsJpegFormat(offenderMugshot.DocumentData))
+                                        //check if to convert image format enable
+                                        if (ProcessorConfig.InboundProcessorConfig.IsEnableImageFormatConversion)
                                         {
-                                            Logger.LogDebug(new LogRequest
+                                            //check if image format is not Jpeg, YES = convert it into Jpeg format, No = continue
+                                            if (!imager.IsJpegFormat(offenderMugshot.DocumentData))
                                             {
-                                                OperationName = this.GetType().Name,
-                                                MethodName = "Execute",
-                                                Message = "Offender MugShot-Photo is not of Jpeg format. Attempting to convert into Jpeg format."
-                                            });
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Offender MugShot-Photo is not of Jpeg format. Attempting to convert into Jpeg format."
+                                                });
 
-                                            //attempt to convert into Jpeg format
-                                            offenderMugshot.DocumentData = imager.ConvertToJpegFormat(offenderMugshot.DocumentData);
+                                                //attempt to convert into Jpeg format
+                                                offenderMugshot.DocumentData = imager.ConvertToJpegFormat(offenderMugshot.DocumentData);
 
-                                            Logger.LogDebug(new LogRequest
-                                            {
-                                                OperationName = this.GetType().Name,
-                                                MethodName = "Execute",
-                                                Message = "Offender MugShot-Photo successfully converted into Jpeg format."
-                                            });
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Offender MugShot-Photo successfully converted into Jpeg format."
+                                                });
+                                            }
                                         }
 
                                         //check if magshot size is exceeding threshold limit, YES = Resize it to small size
