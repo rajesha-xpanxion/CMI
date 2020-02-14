@@ -5,6 +5,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 using CMI.Nexus.Interface;
+using System.IO;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace CMI.Nexus.Service
 {
@@ -192,6 +195,16 @@ namespace CMI.Nexus.Service
         #region Private Helper Methods
         private List<string> GetAddressTypes()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllAddressTypeLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -217,6 +230,16 @@ namespace CMI.Nexus.Service
 
         private List<CaseLoad> GetCaseLoads()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllCaseLoadLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<CaseLoad>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<CaseLoad>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -242,6 +265,16 @@ namespace CMI.Nexus.Service
 
         private List<string> GetClientTypes()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllClientTypeLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -267,6 +300,16 @@ namespace CMI.Nexus.Service
 
         private List<string> GetContactTypes()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllContactTypeLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -292,6 +335,16 @@ namespace CMI.Nexus.Service
 
         private List<string> GetEthnicities()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllEthnicityLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -317,6 +370,16 @@ namespace CMI.Nexus.Service
 
         private List<string> GetGenders()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllGenderLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -342,6 +405,16 @@ namespace CMI.Nexus.Service
 
         private List<SupervisingOfficer> GetSupervisingOfficers()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllSupervisingOfficerLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<SupervisingOfficer>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<SupervisingOfficer>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -367,6 +440,16 @@ namespace CMI.Nexus.Service
 
         private List<string> GetTimeZones()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllTimeZoneLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -392,6 +475,16 @@ namespace CMI.Nexus.Service
 
         private List<string> GetOffenseCategories()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllOffenseCategoryLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -417,6 +510,16 @@ namespace CMI.Nexus.Service
 
         private List<string> GetStaticRiskRatings()
         {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllStaticRiskRatingLookupDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(testDataJsonFileName))
+                    : new List<string>();
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);

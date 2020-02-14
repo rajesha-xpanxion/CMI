@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using CMI.Nexus.Interface;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace CMI.Nexus.Service
 {
@@ -30,6 +32,11 @@ namespace CMI.Nexus.Service
         #region Public Methods
         public bool AddNewCaseDetails(Case @case)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -54,6 +61,11 @@ namespace CMI.Nexus.Service
 
         public Case GetCaseDetails(string clientId, string caseNumber)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return GetAllCaseDetails(clientId).Where(a => a.CaseNumber.Equals(caseNumber, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            }
+
             Case caseDetails = null;
 
             using (HttpClient apiHost = new HttpClient())
@@ -77,6 +89,45 @@ namespace CMI.Nexus.Service
             }
 
             return caseDetails;
+        }
+
+        public List<Case> GetAllCaseDetails(string clientId)
+        {
+            if (nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllClientCaseDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<Case>>(File.ReadAllText(testDataJsonFileName)).Where(c => c.ClientId.Equals(clientId, StringComparison.InvariantCultureIgnoreCase)).ToList()
+                    : new List<Case>();
+            }
+            else
+            {
+                List<Case> allCaseDetails = null;
+
+                using (HttpClient apiHost = new HttpClient())
+                {
+                    apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                    apiHost.DefaultRequestHeaders.Accept.Clear();
+                    apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                    apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/cases", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                    if (apiResponse.IsSuccessStatusCode)
+                    {
+                        allCaseDetails = apiResponse.Content.ReadAsAsync<List<Case>>().Result;
+                    }
+                    else
+                    {
+                        allCaseDetails = null;
+                    }
+                }
+
+                return allCaseDetails;
+            }
         }
 
         public Case GetCaseDetailsUsingAllEndPoint(string clientId, string caseNumber)
@@ -109,6 +160,11 @@ namespace CMI.Nexus.Service
 
         public bool UpdateCaseDetails(Case @case)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);

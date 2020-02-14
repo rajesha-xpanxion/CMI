@@ -4,6 +4,7 @@ using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
+using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -32,6 +33,7 @@ namespace CMI.Processor
 
         public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
+            
             Logger.LogInfo(new LogRequest
             {
                 OperationName = this.GetType().Name,
@@ -43,15 +45,17 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<OffenderPhone> allOffenderPhones = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Phone Contacts" };
+            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Phone Contacts" };
 
             try
             {
+                //retrieve data from Automon for processing
                 allOffenderPhones = offenderPhoneService.GetAllOffenderPhones(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
-                //log number of records received from Automon
+                //check if there are any records to process
                 if (allOffenderPhones.Any())
                 {
+                    //log number of records received from Automon
                     Logger.LogDebug(new LogRequest
                     {
                         OperationName = this.GetType().Name,
@@ -59,118 +63,128 @@ namespace CMI.Processor
                         Message = "Offender Phone records received from Automon.",
                         CustomParams = allOffenderPhones.Count().ToString()
                     });
-                }
 
-                foreach (var offenderPhoneDetails in allOffenderPhones)
-                {
-                    taskExecutionStatus.AutomonReceivedRecordCount++;
+                    //retrieve distinct list of offender pin
+                    List<string> distinctOffenderPin = allOffenderPhones.Select(p => p.Pin).Distinct().ToList();
 
-                    Contact contact = null;
-                    try
+                    //iterate through each of offender pin
+                    foreach (string currentOffenderPin in distinctOffenderPin)
                     {
-                        contact = new Contact()
+                        //check if client exist on Nexus side for current offender pin. This is to avoid validation errors from Nexus API in further calls.
+                        if (ClientService.GetClientDetails(currentOffenderPin) != null)
                         {
-                            ClientId = FormatId(offenderPhoneDetails.Pin),
-                            ContactId = string.Format("{0}-{1}", FormatId(offenderPhoneDetails.Pin), offenderPhoneDetails.Id),
-                            ContactType = MapContactType(offenderPhoneDetails.PhoneNumberType),
-                            ContactValue = offenderPhoneDetails.Phone,
-                            IsPrimary = offenderPhoneDetails.IsPrimary,
-                            IsActive = offenderPhoneDetails.IsActive,
-                            Comment = 
-                                string.IsNullOrEmpty(offenderPhoneDetails.Comment)
-                                ? null
-                                : offenderPhoneDetails.Comment.Replace(Environment.NewLine, " ").Replace("\"", @"""")
-                        };
+                            //get all contacts for given offender pin
+                            var allExistingContactDetails = contactService.GetAllContactDetails(currentOffenderPin).Where(e => !e.ContactType.Equals(DAL.Constants.ContactTypeEmailNexus, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
-                        if (ClientService.GetClientDetails(contact.ClientId) != null)
-                        {
-                            if (contactService.GetContactDetails(contact.ClientId, contact.ContactId) == null)
+                            //set ClientId value
+                            allExistingContactDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+
+                            //iterate through each of offender phone details for current offender pin
+                            foreach (var offenderPhoneDetails in allOffenderPhones.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
                             {
-                                if (contact.IsActive && contactService.AddNewContactDetails(contact))
-                                {
-                                    taskExecutionStatus.NexusAddRecordCount++;
+                                taskExecutionStatus.AutomonReceivedRecordCount++;
 
-                                    Logger.LogDebug(new LogRequest
+                                Contact contact = null;
+                                try
+                                {
+                                    //transform offender phone details in Nexus compliant model
+                                    contact = new Contact()
+                                    {
+                                        ClientId = FormatId(offenderPhoneDetails.Pin),
+                                        ContactId = string.Format("{0}-{1}", FormatId(offenderPhoneDetails.Pin), offenderPhoneDetails.Id),
+                                        ContactType = MapContactType(offenderPhoneDetails.PhoneNumberType),
+                                        ContactValue = offenderPhoneDetails.Phone,
+                                        Comment = FormatComment(offenderPhoneDetails.Comment),
+                                        IsPrimary = offenderPhoneDetails.IsPrimary,
+                                        IsActive = offenderPhoneDetails.IsActive
+                                    };
+
+                                    //get crud action type based on comparison
+                                    switch (GetCrudActionType(contact, allExistingContactDetails))
+                                    {
+                                        case CrudActionType.Add:
+                                            if (contactService.AddNewContactDetails(contact))
+                                            {
+                                                taskExecutionStatus.NexusAddRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "New Client Phone Contact details added successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                                    NexusData = JsonConvert.SerializeObject(contact)
+                                                });
+                                            }
+                                            break;
+                                        case CrudActionType.Update:
+                                            if (contactService.UpdateContactDetails(contact))
+                                            {
+                                                taskExecutionStatus.NexusUpdateRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Existing Client Phone Contact details updated successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                                    NexusData = JsonConvert.SerializeObject(contact)
+                                                });
+                                            }
+                                            break;
+                                        case CrudActionType.Delete:
+                                            if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
+                                            {
+                                                taskExecutionStatus.NexusDeleteRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Existing Client Phone Contact details deleted successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
+                                                    NexusData = JsonConvert.SerializeObject(contact)
+                                                });
+                                            }
+                                            break;
+                                        default:
+                                            taskExecutionStatus.AutomonReceivedRecordCount--;
+                                            break;
+                                    }
+                                }
+                                catch (CmiException ce)
+                                {
+                                    taskExecutionStatus.NexusFailureRecordCount++;
+
+                                    Logger.LogWarning(new LogRequest
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "New Client Phone Contact details added successfully.",
+                                        Message = "Error occurred in API while processing a Client Phone Contact.",
+                                        Exception = ce,
                                         AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
-                                else
+                                catch (Exception ex)
                                 {
-                                    taskExecutionStatus.AutomonReceivedRecordCount--;
-                                }
-                            }
-                            else if (!contact.IsActive)
-                            {
-                                if (contactService.DeleteContactDetails(contact.ClientId, contact.ContactId))
-                                {
-                                    taskExecutionStatus.NexusDeleteRecordCount++;
+                                    taskExecutionStatus.NexusFailureRecordCount++;
 
-                                    Logger.LogDebug(new LogRequest
+                                    Logger.LogError(new LogRequest
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "Existing Client Phone Contact details deleted successfully.",
-                                        AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                                        NexusData = JsonConvert.SerializeObject(contact)
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                if (contactService.UpdateContactDetails(contact))
-                                {
-                                    taskExecutionStatus.NexusUpdateRecordCount++;
-
-                                    Logger.LogDebug(new LogRequest
-                                    {
-                                        OperationName = this.GetType().Name,
-                                        MethodName = "Execute",
-                                        Message = "Existing Client Phone Contact details updated successfully.",
+                                        Message = "Error occurred while processing a Client Phone Contact.",
+                                        Exception = ex,
                                         AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
                                         NexusData = JsonConvert.SerializeObject(contact)
                                     });
                                 }
                             }
                         }
-                        else
-                        {
-                            taskExecutionStatus.AutomonReceivedRecordCount--;
-                        }
-                    }
-                    catch (CmiException ce)
-                    {
-                        taskExecutionStatus.NexusFailureRecordCount++;
-
-                        Logger.LogWarning(new LogRequest
-                        {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "Error occurred in API while processing a Client Phone Contact.",
-                            Exception = ce,
-                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                            NexusData = JsonConvert.SerializeObject(contact)
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        taskExecutionStatus.NexusFailureRecordCount++;
-
-                        Logger.LogError(new LogRequest
-                        {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "Error occurred while processing a Client Phone Contact.",
-                            Exception = ex,
-                            AutomonData = JsonConvert.SerializeObject(offenderPhoneDetails),
-                            NexusData = JsonConvert.SerializeObject(contact)
-                        });
                     }
                 }
+
                 taskExecutionStatus.IsSuccessful = taskExecutionStatus.NexusFailureRecordCount == 0;
             }
             catch (Exception ex)
@@ -181,7 +195,7 @@ namespace CMI.Processor
                 {
                     OperationName = this.GetType().Name,
                     MethodName = "Execute",
-                    Message = "Error occurred while processing Contacts.",
+                    Message = "Error occurred while processing Phone Contacts.",
                     Exception = ex,
                     AutomonData = JsonConvert.SerializeObject(allOffenderPhones)
                 });
@@ -251,6 +265,80 @@ namespace CMI.Processor
             }
 
             return nexusContactType;
+        }
+
+        private string FormatComment(string automonComment)
+        {
+            if (string.IsNullOrEmpty(automonComment))
+            {
+                return null;
+            }
+
+            string formattedComment = automonComment.Replace(Environment.NewLine, " ").Replace("\"", @"""");
+
+            if (formattedComment.Length > 200)
+            {
+                formattedComment = formattedComment.Take(200).ToString();
+
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Phone Contact Comment found to be greater than 200 characters.",
+                    AutomonData = JsonConvert.SerializeObject(automonComment),
+                    NexusData = JsonConvert.SerializeObject(formattedComment)
+                });
+            }
+
+            return formattedComment;
+        }
+
+        private CrudActionType GetCrudActionType(Contact contact, IEnumerable<Contact> contacts)
+        {
+            //try to get existing record using ClientId & ContactId
+            Contact existingContact = contacts.Where(a
+                =>
+                    a.ClientId.Equals(contact.ClientId, StringComparison.InvariantCultureIgnoreCase)
+                    && a.ContactId.Equals(contact.ContactId, StringComparison.InvariantCultureIgnoreCase)
+            )
+            .FirstOrDefault();
+
+            //check if record already exists
+            if (existingContact == null)
+            {
+                //record does not exist.
+                //check if record is active. YES = return Add action type, NO = return None action type
+                if (contact.IsActive)
+                {
+                    return CrudActionType.Add;
+                }
+                else
+                {
+                    return CrudActionType.None;
+                }
+            }
+            else
+            {
+                //record already exist.
+                //check if record is active. YES = compare it with existing record. NO = return Delete action type
+                if (contact.IsActive)
+                {
+                    //record is active.
+                    //compare with existing record. Equal = return None action type, Not Equal = return Update action type
+                    if (contact.Equals(existingContact))
+                    {
+                        return CrudActionType.None;
+                    }
+                    else
+                    {
+                        return CrudActionType.Update;
+                    }
+                }
+                else
+                {
+                    return CrudActionType.Delete;
+                }
+            }
         }
     }
 }

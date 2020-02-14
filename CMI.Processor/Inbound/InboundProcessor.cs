@@ -66,6 +66,15 @@ namespace CMI.Processor
                     //set processor in Non-Incremental mode
                     lastExecutionDateTime = null;
                     ProcessorExecutionStatus.IsExecutedInIncrementalMode = false;
+
+                    //log list of officers configured
+                    Logger.LogDebug(new LogRequest
+                    {
+                        OperationName = this.GetType().Name,
+                        MethodName = "Execute",
+                        Message = "List of officers configured for integration.",
+                        CustomParams = JsonConvert.SerializeObject(ProcessorConfig.InboundProcessorConfig.OfficerLogonsToFilter)
+                    });
                 }
             }
             else

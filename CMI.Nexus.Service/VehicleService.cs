@@ -5,6 +5,9 @@ using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 using CMI.Nexus.Interface;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace CMI.Nexus.Service
 {
@@ -29,6 +32,11 @@ namespace CMI.Nexus.Service
         #region Public Methods
         public bool AddNewVehicleDetails(Vehicle vehicle)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -53,6 +61,11 @@ namespace CMI.Nexus.Service
 
         public Vehicle GetVehicleDetails(string clientId, string vehicleId)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return GetAllVehicleDetails(clientId).Where(a => a.VehicleId.Equals(vehicleId, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            }
+
             Vehicle vehicleDetails = null;
 
             using (HttpClient apiHost = new HttpClient())
@@ -80,33 +93,50 @@ namespace CMI.Nexus.Service
 
         public List<Vehicle> GetAllVehicleDetails(string clientId)
         {
-            List<Vehicle> allVehicleDetails = null;
-
-            using (HttpClient apiHost = new HttpClient())
+            if (nexusConfig.IsDevMode)
             {
-                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllClientVehicleDetails);
 
-                apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
-
-                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/vehicles", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
-
-                if (apiResponse.IsSuccessStatusCode)
-                {
-                    allVehicleDetails = apiResponse.Content.ReadAsAsync<List<Vehicle>>().Result;
-                }
-                else
-                {
-                    allVehicleDetails = null;
-                }
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<Vehicle>>(File.ReadAllText(testDataJsonFileName)).Where(c => c.ClientId.Equals(clientId, StringComparison.InvariantCultureIgnoreCase)).ToList()
+                    : new List<Vehicle>();
             }
+            else
+            {
+                List<Vehicle> allVehicleDetails = null;
 
-            return allVehicleDetails;
+                using (HttpClient apiHost = new HttpClient())
+                {
+                    apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                    apiHost.DefaultRequestHeaders.Accept.Clear();
+                    apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                    apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/vehicles", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                    if (apiResponse.IsSuccessStatusCode)
+                    {
+                        allVehicleDetails = apiResponse.Content.ReadAsAsync<List<Vehicle>>().Result;
+                    }
+                    else
+                    {
+                        allVehicleDetails = null;
+                    }
+                }
+
+                return allVehicleDetails;
+            }
         }
 
         public bool UpdateVehicleDetails(Vehicle vehicle)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -132,6 +162,11 @@ namespace CMI.Nexus.Service
 
         public bool DeleteVehicleDetails(string clientId, string vehicleId)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);

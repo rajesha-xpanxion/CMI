@@ -4,6 +4,7 @@ using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
+using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -42,15 +43,17 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<OffenderAddress> allOffenderAddresses = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Addresses" };
+            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Addresses" };
 
             try
             {
+                //retrieve data from Automon for processing
                 allOffenderAddresses = offenderAddressService.GetAllOffenderAddresses(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
-                //log number of records received from Automon
+                //check if there are any records to process
                 if (allOffenderAddresses.Any())
                 {
+                    //check if there are any records to process
                     Logger.LogDebug(new LogRequest
                     {
                         OperationName = this.GetType().Name,
@@ -58,116 +61,125 @@ namespace CMI.Processor
                         Message = "Offender Address records received from Automon.",
                         CustomParams = allOffenderAddresses.Count().ToString()
                     });
-                }
 
-                foreach (var offenderAddressDetails in allOffenderAddresses)
-                {
-                    taskExecutionStatus.AutomonReceivedRecordCount++;
+                    //retrieve distinct list of offender pin
+                    List<string> distinctOffenderPin = allOffenderAddresses.Select(p => p.Pin).Distinct().ToList();
 
-                    Address address = null;
-                    try
+                    //iterate through each of offender pin
+                    foreach(string currentOffenderPin in distinctOffenderPin)
                     {
-                        address = new Address()
+                        //check if client exist on Nexus side for current offender pin. This is to avoid validation errors from Nexus API in further calls.
+                        if (ClientService.GetClientDetails(currentOffenderPin) != null)
                         {
-                            ClientId = FormatId(offenderAddressDetails.Pin),
-                            AddressId = string.Format("{0}-{1}", FormatId(offenderAddressDetails.Pin), offenderAddressDetails.Id),
-                            AddressType = MapAddressType(offenderAddressDetails.AddressType),
-                            FullAddress = MapFullAddress(offenderAddressDetails.Line1, offenderAddressDetails.Line2, offenderAddressDetails.City, offenderAddressDetails.State, offenderAddressDetails.Zip),
-                            IsPrimary = offenderAddressDetails.IsPrimary,
-                            IsActive = offenderAddressDetails.IsActive,
-                            Comment =
-                                string.IsNullOrEmpty(offenderAddressDetails.Comment)
-                                ? null
-                                : offenderAddressDetails.Comment.Replace(Environment.NewLine, " ").Replace("\"", @"""")
-                        };
+                            //get all addresses for given offender pin
+                            var allExistingAddressDetails = addressService.GetAllAddressDetails(currentOffenderPin);
 
-                        if (ClientService.GetClientDetails(address.ClientId) != null)
-                        {
-                            if (addressService.GetAddressDetails(address.ClientId, address.AddressId) == null)
+                            //set ClientId value
+                            allExistingAddressDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+
+                            //iterate through each of offender address details for current offender pin
+                            foreach (var offenderAddressDetails in allOffenderAddresses.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
                             {
-                                if (address.IsActive && addressService.AddNewAddressDetails(address))
-                                {
-                                    taskExecutionStatus.NexusAddRecordCount++;
+                                taskExecutionStatus.AutomonReceivedRecordCount++;
 
-                                    Logger.LogDebug(new LogRequest
+                                Address address = null;
+                                try
+                                {
+                                    //transform offender address details in Nexus compliant model
+                                    address = new Address()
+                                    {
+                                        ClientId = FormatId(offenderAddressDetails.Pin),
+                                        AddressId = string.Format("{0}-{1}", FormatId(offenderAddressDetails.Pin), offenderAddressDetails.Id),
+                                        AddressType = MapAddressType(offenderAddressDetails.AddressType),
+                                        FullAddress = MapFullAddress(offenderAddressDetails.Line1, offenderAddressDetails.Line2, offenderAddressDetails.City, offenderAddressDetails.State, offenderAddressDetails.Zip),
+                                        Comment = FormatComment(offenderAddressDetails.Comment),
+                                        IsPrimary = offenderAddressDetails.IsPrimary,
+                                        IsActive = offenderAddressDetails.IsActive
+                                    };
+
+                                    //get crud action type based on comparison
+                                    switch(GetCrudActionType(address, allExistingAddressDetails))
+                                    {
+                                        case CrudActionType.Add:
+                                            if (addressService.AddNewAddressDetails(address))
+                                            {
+                                                taskExecutionStatus.NexusAddRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "New Client Address details added successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                                                    NexusData = JsonConvert.SerializeObject(address)
+                                                });
+                                            }
+                                            break;
+                                        case CrudActionType.Update:
+                                            if (addressService.UpdateAddressDetails(address))
+                                            {
+                                                taskExecutionStatus.NexusUpdateRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Existing Client Address details updated successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                                                    NexusData = JsonConvert.SerializeObject(address)
+                                                });
+                                            }
+                                            break;
+                                        case CrudActionType.Delete:
+                                            if (addressService.DeleteAddressDetails(address.ClientId, address.AddressId))
+                                            {
+                                                taskExecutionStatus.NexusDeleteRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Existing Client Address details deleted successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
+                                                    NexusData = JsonConvert.SerializeObject(address)
+                                                });
+                                            }
+                                            break;
+                                        default:
+                                            taskExecutionStatus.AutomonReceivedRecordCount--;
+                                            break;
+                                    }
+                                }
+                                catch (CmiException ce)
+                                {
+                                    taskExecutionStatus.NexusFailureRecordCount++;
+
+                                    Logger.LogWarning(new LogRequest
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "New Client Address details added successfully.",
+                                        Message = "Error occurred in API while processing a Client Address.",
+                                        Exception = ce,
                                         AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
                                         NexusData = JsonConvert.SerializeObject(address)
                                     });
                                 }
-                                else
+                                catch (Exception ex)
                                 {
-                                    taskExecutionStatus.AutomonReceivedRecordCount--;
-                                }
-                            }
-                            else if (!address.IsActive)
-                            {
-                                if (addressService.DeleteAddressDetails(address.ClientId, address.AddressId))
-                                {
-                                    taskExecutionStatus.NexusDeleteRecordCount++;
+                                    taskExecutionStatus.NexusFailureRecordCount++;
 
-                                    Logger.LogDebug(new LogRequest
+                                    Logger.LogError(new LogRequest
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "Existing Client Address details deleted successfully.",
-                                        AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
-                                        NexusData = JsonConvert.SerializeObject(address)
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                if (addressService.UpdateAddressDetails(address))
-                                {
-                                    taskExecutionStatus.NexusUpdateRecordCount++;
-
-                                    Logger.LogDebug(new LogRequest
-                                    {
-                                        OperationName = this.GetType().Name,
-                                        MethodName = "Execute",
-                                        Message = "Existing Client Address details updated successfully.",
+                                        Message = "Error occurred while processing a Client Address.",
+                                        Exception = ex,
                                         AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
                                         NexusData = JsonConvert.SerializeObject(address)
                                     });
                                 }
                             }
                         }
-                        else
-                        {
-                            taskExecutionStatus.AutomonReceivedRecordCount--;
-                        }
-                    }
-                    catch (CmiException ce)
-                    {
-                        taskExecutionStatus.NexusFailureRecordCount++;
-
-                        Logger.LogWarning(new LogRequest
-                        {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "Error occurred in API while processing a Client Address.",
-                            Exception = ce,
-                            AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
-                            NexusData = JsonConvert.SerializeObject(address)
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        taskExecutionStatus.NexusFailureRecordCount++;
-
-                        Logger.LogError(new LogRequest
-                        {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "Error occurred while processing a Client Address.",
-                            Exception = ex,
-                            AutomonData = JsonConvert.SerializeObject(offenderAddressDetails),
-                            NexusData = JsonConvert.SerializeObject(address)
-                        });
                     }
                 }
 
@@ -281,6 +293,80 @@ namespace CMI.Processor
             }
 
             return nexusAddressType;
+        }
+
+        private string FormatComment(string automonComment)
+        {
+            if(string.IsNullOrEmpty(automonComment))
+            {
+                return null;
+            }
+
+            string formattedComment = automonComment.Replace(Environment.NewLine, " ").Replace("\"", @"""");
+
+            if(formattedComment.Length > 200)
+            {
+                formattedComment = formattedComment.Take(200).ToString();
+
+                Logger.LogDebug(new LogRequest
+                {
+                    OperationName = this.GetType().Name,
+                    MethodName = "Execute",
+                    Message = "Address Comment found to be greater than 200 characters.",
+                    AutomonData = JsonConvert.SerializeObject(automonComment),
+                    NexusData = JsonConvert.SerializeObject(formattedComment)
+                });
+            }
+
+            return formattedComment;
+        }
+
+        private CrudActionType GetCrudActionType(Address address, IEnumerable<Address> addresses)
+        {
+            //try to get existing record using ClientId & AddressId
+            Address existingAddress = addresses.Where(a 
+                => 
+                    a.ClientId.Equals(address.ClientId, StringComparison.InvariantCultureIgnoreCase) 
+                    && a.AddressId.Equals(address.AddressId, StringComparison.InvariantCultureIgnoreCase)
+            )
+            .FirstOrDefault();
+
+            //check if record already exists
+            if(existingAddress == null)
+            {
+                //record does not exist.
+                //check if record is active. YES = return Add action type, NO = return None action type
+                if(address.IsActive)
+                {
+                    return CrudActionType.Add;
+                }
+                else
+                {
+                    return CrudActionType.None;
+                }
+            }
+            else
+            {
+                //record already exist.
+                //check if record is active. YES = compare it with existing record. NO = return Delete action type
+                if(address.IsActive)
+                {
+                    //record is active.
+                    //compare with existing record. Equal = return None action type, Not Equal = return Update action type
+                    if(address.Equals(existingAddress))
+                    {
+                        return CrudActionType.None;
+                    }
+                    else
+                    {
+                        return CrudActionType.Update;
+                    }
+                }
+                else
+                {
+                    return CrudActionType.Delete;
+                }
+            }
         }
     }
 }

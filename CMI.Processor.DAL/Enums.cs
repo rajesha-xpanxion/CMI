@@ -21,4 +21,30 @@ namespace CMI.Processor.DAL
         /// </summary>
         Outbound = 2
     }
+
+    /// <summary>
+    /// Crud Action Type
+    /// </summary>
+    public enum CrudActionType
+    {
+        /// <summary>
+        /// Crud Action Type None
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// Crud Action Type Add
+        /// </summary>
+        Add = 1,
+
+        /// <summary>
+        /// Crud Action Type Update
+        /// </summary>
+        Update = 2,
+
+        /// <summary>
+        /// Crud Action Type Delete
+        /// </summary>
+        Delete = 3
+    }
 }

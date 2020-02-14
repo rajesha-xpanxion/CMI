@@ -1,4 +1,5 @@
 ﻿using CMI.Nexus.Model;
+using System.Collections.Generic;
 
 namespace CMI.Nexus.Interface
 {
@@ -7,6 +8,8 @@ namespace CMI.Nexus.Interface
         bool AddNewNoteDetails(Note note);
 
         Note GetNoteDetails(string clientId, string noteId);
+
+        List<Note> GetAllNoteDetails(string clientId);
 
         bool UpdateNoteDetails(Note note);
 

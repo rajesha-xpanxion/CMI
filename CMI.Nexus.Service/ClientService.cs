@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace CMI.Nexus.Service
 {
@@ -28,6 +32,11 @@ namespace CMI.Nexus.Service
         #region Public Methods
         public bool AddNewClientDetails(Client client)
         {
+            if(nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -52,6 +61,17 @@ namespace CMI.Nexus.Service
 
         public Client GetClientDetails(string clientId)
         {
+            if(nexusConfig.IsDevMode)
+            {
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllClientProfileDetails);
+
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<Client>>(File.ReadAllText(testDataJsonFileName))
+                        .Where(cp => cp.IntegrationId.Equals(clientId, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault()
+                    : new Client();
+            }
+
             Client clientDetails = null;
 
             using (HttpClient apiHost = new HttpClient())
@@ -79,6 +99,11 @@ namespace CMI.Nexus.Service
 
         public bool UpdateClientDetails(Client client)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -104,6 +129,11 @@ namespace CMI.Nexus.Service
 
         public bool UpdateClientId(string oldClientId, string newClientId)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -129,6 +159,11 @@ namespace CMI.Nexus.Service
 
         public bool AddNewClientProfilePicture(ClientProfilePicture clientProfilePicture)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -188,6 +223,11 @@ namespace CMI.Nexus.Service
 
         public bool UpdateClientProfilePicture(ClientProfilePicture clientProfilePicture)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -213,6 +253,11 @@ namespace CMI.Nexus.Service
 
         public bool DeleteClientProfilePicture(string clientId)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -238,6 +283,11 @@ namespace CMI.Nexus.Service
 
         public bool UpdateClientCmsStatus(string clientId, string cmsStatus)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);

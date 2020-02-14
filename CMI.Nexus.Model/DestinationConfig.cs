@@ -5,6 +5,8 @@ namespace CMI.Nexus.Model
     {
         public bool IsDevMode { get; set; }
 
+        public string TestDataJsonRepoPath { get; set; }
+
         public string CaseIntegrationApiBaseUrl { get; set; }
 
         public string CaseIntegrationApiVersion { get; set; }

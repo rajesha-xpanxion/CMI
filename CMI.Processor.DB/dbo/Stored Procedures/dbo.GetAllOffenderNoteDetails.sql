@@ -23,6 +23,7 @@ Date			Author			Changes
 18-Nov-19		Rajesh Awate	Changes for implementation of incremental vs non-incremental mode execution
 20-Nov-19		Rajesh Awate	Changes for US114589
 28-Nov-19		Rajesh Awate	Changes for US112771
+10-Feb-20		Rajesh Awate	Changes for US118629
 ==========================================================================================*/
 CREATE PROCEDURE [dbo].[GetAllOffenderNoteDetails]
 	@AutomonDatabaseName NVARCHAR(128),
@@ -57,46 +58,6 @@ BEGIN
 				N.[FromTime] > @LastExecutionDateTime
 				OR @LastExecutionDateTime IS NULL
 
-		), ClientAddressChangeNotesData AS
-		(
-			SELECT DISTINCT
-				OFNDR.[Pin],
-				N.[Id],
-				N.[Value],
-				OFCR.[Email],
-				N.[FromTime]
-			FROM
-				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonAddress] OFNDRPA
-					ON OFNDR.[PersonId] = OFNDRPA.[PersonId]
-					JOIN [$AutomonDatabaseName].[dbo].[Address] OFNDRA
-						ON OFNDRPA.[AddressId] = OFNDRA.[Id]
-						JOIN [$AutomonDatabaseName].[dbo].[Note] N
-							ON OFNDRA.[NoteId] = N.[Id]
-							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
-									ON N.[EnteredByPId] = OFCR.[PersonId]
-			WHERE
-				N.[FromTime] > @LastExecutionDateTime
-				OR @LastExecutionDateTime IS NULL
-		), ClientPhoneNumberChangeNotesData AS
-		(
-			SELECT DISTINCT
-				OFNDR.[Pin],
-				N.[Id],
-				N.[Value],
-				OFCR.[Email],
-				N.[FromTime]
-			FROM
-				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] OFNDRPP
-					ON OFNDR.[PersonId] = OFNDRPP.[PersonId]
-					JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] OFNDRPN
-						ON OFNDRPP.[PhoneNumberId] = OFNDRPN.[Id]
-						JOIN [$AutomonDatabaseName].[dbo].[Note] N
-							ON OFNDRPN.[NoteId] = N.[Id]
-							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
-								ON N.[EnteredByPId] = OFCR.[PersonId]
-			WHERE
-				N.[FromTime] > @LastExecutionDateTime
-				OR @LastExecutionDateTime IS NULL
 		)
 		SELECT DISTINCT
 			[Pin],
@@ -107,26 +68,6 @@ BEGIN
 			''Client'' As [NoteType]
 		FROM
 			ClientNameChangeNotesData
-		UNION
-		SELECT DISTINCT
-			[Pin],
-			[Id],
-			[Value] AS [Text],
-			[Email] AS [AuthorEmail],
-			[FromTime] AS [Date],
-			''Address'' As [NoteType]
-		FROM
-			ClientAddressChangeNotesData
-		UNION
-		SELECT DISTINCT
-			[Pin],
-			[Id],
-			[Value] AS [Text],
-			[Email] AS [AuthorEmail],
-			[FromTime] AS [Date],
-			''Phone'' As [NoteType]
-		FROM
-			ClientPhoneNumberChangeNotesData
 		';
 	END
 	ELSE
@@ -266,68 +207,6 @@ BEGIN
 					WHERE
 						CPD.[Pin] = OFNDR.[Pin]
 				)
-		), ClientAddressChangeNotesData AS
-		(
-			SELECT DISTINCT
-				OFNDR.[Pin],
-				N.[Id],
-				N.[Value],
-				OFCR.[Email],
-				N.[FromTime]
-			FROM
-				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonAddress] OFNDRPA
-					ON OFNDR.[PersonId] = OFNDRPA.[PersonId]
-					JOIN [$AutomonDatabaseName].[dbo].[Address] OFNDRA
-						ON OFNDRPA.[AddressId] = OFNDRA.[Id]
-						JOIN [$AutomonDatabaseName].[dbo].[Note] N
-							ON OFNDRA.[NoteId] = N.[Id]
-							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
-									ON N.[EnteredByPId] = OFCR.[PersonId]
-			WHERE
-				(
-					N.[FromTime] > @LastExecutionDateTime
-					OR @LastExecutionDateTime IS NULL
-				)
-				AND EXISTS
-				(
-					SELECT
-						1
-					FROM
-						ClientProfilesData CPD
-					WHERE
-						CPD.[Pin] = OFNDR.[Pin]
-				)
-		), ClientPhoneNumberChangeNotesData AS
-		(
-			SELECT DISTINCT
-				OFNDR.[Pin],
-				N.[Id],
-				N.[Value],
-				OFCR.[Email],
-				N.[FromTime]
-			FROM
-				[$AutomonDatabaseName].[dbo].[Offender] OFNDR JOIN [$AutomonDatabaseName].[dbo].[PersonPhone] OFNDRPP
-					ON OFNDR.[PersonId] = OFNDRPP.[PersonId]
-					JOIN [$AutomonDatabaseName].[dbo].[PhoneNumber] OFNDRPN
-						ON OFNDRPP.[PhoneNumberId] = OFNDRPN.[Id]
-						JOIN [$AutomonDatabaseName].[dbo].[Note] N
-							ON OFNDRPN.[NoteId] = N.[Id]
-							JOIN [$AutomonDatabaseName].[dbo].[Officer] OFCR
-								ON N.[EnteredByPId] = OFCR.[PersonId]
-			WHERE
-				(
-					N.[FromTime] > @LastExecutionDateTime
-					OR @LastExecutionDateTime IS NULL
-				)
-				AND EXISTS
-				(
-					SELECT
-						1
-					FROM
-						ClientProfilesData CPD
-					WHERE
-						CPD.[Pin] = OFNDR.[Pin]
-				)
 		)
 		SELECT DISTINCT
 			[Pin],
@@ -338,26 +217,6 @@ BEGIN
 			''Client'' As [NoteType]
 		FROM
 			ClientNameChangeNotesData
-		UNION
-		SELECT DISTINCT
-			[Pin],
-			[Id],
-			[Value] AS [Text],
-			[Email] AS [AuthorEmail],
-			[FromTime] AS [Date],
-			''Address'' As [NoteType]
-		FROM
-			ClientAddressChangeNotesData
-		UNION
-		SELECT DISTINCT
-			[Pin],
-			[Id],
-			[Value] AS [Text],
-			[Email] AS [AuthorEmail],
-			[FromTime] AS [Date],
-			''Phone'' As [NoteType]
-		FROM
-			ClientPhoneNumberChangeNotesData
 		';
 	END
 

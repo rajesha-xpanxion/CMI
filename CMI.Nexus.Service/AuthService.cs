@@ -45,6 +45,11 @@ namespace CMI.Nexus.Service
         #region Private Helper Methods
         private bool IsAuthorized()
         {
+            if(nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             bool isAuthorized = false;
 
             if (_AuthToken != null && !string.IsNullOrEmpty(_AuthToken.access_token))

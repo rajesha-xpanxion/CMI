@@ -90,4 +90,25 @@ namespace CMI.Nexus.Service
     {
         public static string Unknown { get { return "Unknown"; } }
     }
+
+    public static class TestDataJsonFileName
+    {
+        public static string AllClientProfileDetails { get { return "AllClientProfileDetails.json"; } }
+        public static string AllClientAddressDetails { get { return "AllClientAddressDetails.json"; } }
+        public static string AllClientCaseDetails { get { return "AllClientCaseDetails.json"; } }
+        public static string AllClientContactDetails { get { return "AllClientContactDetails.json"; } }
+        public static string AllClientEmployerDetails { get { return "AllClientEmployerDetails.json"; } }
+        public static string AllClientNoteDetails { get { return "AllClientNoteDetails.json"; } }
+        public static string AllClientVehicleDetails { get { return "AllClientVehicleDetails.json"; } }
+        public static string AllAddressTypeLookupDetails { get { return "AllAddressTypeLookupDetails.json"; } }
+        public static string AllCaseLoadLookupDetails { get { return "AllCaseLoadLookupDetails.json"; } }
+        public static string AllClientTypeLookupDetails { get { return "AllClientTypeLookupDetails.json"; } }
+        public static string AllContactTypeLookupDetails { get { return "AllContactTypeLookupDetails.json"; } }
+        public static string AllEthnicityLookupDetails { get { return "AllEthnicityLookupDetails.json"; } }
+        public static string AllGenderLookupDetails { get { return "AllGenderLookupDetails.json"; } }
+        public static string AllOffenseCategoryLookupDetails { get { return "AllOffenseCategoryLookupDetails.json"; } }
+        public static string AllStaticRiskRatingLookupDetails { get { return "AllStaticRiskRatingLookupDetails.json"; } }
+        public static string AllSupervisingOfficerLookupDetails { get { return "AllSupervisingOfficerLookupDetails.json"; } }
+        public static string AllTimeZoneLookupDetails { get { return "AllTimeZoneLookupDetails.json"; } }
+    }
 }

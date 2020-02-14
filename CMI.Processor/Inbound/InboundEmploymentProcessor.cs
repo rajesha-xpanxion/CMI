@@ -4,6 +4,7 @@ using CMI.Common.Logging;
 using CMI.Common.Notification;
 using CMI.Nexus.Interface;
 using CMI.Nexus.Model;
+using CMI.Processor.DAL;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
@@ -38,19 +39,18 @@ namespace CMI.Processor
                 Message = "Employment processing initiated."
             });
 
-            //load required lookup data
-            LoadLookupData();
-
             IEnumerable<OffenderEmployment> allOffenderEmployments = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = ProcessorType.Inbound, TaskName = "Process Employments" };
+            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Employments" };
 
             try
             {
+                //retrieve data from Automon for processing
                 allOffenderEmployments = offenderEmploymentService.GetAllOffenderEmployments(ProcessorConfig.CmiDbConnString, lastExecutionDateTime, GetOfficerLogonToFilterDataTable(officerLogonsToFilter));
 
-                //log number of records received from Automon
+                //check if there are any records to process
                 if (allOffenderEmployments.Any())
                 {
+                    //check if there are any records to process
                     Logger.LogDebug(new LogRequest
                     {
                         OperationName = this.GetType().Name,
@@ -58,116 +58,128 @@ namespace CMI.Processor
                         Message = "Offender Employment records received from Automon.",
                         CustomParams = allOffenderEmployments.Count().ToString()
                     });
-                }
 
-                foreach (var offenderEmploymentDetails in allOffenderEmployments)
-                {
-                    taskExecutionStatus.AutomonReceivedRecordCount++;
+                    //retrieve distinct list of offender pin
+                    List<string> distinctOffenderPin = allOffenderEmployments.Select(p => p.Pin).Distinct().ToList();
 
-                    Employment employment = null;
-                    try
+                    //iterate through each of offender pin
+                    foreach (string currentOffenderPin in distinctOffenderPin)
                     {
-                        employment = new Employment()
+                        //check if client exist on Nexus side for current offender pin. This is to avoid validation errors from Nexus API in further calls.
+                        if (ClientService.GetClientDetails(currentOffenderPin) != null)
                         {
-                            ClientId = FormatId(offenderEmploymentDetails.Pin),
-                            EmployerId = string.Format("{0}-{1}", FormatId(offenderEmploymentDetails.Pin), offenderEmploymentDetails.Id),
-                            Employer = offenderEmploymentDetails.OrganizationName,
-                            Occupation = offenderEmploymentDetails.JobTitle,
-                            WorkAddress = offenderEmploymentDetails.OrganizationAddress,
-                            WorkPhone = offenderEmploymentDetails.OrganizationPhone,
-                            Wage = string.IsNullOrEmpty(offenderEmploymentDetails.PayRate) ? null : string.Concat(offenderEmploymentDetails.PayRate.Where(y => y.Equals('.') || Char.IsDigit(y))),
-                            WageUnit = MapWageUnit(offenderEmploymentDetails.PayFrequency),
-                            WorkEnvironment = offenderEmploymentDetails.WorkType,
-                            IsActive = offenderEmploymentDetails.IsActive
-                        };
+                            //get all employments for given offender pin
+                            var allExistingEmploymentDetails = employmentService.GetAllEmploymentDetails(currentOffenderPin);
 
-                        if (ClientService.GetClientDetails(employment.ClientId) != null)
-                        {
-                            if (employmentService.GetEmploymentDetails(employment.ClientId, employment.EmployerId) == null)
+                            //set ClientId value
+                            allExistingEmploymentDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+
+                            //iterate through each of offender employment details for current offender pin
+                            foreach (var offenderEmploymentDetails in allOffenderEmployments.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
                             {
-                                if (employment.IsActive && employmentService.AddNewEmploymentDetails(employment))
-                                {
-                                    taskExecutionStatus.NexusAddRecordCount++;
+                                taskExecutionStatus.AutomonReceivedRecordCount++;
 
-                                    Logger.LogDebug(new LogRequest
+                                Employment employment = null;
+                                try
+                                {
+                                    //transform offender employment details in Nexus compliant model
+                                    employment = new Employment()
+                                    {
+                                        ClientId = FormatId(offenderEmploymentDetails.Pin),
+                                        EmployerId = string.Format("{0}-{1}", FormatId(offenderEmploymentDetails.Pin), offenderEmploymentDetails.Id),
+                                        Employer = offenderEmploymentDetails.OrganizationName,
+                                        Occupation = offenderEmploymentDetails.JobTitle,
+                                        WorkAddress = offenderEmploymentDetails.OrganizationAddress,
+                                        WorkPhone = offenderEmploymentDetails.OrganizationPhone,
+                                        Wage = string.IsNullOrEmpty(offenderEmploymentDetails.PayRate) ? null : string.Concat(offenderEmploymentDetails.PayRate.Where(y => y.Equals('.') || Char.IsDigit(y))),
+                                        WageUnit = MapWageUnit(offenderEmploymentDetails.PayFrequency),
+                                        WorkEnvironment = offenderEmploymentDetails.WorkType,
+                                        IsActive = offenderEmploymentDetails.IsActive
+                                    };
+
+                                    //get crud action type based on comparison
+                                    switch (GetCrudActionType(employment, allExistingEmploymentDetails))
+                                    {
+                                        case CrudActionType.Add:
+                                            if (employmentService.AddNewEmploymentDetails(employment))
+                                            {
+                                                taskExecutionStatus.NexusAddRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "New Client Employment details added successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
+                                                    NexusData = JsonConvert.SerializeObject(employment)
+                                                });
+                                            }
+                                            break;
+                                        case CrudActionType.Update:
+                                            if (employmentService.UpdateEmploymentDetails(employment))
+                                            {
+                                                taskExecutionStatus.NexusUpdateRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Existing Client Employment details updated successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
+                                                    NexusData = JsonConvert.SerializeObject(employment)
+                                                });
+                                            }
+                                            break;
+                                        case CrudActionType.Delete:
+                                            if (employmentService.DeleteEmploymentDetails(employment.ClientId, employment.EmployerId))
+                                            {
+                                                taskExecutionStatus.NexusDeleteRecordCount++;
+
+                                                Logger.LogDebug(new LogRequest
+                                                {
+                                                    OperationName = this.GetType().Name,
+                                                    MethodName = "Execute",
+                                                    Message = "Existing Client Employment details deleted successfully.",
+                                                    AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
+                                                    NexusData = JsonConvert.SerializeObject(employment)
+                                                });
+                                            }
+                                            break;
+                                        default:
+                                            taskExecutionStatus.AutomonReceivedRecordCount--;
+                                            break;
+                                    }
+                                }
+                                catch (CmiException ce)
+                                {
+                                    taskExecutionStatus.NexusFailureRecordCount++;
+
+                                    Logger.LogWarning(new LogRequest
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "New Client Employment details added successfully.",
+                                        Message = "Error occurred in API while processing a Client Employment.",
+                                        Exception = ce,
                                         AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
                                         NexusData = JsonConvert.SerializeObject(employment)
                                     });
                                 }
-                                else
+                                catch (Exception ex)
                                 {
-                                    taskExecutionStatus.AutomonReceivedRecordCount--;
-                                }
-                            }
-                            else if (!employment.IsActive)
-                            {
-                                if (employmentService.DeleteEmploymentDetails(employment.ClientId, employment.EmployerId))
-                                {
-                                    taskExecutionStatus.NexusDeleteRecordCount++;
+                                    taskExecutionStatus.NexusFailureRecordCount++;
 
-                                    Logger.LogDebug(new LogRequest
+                                    Logger.LogError(new LogRequest
                                     {
                                         OperationName = this.GetType().Name,
                                         MethodName = "Execute",
-                                        Message = "Existing Client Employment details deleted successfully.",
-                                        AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
-                                        NexusData = JsonConvert.SerializeObject(employment)
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                if (employmentService.UpdateEmploymentDetails(employment))
-                                {
-                                    taskExecutionStatus.NexusUpdateRecordCount++;
-
-                                    Logger.LogDebug(new LogRequest
-                                    {
-                                        OperationName = this.GetType().Name,
-                                        MethodName = "Execute",
-                                        Message = "Existing Client Employment details updated successfully.",
+                                        Message = "Error occurred while processing a Client Employment.",
+                                        Exception = ex,
                                         AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
                                         NexusData = JsonConvert.SerializeObject(employment)
                                     });
                                 }
                             }
                         }
-                        else
-                        {
-                            taskExecutionStatus.AutomonReceivedRecordCount--;
-                        }
-                    }
-                    catch (CmiException ce)
-                    {
-                        taskExecutionStatus.NexusFailureRecordCount++;
-
-                        Logger.LogWarning(new LogRequest
-                        {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "Error occurred in API while processing a Client Employment.",
-                            Exception = ce,
-                            AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
-                            NexusData = JsonConvert.SerializeObject(employment)
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        taskExecutionStatus.NexusFailureRecordCount++;
-
-                        Logger.LogError(new LogRequest
-                        {
-                            OperationName = this.GetType().Name,
-                            MethodName = "Execute",
-                            Message = "Error occurred while processing a Client Employment.",
-                            Exception = ex,
-                            AutomonData = JsonConvert.SerializeObject(offenderEmploymentDetails),
-                            NexusData = JsonConvert.SerializeObject(employment)
-                        });
                     }
                 }
 
@@ -200,6 +212,7 @@ namespace CMI.Processor
 
         protected override void LoadLookupData()
         {
+            throw new NotImplementedException();
         }
 
         private string MapWageUnit(string automonPayFrequency)
@@ -223,6 +236,54 @@ namespace CMI.Processor
             }
 
             return nexusWageUnit;
+        }
+
+        private CrudActionType GetCrudActionType(Employment employment, IEnumerable<Employment> employments)
+        {
+            //try to get existing record using ClientId & EmployerId
+            Employment existingEmployment = employments.Where(a
+                =>
+                    a.ClientId.Equals(employment.ClientId, StringComparison.InvariantCultureIgnoreCase)
+                    && a.EmployerId.Equals(employment.EmployerId, StringComparison.InvariantCultureIgnoreCase)
+            )
+            .FirstOrDefault();
+
+            //check if record already exists
+            if (existingEmployment == null)
+            {
+                //record does not exist.
+                //check if record is active. YES = return Add action type, NO = return None action type
+                if (employment.IsActive)
+                {
+                    return CrudActionType.Add;
+                }
+                else
+                {
+                    return CrudActionType.None;
+                }
+            }
+            else
+            {
+                //record already exist.
+                //check if record is active. YES = compare it with existing record. NO = return Delete action type
+                if (employment.IsActive)
+                {
+                    //record is active.
+                    //compare with existing record. Equal = return None action type, Not Equal = return Update action type
+                    if (employment.Equals(existingEmployment))
+                    {
+                        return CrudActionType.None;
+                    }
+                    else
+                    {
+                        return CrudActionType.Update;
+                    }
+                }
+                else
+                {
+                    return CrudActionType.Delete;
+                }
+            }
         }
     }
 }

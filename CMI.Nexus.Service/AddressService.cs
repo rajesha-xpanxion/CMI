@@ -5,6 +5,9 @@ using System.Net.Http.Headers;
 using Microsoft.Extensions.Options;
 using CMI.Nexus.Interface;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace CMI.Nexus.Service
 {
@@ -29,6 +32,11 @@ namespace CMI.Nexus.Service
         #region Public Methods
         public bool AddNewAddressDetails(Address address)
         {
+            if(nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -53,6 +61,11 @@ namespace CMI.Nexus.Service
 
         public Address GetAddressDetails(string clientId, string addressId)
         {
+            if(nexusConfig.IsDevMode)
+            {
+                return GetAllAddressDetails(clientId).Where(a => a.AddressId.Equals(addressId, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+            }
+
             Address addressDetails = null;
 
             using (HttpClient apiHost = new HttpClient())
@@ -80,33 +93,50 @@ namespace CMI.Nexus.Service
 
         public List<Address> GetAllAddressDetails(string clientId)
         {
-            List<Address> allAddressDetails = null;
-
-            using (HttpClient apiHost = new HttpClient())
+            if (nexusConfig.IsDevMode)
             {
-                apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+                //test data
+                string testDataJsonFileName = Path.Combine(nexusConfig.TestDataJsonRepoPath, TestDataJsonFileName.AllClientAddressDetails);
 
-                apiHost.DefaultRequestHeaders.Accept.Clear();
-                apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
-                apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
-
-                var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/addresses", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
-
-                if (apiResponse.IsSuccessStatusCode)
-                {
-                    allAddressDetails = apiResponse.Content.ReadAsAsync<List<Address>>().Result;
-                }
-                else
-                {
-                    allAddressDetails = null;
-                }
+                return File.Exists(testDataJsonFileName)
+                    ? JsonConvert.DeserializeObject<List<Address>>(File.ReadAllText(testDataJsonFileName)).Where(a => a.ClientId.Equals(clientId, StringComparison.InvariantCultureIgnoreCase)).ToList()
+                    : new List<Address>();
             }
+            else
+            {
+                List<Address> allAddressDetails = null;
 
-            return allAddressDetails;
+                using (HttpClient apiHost = new HttpClient())
+                {
+                    apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
+
+                    apiHost.DefaultRequestHeaders.Accept.Clear();
+                    apiHost.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Constants.ContentTypeFormatJson));
+                    apiHost.DefaultRequestHeaders.Add(Constants.HeaderTypeAuthorization, string.Format("{0} {1}", authService.AuthToken.token_type, authService.AuthToken.access_token));
+
+                    var apiResponse = apiHost.GetAsync(string.Format("api/{0}/clients/{1}/addresses", nexusConfig.CaseIntegrationApiVersion, clientId)).Result;
+
+                    if (apiResponse.IsSuccessStatusCode)
+                    {
+                        allAddressDetails = apiResponse.Content.ReadAsAsync<List<Address>>().Result;
+                    }
+                    else
+                    {
+                        allAddressDetails = null;
+                    }
+                }
+
+                return allAddressDetails;
+            }
         }
 
         public bool UpdateAddressDetails(Address address)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
@@ -132,6 +162,11 @@ namespace CMI.Nexus.Service
 
         public bool DeleteAddressDetails(string clientId, string addressId)
         {
+            if (nexusConfig.IsDevMode)
+            {
+                return true;
+            }
+
             using (HttpClient apiHost = new HttpClient())
             {
                 apiHost.BaseAddress = new Uri(nexusConfig.CaseIntegrationApiBaseUrl);
