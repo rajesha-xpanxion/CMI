@@ -255,149 +255,157 @@ namespace CMI.Processor
                             //set original value of NeedsClassification retrieved from Nexus to field in passing model so that it will not get overridden
                             client.NeedsClassification = existingClientDetails.NeedsClassification;
 
-                            if (ClientService.UpdateClientDetails(client))
+                            //check for equality
+                            if (!existingClientDetails.Equals(client))
                             {
-                                taskExecutionStatus.NexusUpdateRecordCount++;
-
-                                Logger.LogDebug(new LogRequest
+                                if (ClientService.UpdateClientDetails(client))
                                 {
-                                    OperationName = this.GetType().Name,
-                                    MethodName = "Execute",
-                                    Message = "Existing Client Profile updated successfully.",
-                                    AutomonData = JsonConvert.SerializeObject(offenderDetails),
-                                    NexusData = JsonConvert.SerializeObject(client)
-                                });
+                                    taskExecutionStatus.NexusUpdateRecordCount++;
 
-                                //check if any profile picture exists in Nexus
-                                if (ClientService.GetClientProfilePicture(client.IntegrationId) == null)
+                                    Logger.LogDebug(new LogRequest
+                                    {
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
+                                        Message = "Existing Client Profile updated successfully.",
+                                        AutomonData = JsonConvert.SerializeObject(offenderDetails),
+                                        NexusData = JsonConvert.SerializeObject(client)
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                taskExecutionStatus.AutomonReceivedRecordCount--;
+                            }
+
+                            //check if any profile picture exists in Nexus
+                            if (ClientService.GetClientProfilePicture(client.IntegrationId) == null)
+                            {
+                                //profile picture does not exist in Nexus. Try to get it from Automon and set in Nexus.
+
+                                //get offender mugshot photo details
+                                OffenderMugshot offenderMugshot = offenderProfilePictureService.GetOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderDetails.Pin);
+
+                                if (offenderMugshot != null)
                                 {
-                                    //profile picture does not exist in Nexus. Try to get it from Automon and set in Nexus.
-
-                                    //get offender mugshot photo details
-                                    OffenderMugshot offenderMugshot = offenderProfilePictureService.GetOffenderMugshotPhoto(ProcessorConfig.CmiDbConnString, offenderDetails.Pin);
-
-                                    if (offenderMugshot != null)
+                                    Logger.LogDebug(new LogRequest
                                     {
-                                        Logger.LogDebug(new LogRequest
-                                        {
-                                            OperationName = this.GetType().Name,
-                                            MethodName = "Execute",
-                                            Message = "Offender MugShot-Photo found in Automon.",
-                                            AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId })
-                                        });
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
+                                        Message = "Offender MugShot-Photo found in Automon.",
+                                        AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId })
+                                    });
 
-                                        //check if to save mugshot photo json to file
-                                        if (ProcessorConfig.InboundProcessorConfig.IsSaveMugshotPhotoJsonToFile)
-                                        {
-                                            //save object to json file for test purpose
-                                            offenderProfilePictureService.SaveOffenderMugshotPhotoToJsonFile(offenderMugshot);
-                                        }
-                                    }
-
-                                    //check if there is any mugshot photo set for given offender
-                                    if (offenderMugshot != null && offenderMugshot.DocumentData != null)
+                                    //check if to save mugshot photo json to file
+                                    if (ProcessorConfig.InboundProcessorConfig.IsSaveMugshotPhotoJsonToFile)
                                     {
-                                        //check if to convert image format enable
-                                        if (ProcessorConfig.InboundProcessorConfig.IsEnableImageFormatConversion)
-                                        {
-                                            //check if image format is not Jpeg, YES = convert it into Jpeg format, No = continue
-                                            if (!imager.IsJpegFormat(offenderMugshot.DocumentData))
-                                            {
-                                                Logger.LogDebug(new LogRequest
-                                                {
-                                                    OperationName = this.GetType().Name,
-                                                    MethodName = "Execute",
-                                                    Message = "Offender MugShot-Photo is not of Jpeg format. Attempting to convert into Jpeg format."
-                                                });
-
-                                                //attempt to convert into Jpeg format
-                                                offenderMugshot.DocumentData = imager.ConvertToJpegFormat(offenderMugshot.DocumentData);
-
-                                                Logger.LogDebug(new LogRequest
-                                                {
-                                                    OperationName = this.GetType().Name,
-                                                    MethodName = "Execute",
-                                                    Message = "Offender MugShot-Photo successfully converted into Jpeg format."
-                                                });
-                                            }
-                                        }
-
-                                        //check if magshot size is exceeding threshold limit, YES = Resize it to small size
-                                        double offenderMugshotPhotoSizeInMegaBytes = imager.ConvertBytesToMegaBytes(offenderMugshot.DocumentData.LongLength);
-                                        if (offenderMugshotPhotoSizeInMegaBytes > ProcessorConfig.InboundProcessorConfig.InputImageSizeThresholdInMegaBytes)
-                                        {
-                                            Logger.LogDebug(new LogRequest
-                                            {
-                                                OperationName = this.GetType().Name,
-                                                MethodName = "Execute",
-                                                Message = string.Format(
-                                                    "Offender MugShot-Photo having size of {0} MB is exceeding threshold size of {1} MB. Attempting to resize it.",
-                                                    Math.Round(offenderMugshotPhotoSizeInMegaBytes, 2),
-                                                    ProcessorConfig.InboundProcessorConfig.InputImageSizeThresholdInMegaBytes
-                                                )
-                                            });
-
-                                            //try to resize image
-                                            offenderMugshot.DocumentData = imager.ResizeImage(offenderMugshot.DocumentData, ProcessorConfig.InboundProcessorConfig.OutputImageMaxSize);
-
-                                            Logger.LogDebug(new LogRequest
-                                            {
-                                                OperationName = this.GetType().Name,
-                                                MethodName = "Execute",
-                                                Message = string.Format(
-                                                    "Offender MugShot-Photo resized to size of {0} MB.",
-                                                    Math.Round(imager.ConvertBytesToMegaBytes(offenderMugshot.DocumentData.LongLength), 2)
-                                                )
-                                            });
-                                        }
-
-                                        //transform offender mugshot photo into Nexus compliant model
-                                        ClientProfilePicture clientProfilePicture = new ClientProfilePicture
-                                        {
-                                            IntegrationId = FormatId(offenderMugshot.Pin),
-                                            ImageBase64String = Convert.ToBase64String(offenderMugshot.DocumentData)
-                                        };
-
-                                        if (clientProfilePicture != null)
-                                        {
-                                            Logger.LogDebug(new LogRequest
-                                            {
-                                                OperationName = this.GetType().Name,
-                                                MethodName = "Execute",
-                                                Message = "Offender MugShot-Photo object transformed successfully.",
-                                                AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId }),
-                                                NexusData = JsonConvert.SerializeObject(new ClientProfilePicture { IntegrationId = clientProfilePicture.IntegrationId })
-                                            });
-                                        }
-
-                                        if (ClientService.AddNewClientProfilePicture(clientProfilePicture))
-                                        {
-                                            Logger.LogDebug(new LogRequest
-                                            {
-                                                OperationName = this.GetType().Name,
-                                                MethodName = "Execute",
-                                                Message = "New Client Profile Picture added successfully.",
-                                                AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId }),
-                                                NexusData = JsonConvert.SerializeObject(new ClientProfilePicture { IntegrationId = clientProfilePicture.IntegrationId })
-                                            });
-                                        }
+                                        //save object to json file for test purpose
+                                        offenderProfilePictureService.SaveOffenderMugshotPhotoToJsonFile(offenderMugshot);
                                     }
                                 }
 
-                                //update CMS Status
-                                if (!string.IsNullOrEmpty(client.CmsStatus))
+                                //check if there is any mugshot photo set for given offender
+                                if (offenderMugshot != null && offenderMugshot.DocumentData != null)
                                 {
-                                    if (ClientService.UpdateClientCmsStatus(client.IntegrationId, client.CmsStatus))
+                                    //check if to convert image format enable
+                                    if (ProcessorConfig.InboundProcessorConfig.IsEnableImageFormatConversion)
+                                    {
+                                        //check if image format is not Jpeg, YES = convert it into Jpeg format, No = continue
+                                        if (!imager.IsJpegFormat(offenderMugshot.DocumentData))
+                                        {
+                                            Logger.LogDebug(new LogRequest
+                                            {
+                                                OperationName = this.GetType().Name,
+                                                MethodName = "Execute",
+                                                Message = "Offender MugShot-Photo is not of Jpeg format. Attempting to convert into Jpeg format."
+                                            });
+
+                                            //attempt to convert into Jpeg format
+                                            offenderMugshot.DocumentData = imager.ConvertToJpegFormat(offenderMugshot.DocumentData);
+
+                                            Logger.LogDebug(new LogRequest
+                                            {
+                                                OperationName = this.GetType().Name,
+                                                MethodName = "Execute",
+                                                Message = "Offender MugShot-Photo successfully converted into Jpeg format."
+                                            });
+                                        }
+                                    }
+
+                                    //check if magshot size is exceeding threshold limit, YES = Resize it to small size
+                                    double offenderMugshotPhotoSizeInMegaBytes = imager.ConvertBytesToMegaBytes(offenderMugshot.DocumentData.LongLength);
+                                    if (offenderMugshotPhotoSizeInMegaBytes > ProcessorConfig.InboundProcessorConfig.InputImageSizeThresholdInMegaBytes)
                                     {
                                         Logger.LogDebug(new LogRequest
                                         {
                                             OperationName = this.GetType().Name,
                                             MethodName = "Execute",
-                                            Message = "Client Cms Status updated successfully.",
-                                            AutomonData = JsonConvert.SerializeObject(new { offenderDetails.SupervisionStatus, offenderDetails.BodyStatus }),
-                                            NexusData = JsonConvert.SerializeObject(client.CmsStatus)
+                                            Message = string.Format(
+                                                "Offender MugShot-Photo having size of {0} MB is exceeding threshold size of {1} MB. Attempting to resize it.",
+                                                Math.Round(offenderMugshotPhotoSizeInMegaBytes, 2),
+                                                ProcessorConfig.InboundProcessorConfig.InputImageSizeThresholdInMegaBytes
+                                            )
+                                        });
+
+                                        //try to resize image
+                                        offenderMugshot.DocumentData = imager.ResizeImage(offenderMugshot.DocumentData, ProcessorConfig.InboundProcessorConfig.OutputImageMaxSize);
+
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = string.Format(
+                                                "Offender MugShot-Photo resized to size of {0} MB.",
+                                                Math.Round(imager.ConvertBytesToMegaBytes(offenderMugshot.DocumentData.LongLength), 2)
+                                            )
                                         });
                                     }
+
+                                    //transform offender mugshot photo into Nexus compliant model
+                                    ClientProfilePicture clientProfilePicture = new ClientProfilePicture
+                                    {
+                                        IntegrationId = FormatId(offenderMugshot.Pin),
+                                        ImageBase64String = Convert.ToBase64String(offenderMugshot.DocumentData)
+                                    };
+
+                                    if (clientProfilePicture != null)
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "Offender MugShot-Photo object transformed successfully.",
+                                            AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId }),
+                                            NexusData = JsonConvert.SerializeObject(new ClientProfilePicture { IntegrationId = clientProfilePicture.IntegrationId })
+                                        });
+                                    }
+
+                                    if (ClientService.AddNewClientProfilePicture(clientProfilePicture))
+                                    {
+                                        Logger.LogDebug(new LogRequest
+                                        {
+                                            OperationName = this.GetType().Name,
+                                            MethodName = "Execute",
+                                            Message = "New Client Profile Picture added successfully.",
+                                            AutomonData = JsonConvert.SerializeObject(new OffenderMugshot { Pin = offenderMugshot.Pin, DocumentId = offenderMugshot.DocumentId }),
+                                            NexusData = JsonConvert.SerializeObject(new ClientProfilePicture { IntegrationId = clientProfilePicture.IntegrationId })
+                                        });
+                                    }
+                                }
+                            }
+
+                            //update CMS Status
+                            if (!string.IsNullOrEmpty(client.CmsStatus))
+                            {
+                                if (ClientService.UpdateClientCmsStatus(client.IntegrationId, client.CmsStatus))
+                                {
+                                    Logger.LogDebug(new LogRequest
+                                    {
+                                        OperationName = this.GetType().Name,
+                                        MethodName = "Execute",
+                                        Message = "Client Cms Status updated successfully.",
+                                        AutomonData = JsonConvert.SerializeObject(new { offenderDetails.SupervisionStatus, offenderDetails.BodyStatus }),
+                                        NexusData = JsonConvert.SerializeObject(client.CmsStatus)
+                                    });
                                 }
                             }
                         }
