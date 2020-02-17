@@ -30,7 +30,7 @@ namespace CMI.Processor
             this.addressService = addressService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -43,7 +43,7 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<OffenderAddress> allOffenderAddresses = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Addresses" };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Addresses" };
 
             try
             {
@@ -74,8 +74,11 @@ namespace CMI.Processor
                             //get all addresses for given offender pin
                             var allExistingAddressDetails = addressService.GetAllAddressDetails(currentOffenderPin);
 
-                            //set ClientId value
-                            allExistingAddressDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            if (allExistingAddressDetails != null && allExistingAddressDetails.Any())
+                            {
+                                //set ClientId value
+                                allExistingAddressDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            }
 
                             //iterate through each of offender address details for current offender pin
                             foreach (var offenderAddressDetails in allOffenderAddresses.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
@@ -302,7 +305,7 @@ namespace CMI.Processor
                 return null;
             }
 
-            string formattedComment = automonComment.Replace(Environment.NewLine, " ").Replace("\"", @"""");
+            string formattedComment = automonComment.Replace(Environment.NewLine, " ").Replace("\"", @"""").Replace("+", string.Empty);
 
             if(formattedComment.Length > 200)
             {
@@ -323,6 +326,12 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Address address, IEnumerable<Address> addresses)
         {
+            //check if list is null, YES = return Add Action type
+            if(addresses == null)
+            {
+                return CrudActionType.Add;
+            }
+
             //try to get existing record using ClientId & AddressId
             Address existingAddress = addresses.Where(a 
                 => 

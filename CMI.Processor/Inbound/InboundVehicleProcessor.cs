@@ -40,7 +40,7 @@ namespace CMI.Processor
             });
 
             IEnumerable<OffenderVehicle> allOffenderVehicles = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Vehicles" };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Vehicles" };
 
             try
             {
@@ -71,8 +71,11 @@ namespace CMI.Processor
                             //get all vehicles for given offender pin
                             var allExistingVehicleDetails = vehicleService.GetAllVehicleDetails(currentOffenderPin);
 
-                            //set ClientId value
-                            allExistingVehicleDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            if (allExistingVehicleDetails != null && allExistingVehicleDetails.Any())
+                            {
+                                //set ClientId value
+                                allExistingVehicleDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            }
 
                             //iterate through each of offender vehicle details for current offender pin
                             foreach (var offenderVehicleDetails in allOffenderVehicles.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
@@ -262,6 +265,12 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Vehicle vehicle, IEnumerable<Vehicle> vehicles)
         {
+            //check if list is null, YES = return Add Action type
+            if (vehicles == null)
+            {
+                return CrudActionType.Add;
+            }
+
             //try to get existing record using ClientId & VehicleId
             Vehicle existingVehicle = vehicles.Where(a
                 =>

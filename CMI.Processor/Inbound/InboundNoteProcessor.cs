@@ -71,8 +71,11 @@ namespace CMI.Processor
                             //get all notes for given offender pin
                             var allExistingNoteDetails = noteService.GetAllNoteDetails(currentOffenderPin);
 
-                            //set ClientId value
-                            allExistingNoteDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            if (allExistingNoteDetails != null && allExistingNoteDetails.Any())
+                            {
+                                //set ClientId value
+                                allExistingNoteDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            }
 
                             //iterate through each of offender note details for current offender pin
                             foreach (var offenderNoteDetails in allOffenderNoteDetails.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
@@ -198,6 +201,12 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Note note, IEnumerable<Note> notes)
         {
+            //check if list is null, YES = return Add Action type
+            if (notes == null)
+            {
+                return CrudActionType.Add;
+            }
+
             //try to get existing record using ClientId & NoteId
             Note existingNote = notes.Where(a
                 =>

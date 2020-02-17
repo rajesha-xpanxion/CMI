@@ -30,7 +30,7 @@ namespace CMI.Processor
             this.contactService = contactService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -43,7 +43,7 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<OffenderEmail> allOffenderEmails = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Email Contacts" };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Email Contacts" };
 
             try
             {
@@ -72,10 +72,14 @@ namespace CMI.Processor
                         if (ClientService.GetClientDetails(currentOffenderPin) != null)
                         {
                             //get all contacts for given offender pin
-                            var allExistingContactDetails = contactService.GetAllContactDetails(currentOffenderPin).Where(e => e.ContactType.Equals(DAL.Constants.ContactTypeEmailNexus, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                            var allExistingContactDetails = contactService.GetAllContactDetails(currentOffenderPin);
 
-                            //set ClientId value
-                            allExistingContactDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            if (allExistingContactDetails != null && allExistingContactDetails.Any())
+                            {
+                                allExistingContactDetails = allExistingContactDetails.Where(e => e.ContactType.Equals(DAL.Constants.ContactTypeEmailNexus, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                                //set ClientId value
+                                allExistingContactDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            }
 
                             //iterate through each of offender email details for current offender pin
                             foreach (var offenderEmailDetails in allOffenderEmails.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
@@ -239,6 +243,12 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Contact contact, IEnumerable<Contact> contacts)
         {
+            //check if list is null, YES = return Add Action type
+            if (contacts == null)
+            {
+                return CrudActionType.Add;
+            }
+
             //try to get existing record using ClientId & ContactId
             Contact existingContact = contacts.Where(a
                 =>

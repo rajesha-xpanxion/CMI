@@ -31,7 +31,7 @@ namespace CMI.Processor
             this.caseService = caseService;
         }
 
-        public override Common.Notification.TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
+        public override TaskExecutionStatus Execute(DateTime? lastExecutionDateTime, IEnumerable<string> officerLogonsToFilter)
         {
             Logger.LogInfo(new LogRequest
             {
@@ -44,7 +44,7 @@ namespace CMI.Processor
             LoadLookupData();
 
             IEnumerable<OffenderCase> allOffenderCaseDetails = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Cases" };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Cases" };
             DateTime currentTimestamp = DateTime.Now;
 
             try
@@ -76,8 +76,11 @@ namespace CMI.Processor
                             //get all notes for given offender pin
                             var allExistingCaseDetails = caseService.GetAllCaseDetails(currentOffenderPin);
 
-                            //set ClientId value
-                            allExistingCaseDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            if (allExistingCaseDetails != null && allExistingCaseDetails.Any())
+                            {
+                                //set ClientId value
+                                allExistingCaseDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            }
 
                             //iterate through each of offender case details for current offender pin
                             foreach (var offenderCaseDetails in allOffenderCaseDetails.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)).GroupBy(x => new { x.Pin, x.CaseNumber }).Select(y => y.First()))
@@ -247,6 +250,12 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Case @case, IEnumerable<Case> cases)
         {
+            //check if list is null, YES = return Add Action type
+            if (cases == null)
+            {
+                return CrudActionType.Add;
+            }
+
             //try to get existing record using ClientId & CaseNumber
             Case existingCase = cases.Where(a
                 =>

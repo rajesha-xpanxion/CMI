@@ -40,7 +40,7 @@ namespace CMI.Processor
             });
 
             IEnumerable<OffenderEmployment> allOffenderEmployments = null;
-            Common.Notification.TaskExecutionStatus taskExecutionStatus = new Common.Notification.TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Employments" };
+            TaskExecutionStatus taskExecutionStatus = new TaskExecutionStatus { ProcessorType = Common.Notification.ProcessorType.Inbound, TaskName = "Process Employments" };
 
             try
             {
@@ -71,8 +71,11 @@ namespace CMI.Processor
                             //get all employments for given offender pin
                             var allExistingEmploymentDetails = employmentService.GetAllEmploymentDetails(currentOffenderPin);
 
-                            //set ClientId value
-                            allExistingEmploymentDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            if (allExistingEmploymentDetails != null && allExistingEmploymentDetails.Any())
+                            {
+                                //set ClientId value
+                                allExistingEmploymentDetails.ForEach(ea => ea.ClientId = currentOffenderPin);
+                            }
 
                             //iterate through each of offender employment details for current offender pin
                             foreach (var offenderEmploymentDetails in allOffenderEmployments.Where(a => a.Pin.Equals(currentOffenderPin, StringComparison.InvariantCultureIgnoreCase)))
@@ -240,6 +243,12 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Employment employment, IEnumerable<Employment> employments)
         {
+            //check if list is null, YES = return Add Action type
+            if (employments == null)
+            {
+                return CrudActionType.Add;
+            }
+
             //try to get existing record using ClientId & EmployerId
             Employment existingEmployment = employments.Where(a
                 =>
