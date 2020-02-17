@@ -305,7 +305,7 @@ namespace CMI.Processor
                 return null;
             }
 
-            string formattedComment = automonComment.Replace(Environment.NewLine, " ").Replace("\"", @"""").Replace("+", string.Empty);
+            string formattedComment = automonComment.Replace(Environment.NewLine, " ").Replace("\"", @"""").Replace("+", string.Empty).Trim();
 
             if(formattedComment.Length > 200)
             {
