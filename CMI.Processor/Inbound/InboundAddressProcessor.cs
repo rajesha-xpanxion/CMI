@@ -326,10 +326,10 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Address address, IEnumerable<Address> addresses)
         {
-            //check if list is null, YES = return Add Action type
+            //check if list is null
             if(addresses == null)
             {
-                return CrudActionType.Add;
+                return address.IsActive ? CrudActionType.Add : CrudActionType.None;
             }
 
             //try to get existing record using ClientId & AddressId

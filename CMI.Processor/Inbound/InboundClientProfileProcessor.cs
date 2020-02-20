@@ -80,7 +80,7 @@ namespace CMI.Processor
                             TimeZone = offenderDetails.TimeZone,
                             Gender = offenderDetails.Gender,
                             Ethnicity = MapEthnicity(offenderDetails.RaceDescription, offenderDetails.RacePermDesc),
-                            DateOfBirth = offenderDetails.DateOfBirth.ToShortDateString(),
+                            DateOfBirth = offenderDetails.DateOfBirth.ToString("yyyy-MM-dd"),
 
                             CaseloadId = MapCaseload(offenderDetails.CaseloadName),
                             SupervisingOfficerEmailId = MapSupervisingOfficer(offenderDetails.OfficerFirstName, offenderDetails.OfficerLastName, offenderDetails.OfficerEmail),

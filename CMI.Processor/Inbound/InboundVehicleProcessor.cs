@@ -265,10 +265,10 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Vehicle vehicle, IEnumerable<Vehicle> vehicles)
         {
-            //check if list is null, YES = return Add Action type
+            //check if list is null
             if (vehicles == null)
             {
-                return CrudActionType.Add;
+                return vehicle.IsActive ? CrudActionType.Add : CrudActionType.None;
             }
 
             //try to get existing record using ClientId & VehicleId

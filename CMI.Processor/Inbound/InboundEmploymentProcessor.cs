@@ -243,10 +243,10 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Employment employment, IEnumerable<Employment> employments)
         {
-            //check if list is null, YES = return Add Action type
+            //check if list is null
             if (employments == null)
             {
-                return CrudActionType.Add;
+                return employment.IsActive ? CrudActionType.Add : CrudActionType.None;
             }
 
             //try to get existing record using ClientId & EmployerId

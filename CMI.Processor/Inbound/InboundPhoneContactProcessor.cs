@@ -298,10 +298,10 @@ namespace CMI.Processor
 
         private CrudActionType GetCrudActionType(Contact contact, IEnumerable<Contact> contacts)
         {
-            //check if list is null, YES = return Add Action type
+            //check if list is null
             if (contacts == null)
             {
-                return CrudActionType.Add;
+                return contact.IsActive ? CrudActionType.Add : CrudActionType.None;
             }
 
             //try to get existing record using ClientId & ContactId
