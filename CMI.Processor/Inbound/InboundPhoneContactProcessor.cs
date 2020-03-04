@@ -64,7 +64,7 @@ namespace CMI.Processor
                     });
 
                     //retrieve distinct list of offender pin
-                    List<string> distinctOffenderPin = allOffenderPhones.Select(p => p.Pin).Distinct().ToList();
+                    List<string> distinctOffenderPin = allOffenderPhones.Select(p => FormatId(p.Pin)).Distinct().ToList();
 
                     //iterate through each of offender pin
                     foreach (string currentOffenderPin in distinctOffenderPin)
